@@ -1,0 +1,30 @@
+{{
+  "multiPass": "{password}",
+  "port": "80",
+  "host": "0.0.0.0",
+  "defaultNodeIndex": 1,
+  "SSO": {{
+    "rtlSSO": 0,
+    "rtlCookiePath": "",
+    "logoutRedirectLink": ""
+  }},
+  "nodes": [
+    {{
+      "index": 1,
+      "lnNode": "Embassy LND",
+      "lnImplementation": "LND",
+      "Authentication": {{
+        "macaroonPath": "{macaroon_path}"
+      }},
+      "Settings": {{
+        "userPersona": "{user_persona}",
+        "themeMode": "{theme_mode}",
+        "themeColor": "{theme_color}",
+        "channelBackupPath": "/root/backup/node-1",
+        "enableLogging": true,
+        "fiatConversion": false,
+        "lnServerUrl": "https://{lnd_host}:{lnd_rest_port}"
+      }}
+    }}
+  ]
+}}

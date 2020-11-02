@@ -1,0 +1,25 @@
+compat: v0
+id: ride-the-lightning
+version: 0.9.3
+title: Ride the Lightning
+description:
+  short: "Foo"
+  long: "Bar baz qux."
+release-notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.9.3
+ports:
+  - internal: 80
+    tor: 80
+image:
+  type: tar
+mount: /root
+has-instructions: true
+os-version-required: ">=0.2.5"
+os-version-recommended: ">=0.2.5"
+assets: []
+hidden-service-version: v3
+dependencies:
+  lnd:
+    version: "^0.11.0"
+    optional: Can configure an external LND node.
+    description: Required for interacting with the Lightning Network.
+    mount-public: true

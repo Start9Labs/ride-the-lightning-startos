@@ -1,0 +1,95 @@
+lnd:
+  type: union
+  name: Lightning Network Daemon
+  description: The Lightning Network Daemon node to connect to.
+  tag:
+    id: type
+    name: Type
+    description: |
+      - Internal: The Lightning Network Daemon service installed to your Embassy.
+      - External: A Lightning Network Daemon instance running on a remote device (advanced).
+    variantNames:
+      internal: Internal
+      external: External
+  default: internal
+  variants:
+    internal:
+      address:
+        type: pointer
+        name: Local Address
+        description: The LAN IP address of your Bitcoin Core RPC Proxy service
+        subtype: app
+        app-id: lnd
+        target: lan-address
+    external:
+      address:
+        type: string
+        name: Public Address
+        description: The public address of your LND REST server
+        nullable: false
+      rest-port:
+        type: number
+        name: REST Port
+        description: The port that your Lightning Network Daemon REST server is bound to
+        nullable: false
+        range: "[0,65535]"
+        integral: true
+        default: 8332
+      macaroon:
+        type: string
+        name: Macaroon
+        description: Your admin.macaroon file, Base64URL encoded. This is the same as the value after "macaroon=" in your lndconnect URL.
+        nullable: false
+        masked: true
+      cert:
+        type: string
+        name: TLS Cert
+        description: Your tls.cert file, Base64URL encoded. This is the same as the value after "cert=" in your lndconnect URL.
+        nullable: false
+password:
+  type: string
+  name: Password
+  description: The password for the RPC user on your c-lightning node
+  nullable: false
+  copyable: true
+  masked: true
+  default:
+    charset: "a-z,A-Z,0-9"
+    len: 22
+user-persona:
+  type: enum
+  name: User Persona
+  description: User persona to tailor the data on UI.
+  values:
+    - MERCHANT
+    - OPERATOR
+  valueNames:
+    MERCHANT: Merchant
+    OPERATOR: Operator
+  default: OPERATOR
+theme-mode:
+  type: enum
+  name: Theme Mode
+  values:
+    - NIGHT
+    - DAY
+  valueNames:
+    NIGHT: Night
+    DAY: Day
+  default: NIGHT
+theme-color:
+  type: enum
+  name: Theme Color
+  values:
+    - PURPLE
+    - TEAL
+    - INDIGO
+    - PINK
+    - YELLOW
+  valueNames:
+    PURPLE: Purple
+    TEAL: Teal
+    INDIGO: Indigo
+    PINK: Pink
+    YELLOW: Yellow
+  default: PURPLE
