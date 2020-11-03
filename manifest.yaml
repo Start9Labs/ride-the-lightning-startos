@@ -3,8 +3,8 @@ id: ride-the-lightning
 version: 0.9.3
 title: Ride the Lightning
 description:
-  short: "Foo"
-  long: "Bar baz qux."
+  short: "A full function, device agnostic, web user interface to help manage lightning node operations"
+  long: "There are few options for using your own Lightning Network node over Tor. On the Embassy, Ride The Lightning is hosted as its own Tor V3 Hidden Service, talks directly to the LND node running on your Embassy, and is accessible from any Tor-enabled Browser!"
 release-notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.9.3
 ports:
   - internal: 80

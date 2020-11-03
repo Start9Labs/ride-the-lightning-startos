@@ -1,3 +1,1 @@
-# Ride the Lightning
-
-Nothing to see here.
+./docs/instructions.md
