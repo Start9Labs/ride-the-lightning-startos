@@ -20,6 +20,6 @@ hidden-service-version: v3
 dependencies:
   lnd:
     version: "^0.11.0"
-    optional: Can configure an external LND node.
-    description: Required for interacting with the Lightning Network.
+    optional: Can alternatively configure an external LND node.
+    description: Utilized for communicating with the Lightning Network.
     mount-public: true
