@@ -25,7 +25,9 @@ lnd:
       address:
         type: string
         name: Public Address
-        description: The public address of your LND REST server
+        description: |
+          The public address of your LND REST server
+          NOTE: RTL does not support a .onion URL here
         nullable: false
       rest-port:
         type: number
@@ -49,7 +51,7 @@ lnd:
 password:
   type: string
   name: Password
-  description: The password for the RPC user on your c-lightning node
+  description: The password for your Ride the Lightning dashboard
   nullable: false
   copyable: true
   masked: true
