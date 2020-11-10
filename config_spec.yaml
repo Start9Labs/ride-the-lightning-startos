@@ -68,7 +68,7 @@ user-persona:
   valueNames:
     MERCHANT: Merchant
     OPERATOR: Operator
-  default: OPERATOR
+  default: MERCHANT
 theme-mode:
   type: enum
   name: Theme Mode
