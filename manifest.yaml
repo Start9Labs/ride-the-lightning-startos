@@ -1,6 +1,6 @@
 compat: v0
 id: ride-the-lightning
-version: 0.9.3
+version: 0.10.0
 title: Ride the Lightning
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
