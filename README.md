@@ -1,7 +1,7 @@
-# Wrapper for c-lightning
+# Wrapper for ride-the-lightning
 
-This project wraps [c-lightning](https://github.com/ElementsProject/lightning
-) for EmbassyOS. c-lightning is a lightweight, highly customizable and standard compliant implementation of the [Lightning Network](https://lightning.network/) protocol.
+This project wraps [ride-the-lightning](https://github.com/Ride-The-Lightning/RTL
+) for EmbassyOS. ride-the-lightning is a fully functional user interface to manage lightning node operations.
 
 ## Dependencies
 
@@ -16,8 +16,8 @@ This project wraps [c-lightning](https://github.com/ElementsProject/lightning
 Clone the project locally. Note the submodule link to the original project(s). 
 
 ```
-git clone git@github.com:Start9Labs/c-lightning-wrapper.git
-cd c-lightning-wrapper
+git clone git@github.com:Start9Labs/ride-the-lightning-wrapper.git
+cd ride-the-lightning-wrapper
 git submodule update --init
 
 ```
@@ -37,5 +37,5 @@ SSH into an Embassy device.
 Run the following command to determine successful install:
 
 ```
-appmgr install c-lightning.s9pk
+appmgr install ride-the-lightning.s9pk
 ```
