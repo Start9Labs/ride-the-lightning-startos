@@ -117,5 +117,26 @@ fn main() -> Result<(), anyhow::Error> {
             lnd_rest_port = lnd_rest_port,
         )?;
     }
+
+    serde_yaml::to_writer(
+        File::create("/root/start9/stats.yaml")?,
+        &Properties {
+            version: 1,
+            data: Data {
+                password: Property::String {
+                    value: format!(
+                        "{}",
+                        config.password
+                    ),
+                    description: Some(
+                        "Copy this password to login. Change this value in Config.".to_owned(),
+                    ),
+                    copyable: true,
+                    qr: false,
+                    masked: true,
+                },
+            },
+        },
+    )?;
     Ok(())
 }
