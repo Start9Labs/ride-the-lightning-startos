@@ -1,4 +1,4 @@
-ASSETS := $(shell yq r manifest.yaml assets.*.src)
+ASSETS := $(shell yq e '.assets.[].src' manifest.yaml)
 ASSET_PATHS := $(addprefix assets/,$(ASSETS))
 VERSION_TAG := $(shell git --git-dir=RTL/.git describe --abbrev=0)
 VERSION := $(VERSION_TAG:v%=%)
@@ -25,5 +25,5 @@ configurator/target/armv7-unknown-linux-musleabihf/release/configurator: $(CONFI
 	docker run --rm -it -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:armv7-musleabihf musl-strip target/armv7-unknown-linux-musleabihf/release/configurator
 
 manifest.yaml: $(RTL_GIT_FILE)
-	yq w -i manifest.yaml version $(VERSION)
-	yq w -i manifest.yaml release-notes https://github.com/Ride-The-Lightning/RTL/releases/tag/$(VERSION_TAG)
+	yq eval -i ".version = \"$(VERSION)\"" manifest.yaml
+	yq eval -i ".release-notes = \"https://github.com/Ride-The-Lightning/RTL/releases/tag/$(VERSION_TAG)\"" manifest.yaml 

@@ -5,7 +5,7 @@ title: Ride the Lightning
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
   long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
-release-notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.9.3
+release-notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.10.0
 ports:
   - internal: 80
     tor: 80
@@ -13,13 +13,13 @@ image:
   type: tar
 mount: /root
 has-instructions: true
-os-version-required: ">=0.2.5"
-os-version-recommended: ">=0.2.5"
+os-version-required: ">=0.2.8"
+os-version-recommended: ">=0.2.8"
 assets: []
 hidden-service-version: v3
 dependencies:
   lnd:
-    version: "^0.11.0"
+    version: "^0.11.1"
     optional: Can alternatively configure an external LND node.
     description: Used to communicate with the Lightning Network.
     mount-public: true
