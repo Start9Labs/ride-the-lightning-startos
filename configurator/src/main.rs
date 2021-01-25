@@ -117,11 +117,10 @@ fn main() -> Result<(), anyhow::Error> {
             lnd_rest_port = lnd_rest_port,
         )?;
     }
-
     serde_yaml::to_writer(
         File::create("/root/start9/stats.yaml")?,
         &Properties {
-            version: 1,
+            version: 2,
             data: Data {
                 password: Property::String {
                     value: format!(
