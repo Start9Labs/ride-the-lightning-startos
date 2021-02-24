@@ -17,7 +17,7 @@ lnd:
       address:
         type: pointer
         name: Local Address
-        description: The LAN IP address of your Bitcoin Core RPC Proxy service
+        description: The LAN IP address of your Lightning Network Daemon service
         subtype: app
         app-id: lnd
         target: lan-address
