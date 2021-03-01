@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 use std::net::IpAddr;
+use std::path::Path;
 
 use http::Uri;
 use linear_map::LinearMap;
@@ -22,9 +23,6 @@ fn deserialize_parse<'de, D: Deserializer<'de>, T: std::str::FromStr>(
 struct Config {
     lnd: LNDConfig,
     password: String,
-    user_persona: String,
-    theme_mode: String,
-    theme_color: String,
 }
 
 #[derive(serde::Deserialize)]
@@ -77,7 +75,7 @@ pub enum Property {
 fn main() -> Result<(), anyhow::Error> {
     let config: Config = serde_yaml::from_reader(File::open("/root/start9/config.yaml")?)?;
     {
-        let mut outfile = File::create("/RTL/RTL-Config.json")?;
+        let cfg_path = Path::new("/root/RTL-Config.json");
 
         let (lnd_host, lnd_rest_port, macaroon_path) = match config.lnd {
             LNDConfig::Internal { address } => {
@@ -105,17 +103,81 @@ fn main() -> Result<(), anyhow::Error> {
             }
         };
 
-        write!(
-            outfile,
-            include_str!("RTL-Config.json.template"),
-            password = config.password,
-            user_persona = config.user_persona,
-            theme_mode = config.theme_mode,
-            theme_color = config.theme_color,
-            macaroon_path = macaroon_path,
-            lnd_host = lnd_host,
-            lnd_rest_port = lnd_rest_port,
-        )?;
+        let mut cfg = if cfg_path.exists() {
+            serde_json::from_reader(File::open(&cfg_path)?)?
+        } else {
+            serde_json::json!({
+                "defaultNodeIndex": 1,
+                "SSO": {
+                    "rtlSSO": 0,
+                    "rtlCookiePath": "",
+                    "logoutRedirectLink": ""
+                },
+                "nodes": [
+                    {
+                        "index": 1,
+                        "lnNode": "Embassy LND",
+                        "Authentication": {},
+                        "Settings": {
+                          "userPersona": "MERCHANT",
+                          "themeMode": "NIGHT",
+                          "themeColor": "PURPLE",
+                          "enableLogging": true,
+                          "fiatConversion": false,
+                        }
+                    }
+                ]
+            })
+        };
+
+        let base = cfg
+            .as_object_mut()
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config is not an object"))?;
+        base.insert("multiPass".into(), config.password.as_str().into());
+        base.insert("port".into(), 80.into());
+        base.insert("host".into(), "0.0.0.0".into());
+        let node = base
+            .get_mut("nodes")
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes does not exist"))?
+            .as_array_mut()
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes is not an array"))?
+            .iter_mut()
+            .filter(|n| {
+                n.as_object()
+                    .and_then(|n| n.get("index").map(|i| i == &serde_json::Value::from(1)))
+                    .unwrap_or(false)
+            })
+            .next()
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes does not contain a node with index 1")
+            })?
+            .as_object_mut()
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes[.index = 1] is not an object"))?;
+        node.insert("lnImplementation".into(), "LND".into());
+        node.get_mut("Authentication")
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes[.index = 1].Authentication does not exist")
+            })?
+            .as_object_mut()
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes[.index = 1].Authentication is not an object")
+            })?
+            .insert("macaroonPath".into(), macaroon_path.into());
+        let settings = node
+            .get_mut("Settings")
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes[.index = 1].Settings does not exist"))?
+            .as_object_mut()
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes[.index = 1].Settings is not an object")
+            })?;
+        settings.insert("channelBackupPath".into(), "/root/backup/node-1".into());
+        settings.insert(
+            "lnServerUrl".into(),
+            format!("https://{}:{}", lnd_host, lnd_rest_port).into(),
+        );
+
+        serde_json::to_writer_pretty(File::create("/root/RTL-Config-new.json")?, base)?;
+        std::fs::rename("/root/RTL-Config-new.json", &cfg_path)?;
     }
     serde_yaml::to_writer(
         File::create("/root/start9/stats.yaml")?,
@@ -123,10 +185,7 @@ fn main() -> Result<(), anyhow::Error> {
             version: 2,
             data: Data {
                 password: Property::String {
-                    value: format!(
-                        "{}",
-                        config.password
-                    ),
+                    value: format!("{}", config.password),
                     description: Some(
                         "Copy this password to login. Change this value in Config.".to_owned(),
                     ),
