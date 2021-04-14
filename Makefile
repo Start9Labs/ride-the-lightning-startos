@@ -23,7 +23,3 @@ image.tar: Dockerfile docker_entrypoint.sh configurator/target/armv7-unknown-lin
 configurator/target/armv7-unknown-linux-musleabihf/release/configurator: $(CONFIGURATOR_SRC)
 	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:armv7-musleabihf cargo +beta build --release
 	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:armv7-musleabihf musl-strip target/armv7-unknown-linux-musleabihf/release/configurator
-
-manifest.yaml: $(RTL_GIT_FILE)
-	yq eval -i ".version = \"$(VERSION)\"" manifest.yaml
-	yq eval -i ".release-notes = \"https://github.com/Ride-The-Lightning/RTL/releases/tag/$(VERSION_TAG)\"" manifest.yaml 
