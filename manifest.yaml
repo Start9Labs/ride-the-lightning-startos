@@ -1,11 +1,13 @@
 compat: v0
 id: ride-the-lightning
-version: 0.10.1
+version: 0.10.1.1
 title: Ride the Lightning
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
   long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
-release-notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.10.1
+release-notes: |
+  - https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.10.1
+  - Fixes an issue where public and shared directories would be backed up
 ports:
   - internal: 80
     tor: 80
