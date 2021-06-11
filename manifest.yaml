@@ -1,6 +1,6 @@
 compat: v0
 id: ride-the-lightning
-version: 0.10.1.1
+version: 0.10.1.2
 title: Ride the Lightning
 license-info:
   license: MIT
@@ -11,6 +11,7 @@ description:
 release-notes: |
   - https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.10.1
   - Fixes an issue where public and shared directories would be backed up
+  - Fixes an issue where changing password would have no effect
 ports:
   - internal: 80
     tor: 80
