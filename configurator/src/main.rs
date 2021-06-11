@@ -133,6 +133,7 @@ fn main() -> Result<(), anyhow::Error> {
         let base = cfg
             .as_object_mut()
             .ok_or_else(|| anyhow::anyhow!("RTL-Config is not an object"))?;
+        base.remove("multiPassHashed".into());
         base.insert("multiPass".into(), config.password.as_str().into());
         base.insert("port".into(), 80.into());
         base.insert("host".into(), "0.0.0.0".into());
