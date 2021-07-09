@@ -1,6 +1,6 @@
 compat: v0
 id: ride-the-lightning
-version: 0.10.1.2
+version: 0.11.0
 title: Ride the Lightning
 license-info:
   license: MIT
@@ -9,9 +9,16 @@ description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
   long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
 release-notes: |
-  - https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.10.1
-  - Fixes an issue where public and shared directories would be backed up
-  - Fixes an issue where changing password would have no effect
+  This is a maintenance release which mainly addresses application vulnerabilities and minor enhancements
+
+  Vulnerabilities addressed with this release:
+    - CSRF token based authentication, which strengthens the app against cross site attacks in the browser
+    - Passwords like ‘password’, ‘changeme’ or ‘moneyprintergobrrr’ must be changed before doing any operation on the app
+    - Angular version upgrade to 12, which will require node version to be at a minimum of 12
+
+  Minor enhancements:
+    - Routing fee limit cap removed on Loop Out
+    - Routing Fee rate will also be displayed in %age for easier understanding
 ports:
   - internal: 80
     tor: 80
@@ -19,13 +26,13 @@ image:
   type: tar
 mount: /root
 has-instructions: true
-os-version-required: "^0.2.8"
-os-version-recommended: "^0.2.8"
+os-version-required: "^0.2.13"
+os-version-recommended: "^0.2.13"
 assets: []
 hidden-service-version: v3
 dependencies:
   lnd:
-    version: ">=0.11.1 <0.13.0"
+    version: ">=0.11.1 <0.14.0"
     optional: Can alternatively configure an external LND node.
     description: Used to communicate with the Lightning Network.
     mount-public: true
