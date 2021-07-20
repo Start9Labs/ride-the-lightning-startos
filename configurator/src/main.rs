@@ -22,6 +22,7 @@ fn deserialize_parse<'de, D: Deserializer<'de>, T: std::str::FromStr>(
 #[serde(rename_all = "kebab-case")]
 struct Config {
     lnd: LNDConfig,
+    c_lightning: CLConfig,
     password: String,
 }
 
@@ -29,6 +30,22 @@ struct Config {
 #[serde(tag = "type")]
 #[serde(rename_all = "kebab-case")]
 enum LNDConfig {
+    #[serde(rename_all = "kebab-case")]
+    Internal { address: IpAddr },
+    #[serde(rename_all = "kebab-case")]
+    External {
+        #[serde(deserialize_with = "deserialize_parse")]
+        address: Uri,
+        rest_port: u16,
+        macaroon: String,
+        cert: String,
+    },
+}
+
+#[derive(serde::Deserialize)]
+#[serde(tag = "type")]
+#[serde(rename_all = "kebab-case")]
+enum CLConfig {
     #[serde(rename_all = "kebab-case")]
     Internal { address: IpAddr },
     #[serde(rename_all = "kebab-case")]
@@ -77,7 +94,7 @@ fn main() -> Result<(), anyhow::Error> {
     {
         let cfg_path = Path::new("/root/RTL-Config.json");
 
-        let (lnd_host, lnd_rest_port, macaroon_path) = match config.lnd {
+        let (lnd_host, lnd_rest_port, lnd_macaroon_path) = match config.lnd {
             LNDConfig::Internal { address } => {
                 (format!("{}", address), 8080, "/root/start9/public/lnd")
             }
@@ -99,6 +116,32 @@ fn main() -> Result<(), anyhow::Error> {
                     format!("{}", address.host().unwrap()),
                     rest_port,
                     "/root/lnd-external",
+                )
+            }
+        };
+
+        let (cl_host, cl_rest_port, cl_macaroon_path) = match config.c_lightning {
+            CLConfig::Internal { address } => {
+                (format!("{}", address), 3001, "/root/start9/public/c-lightning")
+            }
+            CLConfig::External {
+                address,
+                rest_port,
+                macaroon,
+                cert: _,
+            } => {
+                std::fs::create_dir_all("/root/cl-external")?;
+                File::create("/root/cl-external/admin.macaroon")?.write_all(
+                    &base64::decode_config(
+                        macaroon,
+                        base64::Config::new(base64::CharacterSet::UrlSafe, false),
+                    )?,
+                )?;
+
+                (
+                    format!("{}", address.host().unwrap()),
+                    rest_port,
+                    "/root/cl-external",
                 )
             }
         };
@@ -125,6 +168,18 @@ fn main() -> Result<(), anyhow::Error> {
                           "enableLogging": true,
                           "fiatConversion": false,
                         }
+                    },
+                    {
+                        "index": 2,
+                        "lnNode": "Embassy C-Lightning",
+                        "Authentication": {},
+                        "Settings": {
+                          "userPersona": "MERCHANT",
+                          "themeMode": "NIGHT",
+                          "themeColor": "PURPLE",
+                          "enableLogging": true,
+                          "fiatConversion": false,
+                        }
                     }
                 ]
             })
@@ -137,7 +192,9 @@ fn main() -> Result<(), anyhow::Error> {
         base.insert("multiPass".into(), config.password.as_str().into());
         base.insert("port".into(), 80.into());
         base.insert("host".into(), "0.0.0.0".into());
-        let node = base
+
+        // RTL config
+        let lnd_node = base
             .get_mut("nodes")
             .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes does not exist"))?
             .as_array_mut()
@@ -154,8 +211,8 @@ fn main() -> Result<(), anyhow::Error> {
             })?
             .as_object_mut()
             .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes[.index = 1] is not an object"))?;
-        node.insert("lnImplementation".into(), "LND".into());
-        node.get_mut("Authentication")
+        lnd_node.insert("lnImplementation".into(), "LND".into());
+        lnd_node.get_mut("Authentication")
             .ok_or_else(|| {
                 anyhow::anyhow!("RTL-Config.nodes[.index = 1].Authentication does not exist")
             })?
@@ -163,18 +220,59 @@ fn main() -> Result<(), anyhow::Error> {
             .ok_or_else(|| {
                 anyhow::anyhow!("RTL-Config.nodes[.index = 1].Authentication is not an object")
             })?
-            .insert("macaroonPath".into(), macaroon_path.into());
-        let settings = node
+            .insert("macaroonPath".into(), lnd_macaroon_path.into());
+        let lnd_node_settings = lnd_node
             .get_mut("Settings")
             .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes[.index = 1].Settings does not exist"))?
             .as_object_mut()
             .ok_or_else(|| {
                 anyhow::anyhow!("RTL-Config.nodes[.index = 1].Settings is not an object")
             })?;
-        settings.insert("channelBackupPath".into(), "/root/backup/node-1".into());
-        settings.insert(
+        lnd_node_settings.insert("channelBackupPath".into(), "/root/backup/node-1".into());
+        lnd_node_settings.insert(
             "lnServerUrl".into(),
             format!("https://{}:{}", lnd_host, lnd_rest_port).into(),
+        );
+        
+        // C-Lightning config
+        let cl_node = base
+            .get_mut("nodes")
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes does not exist"))?
+            .as_array_mut()
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes is not an array"))?
+            .iter_mut()
+            .filter(|n| {
+                n.as_object()
+                    .and_then(|n| n.get("index").map(|i| i == &serde_json::Value::from(2)))
+                    .unwrap_or(false)
+            })
+            .next()
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes does not contain a node with index 2")
+            })?
+            .as_object_mut()
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes[.index = 2] is not an object"))?;
+        cl_node.insert("lnImplementation".into(), "CLT".into());
+        cl_node.get_mut("Authentication")
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes[.index = 2].Authentication does not exist")
+            })?
+            .as_object_mut()
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes[.index = 2].Authentication is not an object")
+            })?
+            .insert("macaroonPath".into(), cl_macaroon_path.into());
+        let cl_node_settings = cl_node
+            .get_mut("Settings")
+            .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes[.index = 2].Settings does not exist"))?
+            .as_object_mut()
+            .ok_or_else(|| {
+                anyhow::anyhow!("RTL-Config.nodes[.index = 2].Settings is not an object")
+            })?;
+        cl_node_settings.insert("channelBackupPath".into(), "/root/backup/node-2".into());
+        cl_node_settings.insert(
+            "lnServerUrl".into(),
+            format!("https://{}:{}", cl_host, cl_rest_port).into(),
         );
 
         serde_json::to_writer_pretty(File::create("/root/RTL-Config-new.json")?, base)?;

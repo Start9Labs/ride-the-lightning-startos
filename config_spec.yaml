@@ -1,53 +1,288 @@
-lnd:
-  type: union
-  name: Lightning Network Daemon
-  description: The Lightning Network Daemon node to connect to.
-  tag:
-    id: type
-    name: Type
-    description: |
-      - Internal: The Lightning Network Daemon service installed to your Embassy.
-      - External: A Lightning Network Daemon instance running on a remote device (advanced).
-    variantNames:
-      internal: Internal
-      external: External
-  default: internal
-  variants:
-    internal:
-      address:
-        type: pointer
-        name: Local Address
-        description: The LAN IP address of your Lightning Network Daemon service
-        subtype: app
-        app-id: lnd
-        target: lan-address
-    external:
-      address:
-        type: string
-        name: Public Address
-        description: |
-          The public address of your LND REST server
-          NOTE: RTL does not support a .onion URL here
-        nullable: false
-      rest-port:
-        type: number
-        name: REST Port
-        description: The port that your Lightning Network Daemon REST server is bound to
-        nullable: false
-        range: "[0,65535]"
-        integral: true
-        default: 8332
-      macaroon:
-        type: string
-        name: Macaroon
-        description: Your admin.macaroon file, Base64URL encoded. This is the same as the value after "macaroon=" in your lndconnect URL.
-        nullable: false
-        masked: true
-      cert:
-        type: string
-        name: TLS Cert
-        description: Your tls.cert file, Base64URL encoded. This is the same as the value after "cert=" in your lndconnect URL.
-        nullable: false
+nodes:
+  type: list
+  subtype: union
+  name: Lightning Nodes
+  description: List of Lightning Network node instances to manage
+  range: "[1,*)"
+  default:
+  - lnd-internal
+  spec:
+    name: Node Implementation
+    tag:
+      id: type
+      name: Type
+      description: |
+        - LND Internal: Lightning Network Daemon from Lightning Labs (internal)
+        - C-Lightning Internal: C-Lightning from Blockstream (internal)
+        - LND External: Lightning Network Daemon from Lightning Labs (external)
+        - LND LNDConnect: Lightning Network Daemon from Lightning Labs (LNDConnect)
+        - C-Lightning External: C-Lightning from Blockstream (external)
+      variantNames:
+        lnd-internal: LND Internal
+        c-lightning-internal: C-Lightning Internal
+        lnd-external: LND External
+        lnd-lndconnect: LND LNDConnect
+        c-lightning-external: C-Lightning External
+    default: lnd-internal
+    variants:
+      lnd-internal:
+        address:
+          type: pointer
+          name: Local IP
+          description: The LAN IP address of your LND service
+          subtype: app
+          app-id: lnd
+          target: lan-address
+      c-lightning-internal:
+        address:
+          type: pointer
+          name: Local IP
+          description: The LAN IP address of your C-Lightning service
+          subtype: app
+          app-id: lnd
+          target: lan-address
+      lnd-external:
+        address:
+          type: string
+          name: Public Address
+          description: |
+            The public address of your LND REST server
+            NOTE: RTL does not support a .onion URL here
+          nullable: false
+        rest-port:
+          type: number
+          name: REST Port
+          description: The port that your Lightning Network Daemon REST server is bound to
+          nullable: false
+          range: "[0,65535]"
+          integral: true
+          default: 8332
+        macaroon:
+          type: string
+          name: Macaroon
+          description: Your admin.macaroon file, Base64URL encoded. This is the same as the value after "macaroon=" in your lndconnect URL.
+          nullable: false
+          masked: true
+        cert:
+          type: string
+          name: TLS Cert
+          description: Your tls.cert file, Base64URL encoded. This is the same as the value after "cert=" in your lndconnect URL.
+          nullable: false
+      lnd-lndconnect:
+        lndconnect-url:
+          type: string
+          name: LNDConnect URL
+          description: LNDConnect URL for your external LND node
+          nullable: false
+          pattern: "^lndconnect://(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[1-9][0-9]{0,4}[?](cert=[a-zA-Z0-9\\-_]+&macaroon=[a-zA-Z0-9\\-_]+|macaroon=[a-zA-Z0-9\\-_]+&cert=[a-zA-Z0-9\\-_]+)$"
+          patternDescription: Must be a valid LNDConnect URL
+      c-lightning-external:
+        address:
+          type: string
+          name: Public Address
+          description: |
+            The public address of your c-Lightning-REST server
+            NOTE: RTL does not support a .onion URL here
+          nullable: false
+        rest-port:
+          type: number
+          name: REST Port
+          description: The port that your c-Lightning-REST server is bound to
+          nullable: false
+          range: "[0,65535]"
+          integral: true
+          default: 3001
+        macaroon:
+          type: string
+          name: Macaroon
+          description: Your c-lightning-REST admin.macaroon file, Base64URL encoded.
+          nullable: false
+          masked: true
+        cert:
+          type: string
+          name: TLS Cert
+          description: Your c-lightning-REST tls.cert file, Base64URL encoded.
+          nullable: false
+
+    # uniqueBy: connection-settings
+    # uniqueBy: connection-settings
+    # displayAs: "{{name}}"
+  #   spec:
+  #     name:
+  #       type: string
+  #       name: Account Name
+  #       description: Name of this Lightning node
+  #       nullable: false
+  #     connection-settings:
+  #       type: union
+  #       name: Connection Settings
+  #       tag:
+  #         id: implementation
+  #         name: LN Node Implementation
+  #         description: |
+  #           - Internal: The LND service installed to your Embassy
+  #           - LNDConnect: An LNDConnect URL
+  #         variantNames:
+  #           internal: Internal
+  #           external: External Manual
+  #           lndconnect: External LNDConnect
+  #       default: internal
+  #       variants:
+  #         lnd:
+  #           address:
+  #             type: pointer
+  #             name: Local IP
+  #             description: The LAN IP address of your LND service
+  #             subtype: app
+  #             app-id: lnd
+  #             target: lan-address
+  #         external-lnd:
+  #           addressext:
+  #             type: string
+  #             name: Public Address
+  #             description: The public address of your LND node, NOTE that external tor nodes do not work yet.
+  #             nullable: false
+  #           port:
+  #             type: number
+  #             name: Port
+  #             description: The gRPC port of your LND node
+  #             nullable: false
+  #             range: "[0,65535]"
+  #             integral: true
+  #             default: 10009
+  #           macaroon:
+  #             type: string
+  #             name: Admin Macaroon
+  #             description: Base64 encoded admin macaroon from your LND node
+  #             nullable: false
+  #             pattern: "^[a-zA-Z0-9/+]+[=]{0,2}$"
+  #             patternDescription: Must be a valid base64 string
+  #           certificate:
+  #             type: string
+  #             name: TLS Certificate
+  #             description: Base64 encoded tls certificate from your LND node
+  #             nullable: false
+  #             pattern: "^[a-zA-Z0-9/+]+[=]{0,2}$"
+  #             patternDescription: Must be a valid base64 string
+  #         lndconnect:
+  #           lndconnect-url:
+  #             type: string
+  #             name: LNDConnect URL
+  #             description: LNDConnect URL for your external LND node
+  #             nullable: false
+  #             pattern: "^lndconnect://(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):[1-9][0-9]{0,4}[?](cert=[a-zA-Z0-9\\-_]+&macaroon=[a-zA-Z0-9\\-_]+|macaroon=[a-zA-Z0-9\\-_]+&cert=[a-zA-Z0-9\\-_]+)$"
+  #             patternDescription: Must be a valid LNDConnect URL
+  #     password:
+  #       type: string
+  #       name: Password
+  #       description: Account specific password to use in place of the master password, if left blank you must log into this account using the master password
+  #       nullable: true
+  #       default: null
+  #       masked: true
+
+
+# ------------------------------------------------------------------
+
+# lnd:
+#   type: union
+#   name: Lightning Network Daemon
+#   description: The Lightning Network Daemon node to connect to.
+#   tag:
+#     id: type
+#     name: Type
+#     description: |
+#       - Internal: The Lightning Network Daemon service installed to your Embassy.
+#       - External: A Lightning Network Daemon instance running on a remote device (advanced).
+#     variantNames:
+#       internal: Internal
+#       external: External
+#   default: internal
+#   variants:
+#     internal:
+#       address:
+#         type: pointer
+#         name: Local Address
+#         description: The LAN IP address of your Lightning Network Daemon service
+#         subtype: app
+#         app-id: lnd
+#         target: lan-address
+#     external:
+#       address:
+#         type: string
+#         name: Public Address
+#         description: |
+#           The public address of your LND REST server
+#           NOTE: RTL does not support a .onion URL here
+#         nullable: false
+#       rest-port:
+#         type: number
+#         name: REST Port
+#         description: The port that your Lightning Network Daemon REST server is bound to
+#         nullable: false
+#         range: "[0,65535]"
+#         integral: true
+#         default: 8332
+#       macaroon:
+#         type: string
+#         name: Macaroon
+#         description: Your admin.macaroon file, Base64URL encoded. This is the same as the value after "macaroon=" in your lndconnect URL.
+#         nullable: false
+#         masked: true
+#       cert:
+#         type: string
+#         name: TLS Cert
+#         description: Your tls.cert file, Base64URL encoded. This is the same as the value after "cert=" in your lndconnect URL.
+#         nullable: false
+# c-lightning:
+#   type: union
+#   name: C-Lightning
+#   description: The C-Lightning node to connect to.
+#   tag:
+#     id: type
+#     name: Type
+#     description: |
+#       - Internal: The C-Lightning service installed to your Embassy.
+#       - External: A C-Lightning instance running on a remote device (advanced).
+#     variantNames:
+#       internal: Internal
+#       external: External
+#   default: internal
+#   variants:
+#     internal:
+#       address:
+#         type: pointer
+#         name: Local Address
+#         description: The LAN IP address of your C-Lightning service
+#         subtype: app
+#         app-id: c-lightning
+#         target: lan-address
+#     external:
+#       address:
+#         type: string
+#         name: Public Address
+#         description: |
+#           The public address of your c-Lightning-REST server
+#           NOTE: RTL does not support a .onion URL here
+#         nullable: false
+#       rest-port:
+#         type: number
+#         name: REST Port
+#         description: The port that your c-Lightning-REST server is bound to
+#         nullable: false
+#         range: "[0,65535]"
+#         integral: true
+#         default: 3001
+#       macaroon:
+#         type: string
+#         name: Macaroon
+#         description: Your c-lightning-REST admin.macaroon file, Base64URL encoded.
+#         nullable: false
+#         masked: true
+#       cert:
+#         type: string
+#         name: TLS Cert
+#         description: Your c-lightning-REST tls.cert file, Base64URL encoded.
+#         nullable: false
 password:
   type: string
   name: Password
