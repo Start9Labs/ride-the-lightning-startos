@@ -1,24 +1,15 @@
 compat: v0
 id: ride-the-lightning
-version: 0.11.0
+version: 0.11.0.1
 title: Ride the Lightning
 license-info:
   license: MIT
   url: https://github.com/Ride-The-Lightning/RTL/blob/master/LICENSE
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
-  long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
+  long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND and/or C-Lightning node running on your Embassy and is accessible from any Tor-enabled Browser!"
 release-notes: |
-  This is a maintenance release which mainly addresses application vulnerabilities and minor enhancements
-
-  Vulnerabilities addressed with this release:
-    - CSRF token based authentication, which strengthens the app against cross site attacks in the browser
-    - Passwords like ‘password’, ‘changeme’ or ‘moneyprintergobrrr’ must be changed before doing any operation on the app
-    - Angular version upgrade to 12, which will require node version to be at a minimum of 12
-
-  Minor enhancements:
-    - Routing fee limit cap removed on Loop Out
-    - Routing Fee rate will also be displayed in %age for easier understanding
+  This is a minor S9 release that adds C-Lightning compatibility
 ports:
   - internal: 80
     tor: 80
