@@ -1,7 +1,7 @@
 use std::{convert::TryInto, fs::File};
 use std::io::Write;
 use std::net::IpAddr;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use http::Uri;
 use linear_map::LinearMap;
@@ -60,22 +60,6 @@ enum NodeConnectionSettings {
         cert: String,
     },
 }
-
-// #[derive(serde::Deserialize)]
-// #[serde(tag = "type")]
-// #[serde(rename_all = "kebab-case")]
-// enum CLConfig {
-//     #[serde(rename_all = "kebab-case")]
-//     Internal { address: IpAddr },
-//     #[serde(rename_all = "kebab-case")]
-//     External {
-//         #[serde(deserialize_with = "deserialize_parse")]
-//         address: Uri,
-//         rest_port: u16,
-//         macaroon: String,
-//         cert: String,
-//     },
-// }
 
 #[derive(serde::Serialize)]
 pub struct Properties {
@@ -137,32 +121,6 @@ fn main() -> Result<(), anyhow::Error> {
                     "logoutRedirectLink": ""
                 },
                 "nodes": []
-                // "nodes": [
-                //     {
-                //         "index": 1,
-                //         "lnNode": "Embassy LND",
-                //         "Authentication": {},
-                //         "Settings": {
-                //           "userPersona": "MERCHANT",
-                //           "themeMode": "NIGHT",
-                //           "themeColor": "PURPLE",
-                //           "enableLogging": true,
-                //           "fiatConversion": false,
-                //         }
-                //     },
-                //     {
-                //         "index": 2,
-                //         "lnNode": "Embassy C-Lightning",
-                //         "Authentication": {},
-                //         "Settings": {
-                //           "userPersona": "MERCHANT",
-                //           "themeMode": "NIGHT",
-                //           "themeColor": "PURPLE",
-                //           "enableLogging": true,
-                //           "fiatConversion": false,
-                //         }
-                //     }
-                // ]
             })
         };
 
@@ -183,7 +141,7 @@ fn main() -> Result<(), anyhow::Error> {
                 NodeType::Lnd => {
                     match s9_node_config.clone().connection_settings {
                         NodeConnectionSettings::Internal { address } => {
-                            (format!("{}", address), 8080, "/root/start9/public/lnd")
+                            (format!("{}", address), 8080, PathBuf::from("/root/start9/public/lnd"))
                         }
                         NodeConnectionSettings::External {
                             address,
@@ -191,8 +149,10 @@ fn main() -> Result<(), anyhow::Error> {
                             macaroon,
                             cert: _,
                         } => {
-                            std::fs::create_dir_all("/root/lnd-external")?;
-                            File::create("/root/lnd-external/admin.macaroon")?.write_all(
+                            let macaroon_dir_path = PathBuf::from(format!("/root/lnd-external-{}", node_index));
+                            std::fs::create_dir_all(macaroon_dir_path.as_path())?;
+                            let macaroon_path = macaroon_dir_path.join("admin.macaroon");
+                            File::create(macaroon_path)?.write_all(
                                 &base64::decode_config(
                                     macaroon,
                                     base64::Config::new(base64::CharacterSet::UrlSafe, false),
@@ -202,7 +162,7 @@ fn main() -> Result<(), anyhow::Error> {
                             (
                                 format!("{}", address.host().unwrap()),
                                 rest_port,
-                                "/root/lnd-external",
+                                macaroon_dir_path
                             )
                         }
                     }
@@ -210,7 +170,7 @@ fn main() -> Result<(), anyhow::Error> {
                 NodeType::CLightning => {
                     match s9_node_config.clone().connection_settings {
                         NodeConnectionSettings::Internal { address } => {
-                            (format!("{}", address), 3001, "/root/start9/public/c-lightning")
+                            (format!("{}", address), 3001, PathBuf::from("/root/start9/public/c-lightning"))
                         }
                         NodeConnectionSettings::External {
                             address,
@@ -218,8 +178,10 @@ fn main() -> Result<(), anyhow::Error> {
                             macaroon,
                             cert: _,
                         } => {
-                            std::fs::create_dir_all("/root/cl-external")?;
-                            File::create("/root/cl-external/admin.macaroon")?.write_all(
+                            let macaroon_dir_path = PathBuf::from(format!("/root/cl-external-{}", node_index));
+                            std::fs::create_dir_all(macaroon_dir_path.as_path())?;
+                            let macaroon_path = macaroon_dir_path.join("access.macaroon");
+                            File::create(macaroon_path)?.write_all(
                                 &base64::decode_config(
                                     macaroon,
                                     base64::Config::new(base64::CharacterSet::UrlSafe, false),
@@ -229,7 +191,7 @@ fn main() -> Result<(), anyhow::Error> {
                             (
                                 format!("{}", address.host().unwrap()),
                                 rest_port,
-                                "/root/cl-external",
+                                macaroon_dir_path
                             )
                         }
                     }
@@ -245,7 +207,7 @@ fn main() -> Result<(), anyhow::Error> {
                 .iter_mut()
                 .filter(|n| {
                     n.as_object()
-                        .and_then(|n| n.get("name").map(|i| i == &serde_json::Value::from(s9_node_config.clone().name)))
+                        .and_then(|n| n.get("lnNode").map(|i| i == &serde_json::Value::from(s9_node_config.clone().name)))
                         .unwrap_or(false)
                 })
                 .next() 
@@ -281,16 +243,16 @@ fn main() -> Result<(), anyhow::Error> {
                 .ok_or_else(|| {
                     anyhow::anyhow!("Node found in RTL-Config has invalid Authentication")
                 })?
-                .insert("macaroonPath".into(), macaroon_path.into());
-            let lnd_node_settings = node_cfg
+                .insert("macaroonPath".into(), macaroon_path.to_str().unwrap().into());
+            let node_settings = node_cfg
                 .get_mut("Settings")
                 .ok_or_else(|| anyhow::anyhow!("Node found in RTL-Config does not have Settings"))?
                 .as_object_mut()
                 .ok_or_else(|| {
                     anyhow::anyhow!("Node found in RTL-Config has invalid Settings")
                 })?;
-            lnd_node_settings.insert("channelBackupPath".into(), "/root/backup/node-1".into());
-            lnd_node_settings.insert(
+            node_settings.insert("channelBackupPath".into(), format!("/root/backup/node-{}", node_index).into());
+            node_settings.insert(
                 "lnServerUrl".into(),
                 format!("https://{}:{}", host, rest_port).into(),
             );
