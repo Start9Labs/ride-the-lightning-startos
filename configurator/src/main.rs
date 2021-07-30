@@ -98,8 +98,6 @@ fn main() -> Result<(), anyhow::Error> {
         let cfg_path = Path::new("/root/RTL-Config.json");
 
         let mut default_node_cfg = serde_json::json!({
-            // "index": 1,
-            // "lnNode": "Embassy LND",
             "Authentication": {},
             "Settings": {
                 "userPersona": "MERCHANT",
@@ -198,7 +196,6 @@ fn main() -> Result<(), anyhow::Error> {
                 }
             };
     
-            // let node_cfg = &mut serde_json::Map::new();
             // RTL config
             let node_cfg = match base_cfg.get_mut("nodes")
                 .ok_or_else(|| anyhow::anyhow!("RTL-Config.nodes does not exist"))?
