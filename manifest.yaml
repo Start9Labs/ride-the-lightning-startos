@@ -2,23 +2,78 @@ compat: v0
 id: ride-the-lightning
 version: 0.11.0
 title: Ride the Lightning
+release-notes: Upgrade to EmbassyOS v0.3.0
+license: MIT
+wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
+upstream-repo: https://github.com/Ride-The-Lightning/RTL
+build: ["make"]
+min-os-version: 0.3.0
 license-info:
   license: MIT
   url: https://github.com/Ride-The-Lightning/RTL/blob/master/LICENSE
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
   long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
-release-notes: |
-  This is a maintenance release which mainly addresses application vulnerabilities and minor enhancements
-
-  Vulnerabilities addressed with this release:
-    - CSRF token based authentication, which strengthens the app against cross site attacks in the browser
-    - Passwords like ‘password’, ‘changeme’ or ‘moneyprintergobrrr’ must be changed before doing any operation on the app
-    - Angular version upgrade to 12, which will require node version to be at a minimum of 12
-
-  Minor enhancements:
-    - Routing fee limit cap removed on Loop Out
-    - Routing Fee rate will also be displayed in %age for easier understanding
+assets:
+  license: LICENSE
+  icon: icon.png
+  instructions: instructions.md
+  docker-images: image.tar
+  icon-type: png
+main:
+  type: docker
+  image: main
+  entrypoint: "/usr/local/bin/docker_entrypoint.sh"
+  args: []
+  mounts: {}
+  io-format: yaml
+health-checks: {}
+config:
+  get:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: config
+    args: 
+      - "get"
+      - "/root"
+    mounts: {}
+    io-format: yaml
+  set:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: config
+    args:
+      - "set"
+      - "/root"
+    mounts: {}
+    io-format: yaml
+volumes: {}
+interfaces:
+  main:
+    tor-config:
+      port-mapping:
+        80: "80"
+    ui: true
+    protocols:
+      - tcp
+      - http
+backup:
+  create:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: "true"
+    args: []
+    mounts: {}
+  restore:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: "true"
+    args: []
+    mounts: {} 
 ports:
   - internal: 80
     tor: 80
@@ -26,9 +81,6 @@ image:
   type: tar
 mount: /root
 has-instructions: true
-os-version-required: "^0.2.13"
-os-version-recommended: "^0.2.13"
-assets: []
 hidden-service-version: v3
 dependencies:
   lnd:
@@ -36,3 +88,4 @@ dependencies:
     optional: Can alternatively configure an external LND node.
     description: Used to communicate with the Lightning Network.
     mount-public: true
+    critical: false

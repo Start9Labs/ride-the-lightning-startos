@@ -8,7 +8,7 @@ lnd:
     description: |
       - Internal: The Lightning Network Daemon service installed to your Embassy.
       - External: A Lightning Network Daemon instance running on a remote device (advanced).
-    variantNames:
+    variant-names:
       internal: Internal
       external: External
   default: internal
