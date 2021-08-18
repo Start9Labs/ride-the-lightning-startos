@@ -17,8 +17,8 @@ image:
   type: tar
 mount: /root
 has-instructions: true
-os-version-required: "^0.2.13"
-os-version-recommended: "^0.2.13"
+os-version-required: "^0.2.15"
+os-version-recommended: "^0.2.15"
 assets: []
 hidden-service-version: v3
 dependencies:
@@ -28,7 +28,7 @@ dependencies:
     description: Used to communicate with the Lightning Network.
     mount-public: true
   c-lightning:
-    version: ">=0.9.3 <0.11.0"
+    version: ">=0.10.1 <0.11.0"
     optional: Can alternatively configure an external LND node.
     description: Used to communicate with the Lightning Network.
     mount-public: true
