@@ -1,11 +1,13 @@
 compat: v0
 id: ride-the-lightning
-version: 0.11.0
+version: 0.11.0.1
 title: Ride the Lightning
 release-notes: Upgrade to EmbassyOS v0.3.0
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
+support-site: https://github.com/Ride-The-Lightning/RTL/issues
+marketing-site: https://twitter.com/RTL_App
 build: ["make"]
 min-os-version: 0.3.0
 license-info:
@@ -32,29 +34,43 @@ config:
   get:
     type: docker
     image: compat
-    system: true
-    entrypoint: config
+    entrypoint: compat
     args: 
+      - "config"
       - "get"
-      - "/root"
-    mounts: {}
+      - "/root/start9/config.yaml"
+      - "/mnt/assets/config_spec.yaml"
+    mounts:
+      compat: "/mnt/assets"
+      main: "/root"
     io-format: yaml
   set:
     type: docker
     image: compat
-    system: true
-    entrypoint: config
+    entrypoint: compat
     args:
+      - "config"
       - "set"
-      - "/root"
-    mounts: {}
+      - "/root/start9/config.yaml"
+    mounts:
+      main: "/root"
     io-format: yaml
-volumes: {}
+volumes:
+  main:
+    type: data
+  compat:
+    type: assets
 interfaces:
   main:
+    name: Main Interface
+    description: The main RTL browser interface
     tor-config:
       port-mapping:
         80: "80"
+    lan-config:
+      80:
+        ssl: true
+        mapping: 443
     ui: true
     protocols:
       - tcp
@@ -64,24 +80,31 @@ backup:
     type: docker
     image: compat
     system: true
-    entrypoint: "true"
-    args: []
-    mounts: {}
+    entrypoint: compat
+    args:
+      - duplicity
+      - ride-the-lightning
+      - file:///mnt/backup
+      - /root
+    mounts:
+      # BACKUP is the default volume that is used for backups - this is whatever backup drive is mounted to the device, or a network filesystem
+      # the value here denotes where the data mount point will be
+      # mounts backup drive to this location, which contains previous backups
+      BACKUP: /mnt/backup
+      main: /root/
   restore:
     type: docker
     image: compat
     system: true
-    entrypoint: "true"
-    args: []
-    mounts: {} 
-ports:
-  - internal: 80
-    tor: 80
-image:
-  type: tar
-mount: /root
-has-instructions: true
-hidden-service-version: v3
+    entrypoint: compat
+    args:
+      - ride-the-lightning
+      - /root
+      - file:///mnt/backup
+    mounts:
+      BACKUP: /mnt/backup
+      main: /root
+      compat: /mnt/assets
 dependencies:
   lnd:
     version: ">=0.11.1 <0.14.0"

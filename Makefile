@@ -8,14 +8,16 @@ CONFIGURATOR_SRC := $(shell find ./configurator/src) configurator/Cargo.toml con
 
 .DELETE_ON_ERROR:
 
-all: ride-the-lightning.s9pk
+all: verify
+
+verify: ride-the-lightning.s9pk
+	embassy-sdk verify ride-the-lightning.s9pk
 
 install: ride-the-lightning.s9pk
-	embassy-sdk pack
+	embassy-cli package install ride-the-lightning.s9pk
 
-ride-the-lightning.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instructions.md $(ASSET_PATHS)
-	appmgr -vv pack $(shell pwd) -o ride-the-lightning.s9pk
-	appmgr -vv verify ride-the-lightning.s9pk
+ride-the-lightning.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar instructions.md $(ASSET_PATHS)
+	embassy-sdk pack
 
 image.tar: Dockerfile docker_entrypoint.sh configurator/target/aarch64-unknown-linux-musl/release/configurator $(RTL_GIT_FILE)
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/ride-the-lightning --build-arg BITCOIN_VERSION=$(BITCOIN_VERSION) --platform=linux/arm64 -o type=docker,dest=image.tar .

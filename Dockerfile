@@ -17,8 +17,6 @@ ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
 ADD ./configurator/target/aarch64-unknown-linux-musl/release/configurator /usr/local/bin/configurator
 RUN chmod +x /usr/local/bin/configurator
-ADD ./config.sh /usr/local/bin/config
-RUN chmod a+x /usr/local/bin/config
 
 EXPOSE 80
 
