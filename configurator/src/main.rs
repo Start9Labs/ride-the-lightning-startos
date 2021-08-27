@@ -100,7 +100,7 @@ fn main() -> Result<(), anyhow::Error> {
         let mut default_node_cfg = serde_json::json!({
             "Authentication": {},
             "Settings": {
-                "userPersona": "MERCHANT",
+                "userPersona": "OPERATOR",
                 "themeMode": "NIGHT",
                 "themeColor": "PURPLE",
                 "enableLogging": true,

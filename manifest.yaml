@@ -24,11 +24,11 @@ hidden-service-version: v3
 dependencies:
   lnd:
     version: ">=0.11.1 <0.14.0"
-    optional: Can alternatively configure an external LND node.
+    optional: Can alternatively configure an external LND node or a C-Lightning node.
     description: Used to communicate with the Lightning Network.
     mount-public: true
   c-lightning:
     version: ">=0.10.1 <0.11.0"
-    optional: Can alternatively configure an external LND node.
+    optional: Can alternatively configure an external C-Lightning node or LND node.
     description: Used to communicate with the Lightning Network.
     mount-public: true
