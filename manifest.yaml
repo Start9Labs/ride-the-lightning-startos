@@ -32,3 +32,10 @@ dependencies:
     optional: Can alternatively configure an external C-Lightning node or LND node.
     description: Used to communicate with the Lightning Network.
     mount-public: true
+    config: 
+      - rule: 'advanced.plugins.rest?'
+        description: 'C-Lightning-REST plugin must be enabled'
+        suggestions:
+          - SET:
+              var: 'advanced.plugins.rest'
+              to-value: true
