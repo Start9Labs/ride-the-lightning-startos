@@ -108,7 +108,8 @@ backup:
 dependencies:
   lnd:
     version: ">=0.11.1 <0.14.0"
-    optional: Can alternatively configure an external LND node.
+    requirement:
+      type: "opt-in"
+      how: Can alternatively configure an external LND node.
     description: Used to communicate with the Lightning Network.
-    mount-public: true
     critical: false
