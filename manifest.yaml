@@ -29,7 +29,17 @@ main:
   args: []
   mounts: {}
   io-format: yaml
-health-checks: {}
+health-checks:
+  main:
+    type: docker
+    image: main
+    system: false
+    entrypoint: curl
+    args: ["ride-the-lightning.embassy"]
+    mounts:
+      main: /root
+    io-format: yaml
+    critical: false
 config:
   get:
     type: docker
