@@ -13,14 +13,7 @@ lnd:
       external: External
   default: internal
   variants:
-    internal:
-      address:
-        type: pointer
-        name: Local Address
-        description: The LAN IP address of your Lightning Network Daemon service
-        subtype: app
-        app-id: lnd
-        target: lan-address
+    internal: {}
     external:
       address:
         type: string

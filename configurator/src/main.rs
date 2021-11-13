@@ -30,7 +30,7 @@ struct Config {
 #[serde(rename_all = "kebab-case")]
 enum LNDConfig {
     #[serde(rename_all = "kebab-case")]
-    Internal { address: IpAddr },
+    Internal,
     #[serde(rename_all = "kebab-case")]
     External {
         #[serde(deserialize_with = "deserialize_parse")]
@@ -78,9 +78,7 @@ fn main() -> Result<(), anyhow::Error> {
         let cfg_path = Path::new("/root/RTL-Config.json");
 
         let (lnd_host, lnd_rest_port, macaroon_path) = match config.lnd {
-            LNDConfig::Internal { address } => {
-                (format!("{}", address), 8080, "/root/start9/public/lnd")
-            }
+            LNDConfig::Internal => ("lnd.embassy".to_owned(), 8080, "/mnt/lnd"),
             LNDConfig::External {
                 address,
                 rest_port,

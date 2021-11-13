@@ -1,7 +1,6 @@
-compat: v0
 id: ride-the-lightning
-version: 0.11.0.1
 title: Ride the Lightning
+version: 0.11.0.1
 release-notes: Upgrade to EmbassyOS v0.3.0
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
@@ -10,9 +9,6 @@ support-site: https://github.com/Ride-The-Lightning/RTL/issues
 marketing-site: https://twitter.com/RTL_App
 build: ["make"]
 min-os-version: 0.3.0
-license-info:
-  license: MIT
-  url: https://github.com/Ride-The-Lightning/RTL/blob/master/LICENSE
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
   long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
@@ -21,58 +17,79 @@ assets:
   icon: icon.png
   instructions: instructions.md
   docker-images: image.tar
-  icon-type: png
 main:
   type: docker
   image: main
-  entrypoint: "/usr/local/bin/docker_entrypoint.sh"
+  entrypoint: docker_entrypoint.sh
   args: []
-  mounts: {}
+  mounts:
+    main: /root
+    lnd: /mnt/lnd
   io-format: yaml
 health-checks:
   main:
     type: docker
     image: main
-    system: false
-    entrypoint: curl
-    args: ["ride-the-lightning.embassy"]
-    mounts:
-      main: /root
+    entrypoint: sh
+    args: ["-c", "curl ride-the-lightning.embassy:80 || exit 1"]
     io-format: yaml
     critical: false
+    inject: true
 config:
   get:
     type: docker
     image: compat
+    system: true
     entrypoint: compat
     args: 
-      - "config"
-      - "get"
-      - "/root/start9/config.yaml"
-      - "/mnt/assets/config_spec.yaml"
+      - config
+      - get
+      - /root
+      - /mnt/assets/config_spec.yaml
     mounts:
-      compat: "/mnt/assets"
-      main: "/root"
+      main: /root
+      compat: /mnt/assets
     io-format: yaml
   set:
     type: docker
     image: compat
+    system: true
     entrypoint: compat
     args:
-      - "config"
-      - "set"
-      - "/root/start9/config.yaml"
+      - config
+      - set
+      - ride-the-lightning
+      - /root
+      - /mnt/assets/config_rules.yaml
     mounts:
-      main: "/root"
+      main: /root
+      compat: /mnt/assets
     io-format: yaml
+properties:
+  type: docker
+  image: compat
+  system: true
+  entrypoint: compat
+  args:
+    - properties
+    - /root
+  mounts:
+    main: /root
+  io-format: yaml
 volumes:
   main:
     type: data
   compat:
     type: assets
+  lnd:
+    type: pointer
+    package-id: lnd
+    volume-id: main
+    path: /public
+    readonly: true
 interfaces:
   main:
-    name: Main Interface
+    name: Browser Interface
     description: The main RTL browser interface
     tor-config:
       port-mapping:
@@ -85,6 +102,14 @@ interfaces:
     protocols:
       - tcp
       - http
+dependencies:
+  lnd:
+    version: ">=0.11.1 <0.14.0"
+    description: Used to communicate with the Lightning Network.
+    critical: false
+    requirement:
+      type: required
+    config: ~
 backup:
   create:
     type: docker
@@ -93,33 +118,24 @@ backup:
     entrypoint: compat
     args:
       - duplicity
-      - ride-the-lightning
-      - file:///mnt/backup
-      - /root
+      - create
+      - /mnt/backup
+      - /root/data
     mounts:
-      # BACKUP is the default volume that is used for backups - this is whatever backup drive is mounted to the device, or a network filesystem
-      # the value here denotes where the data mount point will be
-      # mounts backup drive to this location, which contains previous backups
       BACKUP: /mnt/backup
-      main: /root/
+      main: /root/data
+    io-format: yaml
   restore:
     type: docker
     image: compat
     system: true
     entrypoint: compat
     args:
-      - ride-the-lightning
-      - /root
-      - file:///mnt/backup
+      - duplicity
+      - restore
+      - /mnt/backup
+      - /root/data
     mounts:
       BACKUP: /mnt/backup
-      main: /root
-      compat: /mnt/assets
-dependencies:
-  lnd:
-    version: ">=0.11.1 <0.14.0"
-    requirement:
-      type: "opt-in"
-      how: Can alternatively configure an external LND node.
-    description: Used to communicate with the Lightning Network.
-    critical: false
+      main: /root/data
+    io-format: yaml

@@ -1,7 +1,7 @@
 FROM node:10-alpine
 
 RUN apk update
-RUN apk add --no-cache tini
+RUN apk add --no-cache tini curl
 
 WORKDIR /RTL
 
