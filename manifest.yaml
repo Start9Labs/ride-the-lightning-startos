@@ -33,7 +33,7 @@ health-checks:
     type: docker
     image: main
     entrypoint: sh
-    args: ["-c", "curl ride-the-lightning.embassy:80 || exit 1"]
+    args: ["-c", "curl ride-the-lightning.embassy:80 || exit 60"]
     io-format: yaml
     inject: true
 config:
