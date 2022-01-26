@@ -1,7 +1,7 @@
 FROM node:10-alpine
 
 RUN apk update
-RUN apk add --no-cache tini curl
+RUN apk add --no-cache bash tini curl
 
 WORKDIR /RTL
 
@@ -15,6 +15,8 @@ COPY ./RTL /RTL
 
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
+ADD ./check-web.sh /usr/local/bin/check-web.sh
+RUN chmod +x /usr/local/bin/check-web.sh
 ADD ./configurator/target/aarch64-unknown-linux-musl/release/configurator /usr/local/bin/configurator
 RUN chmod +x /usr/local/bin/configurator
 

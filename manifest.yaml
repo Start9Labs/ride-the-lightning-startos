@@ -32,8 +32,8 @@ health-checks:
     description: Activates once your RTL Web UI is ready to visit
     type: docker
     image: main
-    entrypoint: sh
-    args: ["-c", "curl ride-the-lightning.embassy:80 || exit 60"]
+    entrypoint: check-web.sh
+    args: []
     io-format: yaml
     inject: true
 config:
