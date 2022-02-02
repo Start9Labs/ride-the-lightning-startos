@@ -34,7 +34,7 @@ health-checks:
     image: main
     entrypoint: check-web.sh
     args: []
-    io-format: yaml
+    io-format: json
     inject: true
 config:
   get:

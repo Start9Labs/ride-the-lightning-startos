@@ -11,5 +11,7 @@ else
     if test "$RES" != 0; then
         echo "Web interface is unreachable"
         exit 1
+    else 
+        exit 0
     fi
 fi
