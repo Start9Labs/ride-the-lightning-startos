@@ -1,38 +1,142 @@
-compat: v0
 id: ride-the-lightning
-version: 0.11.0
 title: Ride the Lightning
-license-info:
-  license: MIT
-  url: https://github.com/Ride-The-Lightning/RTL/blob/master/LICENSE
+version: 0.11.0.1
+release-notes: Upgrade to EmbassyOS v0.3.0
+license: MIT
+wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
+upstream-repo: https://github.com/Ride-The-Lightning/RTL
+support-site: https://github.com/Ride-The-Lightning/RTL/issues
+marketing-site: https://twitter.com/RTL_App
+build: ["make"]
+min-os-version: 0.3.0
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
   long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
-release-notes: |
-  This is a maintenance release which mainly addresses application vulnerabilities and minor enhancements
-
-  Vulnerabilities addressed with this release:
-    - CSRF token based authentication, which strengthens the app against cross site attacks in the browser
-    - Passwords like ‘password’, ‘changeme’ or ‘moneyprintergobrrr’ must be changed before doing any operation on the app
-    - Angular version upgrade to 12, which will require node version to be at a minimum of 12
-
-  Minor enhancements:
-    - Routing fee limit cap removed on Loop Out
-    - Routing Fee rate will also be displayed in %age for easier understanding
-ports:
-  - internal: 80
-    tor: 80
-image:
-  type: tar
-mount: /root
-has-instructions: true
-os-version-required: "^0.2.13"
-os-version-recommended: "^0.2.13"
-assets: []
-hidden-service-version: v3
+assets:
+  license: LICENSE
+  icon: icon.png
+  instructions: instructions.md
+  docker-images: image.tar
+main:
+  type: docker
+  image: main
+  entrypoint: docker_entrypoint.sh
+  args: []
+  mounts:
+    main: /root
+    lnd: /mnt/lnd
+  io-format: yaml
+health-checks:
+  main:
+    name: Main
+    description: Activates once your RTL Web UI is ready to visit
+    type: docker
+    image: main
+    entrypoint: check-web.sh
+    args: []
+    io-format: json
+    inject: true
+config:
+  get:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - config
+      - get
+      - /root
+      - /mnt/assets/config_spec.yaml
+    mounts:
+      main: /root
+      compat: /mnt/assets
+    io-format: yaml
+  set:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - config
+      - set
+      - ride-the-lightning
+      - /root
+      - /mnt/assets/config_rules.yaml
+    mounts:
+      main: /root
+      compat: /mnt/assets
+    io-format: yaml
+properties:
+  type: docker
+  image: compat
+  system: true
+  entrypoint: compat
+  args:
+    - properties
+    - /root
+  mounts:
+    main: /root
+  io-format: yaml
+volumes:
+  main:
+    type: data
+  compat:
+    type: assets
+  lnd:
+    type: pointer
+    package-id: lnd
+    volume-id: main
+    path: /public
+    readonly: true
+interfaces:
+  main:
+    name: Browser Interface
+    description: The main RTL browser interface
+    tor-config:
+      port-mapping:
+        80: "80"
+    lan-config:
+      443:
+        ssl: true
+        internal: 80
+    ui: true
+    protocols:
+      - tcp
+      - http
 dependencies:
   lnd:
     version: ">=0.11.1 <0.14.0"
-    optional: Can alternatively configure an external LND node.
     description: Used to communicate with the Lightning Network.
-    mount-public: true
+    critical: false
+    requirement:
+      type: required
+    config: ~
+backup:
+  create:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - create
+      - /mnt/backup
+      - /root/data
+    mounts:
+      BACKUP: /mnt/backup
+      main: /root/data
+    io-format: yaml
+  restore:
+    type: docker
+    image: compat
+    system: true
+    entrypoint: compat
+    args:
+      - duplicity
+      - restore
+      - /mnt/backup
+      - /root/data
+    mounts:
+      BACKUP: /mnt/backup
+      main: /root/data
+    io-format: yaml

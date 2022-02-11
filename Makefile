@@ -1,25 +1,28 @@
 ASSETS := $(shell yq e '.assets.[].src' manifest.yaml)
 ASSET_PATHS := $(addprefix assets/,$(ASSETS))
-VERSION_TAG := $(shell git --git-dir=RTL/.git describe --abbrev=0)
-VERSION := $(VERSION_TAG:v%=%)
+# VERSION_TAG := $(shell git --git-dir=RTL/.git describe --abbrev=0)
+# VERSION := $(VERSION_TAG:v%=%)
 RTL_GIT_REF := $(shell cat .git/modules/RTL/HEAD)
 RTL_GIT_FILE := $(addprefix .git/modules/RTL/,$(if $(filter ref:%,$(RTL_GIT_REF)),$(lastword $(RTL_GIT_REF)),HEAD))
 CONFIGURATOR_SRC := $(shell find ./configurator/src) configurator/Cargo.toml configurator/Cargo.lock
+VERSION := $(shell yq e ".version" manifest.yaml)
+HEALTH_CHECK := $(shell find ./check-web.sh)
 
 .DELETE_ON_ERROR:
 
-all: ride-the-lightning.s9pk
+all: verify
+
+verify: ride-the-lightning.s9pk
+	embassy-sdk verify s9pk ride-the-lightning.s9pk
 
 install: ride-the-lightning.s9pk
-	appmgr install ride-the-lightning.s9pk
+	embassy-cli package install ride-the-lightning.s9pk
 
-ride-the-lightning.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instructions.md $(ASSET_PATHS)
-	appmgr -vv pack $(shell pwd) -o ride-the-lightning.s9pk
-	appmgr -vv verify ride-the-lightning.s9pk
+ride-the-lightning.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar instructions.md $(ASSET_PATHS)
+	embassy-sdk pack
 
-image.tar: Dockerfile docker_entrypoint.sh configurator/target/armv7-unknown-linux-musleabihf/release/configurator $(RTL_GIT_FILE)
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --tag start9/ride-the-lightning --build-arg BITCOIN_VERSION=$(BITCOIN_VERSION) --platform=linux/arm/v7 -o type=docker,dest=image.tar .
+image.tar: Dockerfile docker_entrypoint.sh configurator/target/aarch64-unknown-linux-musl/release/configurator $(RTL_GIT_FILE) $(HEALTH_CHECK)
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --no-cache --tag start9/ride-the-lightning/main:$(VERSION) --platform=linux/arm64 -o type=docker,dest=image.tar .
 
-configurator/target/armv7-unknown-linux-musleabihf/release/configurator: $(CONFIGURATOR_SRC)
-	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:armv7-musleabihf cargo +beta build --release
-	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:armv7-musleabihf musl-strip target/armv7-unknown-linux-musleabihf/release/configurator
+configurator/target/aarch64-unknown-linux-musl/release/configurator: $(CONFIGURATOR_SRC)
+	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:aarch64-musl cargo +beta build --release

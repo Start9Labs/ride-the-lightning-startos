@@ -8,19 +8,12 @@ lnd:
     description: |
       - Internal: The Lightning Network Daemon service installed to your Embassy.
       - External: A Lightning Network Daemon instance running on a remote device (advanced).
-    variantNames:
+    variant-names:
       internal: Internal
       external: External
   default: internal
   variants:
-    internal:
-      address:
-        type: pointer
-        name: Local Address
-        description: The LAN IP address of your Lightning Network Daemon service
-        subtype: app
-        app-id: lnd
-        target: lan-address
+    internal: {}
     external:
       address:
         type: string
