@@ -13,7 +13,7 @@ HEALTH_CHECK := $(shell find ./check-web.sh)
 all: verify
 
 verify: ride-the-lightning.s9pk
-	embassy-sdk verify ride-the-lightning.s9pk
+	embassy-sdk verify s9pk ride-the-lightning.s9pk
 
 install: ride-the-lightning.s9pk
 	embassy-cli package install ride-the-lightning.s9pk
