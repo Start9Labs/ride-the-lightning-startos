@@ -21,7 +21,7 @@ install: ride-the-lightning.s9pk
 ride-the-lightning.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar instructions.md $(ASSET_PATHS)
 	embassy-sdk pack
 
-image.tar: Dockerfile docker_entrypoint.sh configurator/target/aarch64-unknown-linux-musl/release/configurator $(RTL_GIT_FILE) $(HEALTH_CHECK)
+image.tar: Dockerfile docker_entrypoint.sh check-web.sh configurator/target/aarch64-unknown-linux-musl/release/configurator $(RTL_GIT_FILE) $(HEALTH_CHECK)
 	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --no-cache --tag start9/ride-the-lightning/main:$(VERSION) --platform=linux/arm64 -o type=docker,dest=image.tar .
 
 configurator/target/aarch64-unknown-linux-musl/release/configurator: $(CONFIGURATOR_SRC)
