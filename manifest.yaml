@@ -28,8 +28,8 @@ main:
   io-format: yaml
 health-checks:
   main:
-    name: Main
-    description: Activates once your RTL Web UI is ready to visit
+    name: Web UI
+    success-message: The Web UI is ready to visit
     type: docker
     image: main
     entrypoint: check-web.sh
