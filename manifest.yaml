@@ -29,7 +29,7 @@ main:
 health-checks:
   main:
     name: Web UI
-    success-message: The Web UI is ready to visit
+    success-message: The Web UI is ready to visit from a web browser
     type: docker
     image: main
     entrypoint: check-web.sh
