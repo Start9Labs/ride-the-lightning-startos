@@ -1,7 +1,7 @@
 FROM node:10-alpine
 
 RUN apk update
-RUN apk add --no-cache bash tini curl
+RUN apk add --no-cache bash tini curl bash
 
 WORKDIR /RTL
 
@@ -10,6 +10,8 @@ COPY ./RTL/package-lock.json /RTL/package-lock.json
 
 # Install dependencies
 RUN npm install --only=prod
+RUN wget https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_arm.tar.gz -O - |\
+  tar xz && mv yq_linux_arm /usr/bin/yq
 
 COPY ./RTL /RTL
 
