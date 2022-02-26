@@ -8,10 +8,9 @@ upstream-repo: https://github.com/Ride-The-Lightning/RTL
 support-site: https://github.com/Ride-The-Lightning/RTL/issues
 marketing-site: https://twitter.com/RTL_App
 build: ["make"]
-min-os-version: 0.3.0
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
-  long: "A full function, device agnostic, web user interface for managing lightning node operations. Ride The Lightning is hosted as its own Tor V3 Hidden Service. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
+  long: "A full function, device agnostic, web user interface for managing lightning node operations. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
 assets:
   license: LICENSE
   icon: icon.png
@@ -29,7 +28,7 @@ main:
 health-checks:
   main:
     name: Web UI
-    success-message: The Web UI is ready to visit from a web browser
+    success-message: RTL is ready to visit in a web browser
     type: docker
     image: main
     entrypoint: check-web.sh
@@ -107,7 +106,6 @@ dependencies:
   lnd:
     version: ">=0.11.1 <0.14.0"
     description: Used to communicate with the Lightning Network.
-    critical: false
     requirement:
       type: required
     config: ~
