@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node:16-alpine
 
 RUN apk update
 RUN apk add --no-cache bash tini curl bash
