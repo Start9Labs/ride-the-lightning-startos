@@ -138,3 +138,22 @@ backup:
       BACKUP: /mnt/backup
       main: /root/data
     io-format: yaml
+migrations:
+  from:
+    ">=0.11.0 <0.12.2":
+      type: docker
+      image: main
+      system: false
+      entrypoint: "/bin/echo"
+      args: ['{"configured": true}']
+      io-format: json
+      inject: false
+  to:
+    ">=0.11.0 <0.12.2":
+      type: docker
+      image: main
+      system: false
+      entrypoint: "/bin/echo"
+      args: ['{"configured": true}']
+      io-format: json
+      inject: false
