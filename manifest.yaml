@@ -1,7 +1,7 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.11.0.1
-release-notes: Upgrade to EmbassyOS v0.3.0
+version: 0.12.2
+release-notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.12.2
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -104,7 +104,7 @@ interfaces:
       - http
 dependencies:
   lnd:
-    version: ">=0.11.1 <0.14.0"
+    version: ">=0.13.4 <0.15.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: required
