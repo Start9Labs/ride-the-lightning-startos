@@ -1,0 +1,6 @@
+- rule: 'advanced.plugins.rest?'
+  description: 'C-Lightning-REST plugin must be enabled'
+  suggestions:
+    - SET:
+        var: 'advanced.plugins.rest'
+        to-value: true
