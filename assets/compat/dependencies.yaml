@@ -1,0 +1,6 @@
+lnd:
+  condition: '''nodes.*.type = "lnd"'
+  health_checks: []
+c-lightning:
+  condition: '''nodes.*.type = "c-lightning"'
+  health_checks: []

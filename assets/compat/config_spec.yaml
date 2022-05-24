@@ -7,8 +7,8 @@ nodes:
   default:
   - lnd
   spec:
-    displayAs: "{{name}}"
-    uniqueBy: name
+    display-as: "{{name}}"
+    unique-by: name
     name: Node Implementation
     tag:
       id: type
@@ -16,7 +16,7 @@ nodes:
       description: |
         - LND: Lightning Network Daemon from Lightning Labs
         - C-Lightning: C-Lightning from Blockstream
-      variantNames:
+      variant-names:
         lnd: LND
         c-lightning: C-Lightning
     default: lnd
@@ -38,19 +38,12 @@ nodes:
             description: |
               - Internal: The Lightning Network Daemon service installed to your Embassy.
               - External: A Lightning Network Daemon instance running on a remote device (advanced).
-            variantNames:
+            variant-names:
               internal: Internal
               external: External
           default: internal
           variants:
-            internal:
-              address:
-                type: pointer
-                name: Local Address
-                description: The LAN IP address of your Lightning Network Daemon service
-                subtype: app
-                app-id: lnd
-                target: lan-address
+            internal: {}
             external:
               address:
                 type: string
@@ -95,19 +88,12 @@ nodes:
             description: |
               - Internal: The C-Lightning service installed to your Embassy.
               - External: A C-Lightning instance running on a remote device (advanced).
-            variantNames:
+            variant-names:
               internal: Internal
               external: External
           default: internal
           variants:
-            internal:
-              address:
-                type: pointer
-                name: Local Address
-                description: The LAN IP address of your C-Lightning service
-                subtype: app
-                app-id: c-lightning
-                target: lan-address
+            internal: {}
             external:
               address:
                 type: string

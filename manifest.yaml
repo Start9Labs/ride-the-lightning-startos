@@ -26,6 +26,7 @@ main:
   mounts:
     main: /root
     lnd: /mnt/lnd
+    c-lightning: "/mnt/c-lightning"
   io-format: yaml
 health-checks:
   main:
@@ -63,6 +64,7 @@ config:
       - ride-the-lightning
       - /root
       - /mnt/assets/config_rules.yaml
+      - /mnt/assets/dependencies.yaml
     mounts:
       main: /root
       compat: /mnt/assets
@@ -86,6 +88,12 @@ volumes:
   lnd:
     type: pointer
     package-id: lnd
+    volume-id: main
+    path: /public
+    readonly: true
+  c-lightning:
+    type: pointer
+    package-id: c-lightning
     volume-id: main
     path: /public
     readonly: true
@@ -113,7 +121,7 @@ dependencies:
       how: Can opt to use the internal Core Lightning (CLN) instance instead of LND
     config: ~
   c-lightning:
-    version: ">=0.10.1 <0.11.0"
+    version: ">=0.10.1 <0.12.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: opt-out
@@ -182,20 +190,24 @@ backup:
     io-format: yaml
 migrations:
   from:
-    ">=0.11.0 <0.12.2":
+    "<0.12.3":
       type: docker
       image: main
       system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
+      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+      args: ["from"]
       io-format: json
+      mounts:
+        main: /root
       inject: false
   to:
-    ">=0.11.0 <0.12.2":
+    "<0.12.3":
       type: docker
       image: main
       system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
+      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+      args: ["to"]
       io-format: json
+      mounts:
+        main: /root
       inject: false

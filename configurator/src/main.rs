@@ -94,9 +94,9 @@ fn main() -> Result<(), anyhow::Error> {
     {
         let cfg_path = Path::new("/root/RTL-Config.json");
 
-        // let (lnd_host, lnd_rest_port, macaroon_path) = match config.lnd {
-        //     LNDConfig::Internal => ("lnd.embassy".to_owned(), 8080, "/mnt/lnd"),
-        //     LNDConfig::External {
+        // let (lnd_host, lnd_rest_port, macaroon_path) = match s9_config.nodes {
+        //     NodeConfig { typ : LND } => ("lnd.embassy".to_owned(), 8080, "/mnt/lnd"),
+        //     NodeConfig::External {
         //         address,
         //         rest_port,
         //         macaroon,
@@ -115,6 +115,8 @@ fn main() -> Result<(), anyhow::Error> {
         //             rest_port,
         //             "/root/lnd-external",
         //         )
+        //     }
+        // };
 
         let mut default_node_cfg = serde_json::json!({
             "Authentication": {},
@@ -159,7 +161,7 @@ fn main() -> Result<(), anyhow::Error> {
                     NodeConnectionSettings::Internal => (
                         format!("{}", "lnd.embassy"),
                         8080,
-                        PathBuf::from("/root/start9/public/lnd"),
+                        PathBuf::from("/mnt/lnd"),
                     ),
                     NodeConnectionSettings::External {
                         address,
@@ -187,7 +189,7 @@ fn main() -> Result<(), anyhow::Error> {
                     NodeConnectionSettings::Internal => (
                         format!("{}", "c-lightning.embassy"),
                         3001,
-                        PathBuf::from("/root/start9/public/c-lightning"),
+                        PathBuf::from("/mnt/c-lightning"),
                     ),
                     NodeConnectionSettings::External {
                         address,
