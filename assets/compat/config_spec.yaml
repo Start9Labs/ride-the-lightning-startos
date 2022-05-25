@@ -15,10 +15,10 @@ nodes:
       name: Type
       description: |
         - LND: Lightning Network Daemon from Lightning Labs
-        - C-Lightning: C-Lightning from Blockstream
+        - CLN: Core Lightning from Blockstream
       variant-names:
-        lnd: LND
-        c-lightning: C-Lightning
+        lnd: Lightning Network Daemon (LND)
+        c-lightning: Core Lightning (CLN)
     default: lnd
     variants:
       lnd:
@@ -76,18 +76,18 @@ nodes:
           type: string
           name: Node Name
           description: Name of this node in the list
-          default: "Embassy C-Lightning"
+          default: "Embassy Core Lightning (CLN)"
           nullable: false
         connection-settings:
           type: union
           name: Connection Settings
-          description: The C-Lightning node to connect to.
+          description: The Core Lightning (CLN) node to connect to.
           tag:
             id: type
             name: Type
             description: |
-              - Internal: The C-Lightning service installed to your Embassy.
-              - External: A C-Lightning instance running on a remote device (advanced).
+              - Internal: The Core Lightning (CLN) service installed to your Embassy.
+              - External: A Core Lightning (CLN) instance running on a remote device (advanced).
             variant-names:
               internal: Internal
               external: External
