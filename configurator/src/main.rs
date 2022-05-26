@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::net::IpAddr;
@@ -9,7 +10,6 @@ use serde::{
     de::{Deserializer, Error as DeserializeError, Unexpected},
     Deserialize,
 };
-use serde_json::Value;
 
 fn deserialize_parse<'de, D: Deserializer<'de>, T: std::str::FromStr>(
     deserializer: D,
@@ -22,13 +22,13 @@ fn deserialize_parse<'de, D: Deserializer<'de>, T: std::str::FromStr>(
 #[derive(Deserialize)]
 #[serde(rename_all = "kebab-case")]
 struct S9Config {
-    nodes: Vec<S9NodeConfig>,
+    nodes: Vec<S9Node>,
     password: String,
 }
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(tag = "type")]
 #[serde(rename_all = "kebab-case")]
-pub struct S9NodeConfig {
+pub struct S9Node {
     #[serde(rename = "type")]
     typ: NodeType,
     name: String,
@@ -97,7 +97,7 @@ struct SSO {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct RTLNode {
-    index: usize,
+    index: u8,
     ln_implementation: RTLNodeType,
     ln_node: String,
     #[serde(rename = "Authentication")]
@@ -184,11 +184,134 @@ pub enum Property {
     },
 }
 
+// s9nodes :: [S9Node]
+// rtlNodes :: [RTLNode]
+fn apply_s9_node(
+    s9_node: &S9Node,
+    node_index: u8,
+) -> Result<(String, u16, PathBuf), anyhow::Error> {
+    match s9_node.clone().typ {
+        NodeType::Lnd => match s9_node.clone().connection_settings {
+            S9NodeConnectionSettings::Internal => Ok((
+                format!("{}", "lnd.embassy"),
+                8080,
+                PathBuf::from("/mnt/lnd"),
+            )),
+            S9NodeConnectionSettings::External {
+                address,
+                rest_port,
+                macaroon,
+                cert: _,
+            } => {
+                let macaroon_dir_path = PathBuf::from(format!("/root/lnd-external-{}", node_index));
+                std::fs::create_dir_all(macaroon_dir_path.as_path())?;
+                let macaroon_path = macaroon_dir_path.join("admin.macaroon");
+                File::create(macaroon_path)?.write_all(&base64::decode_config(
+                    macaroon,
+                    base64::Config::new(base64::CharacterSet::UrlSafe, false),
+                )?)?;
+
+                Ok((
+                    format!("{}", address.host().unwrap()),
+                    rest_port,
+                    macaroon_dir_path,
+                ))
+            }
+        },
+        NodeType::CLightning => match s9_node.clone().connection_settings {
+            S9NodeConnectionSettings::Internal => Ok((
+                format!("{}", "c-lightning.embassy"),
+                3001,
+                PathBuf::from("/mnt/c-lightning"),
+            )),
+            S9NodeConnectionSettings::External {
+                address,
+                rest_port,
+                macaroon,
+                cert: _,
+            } => {
+                let macaroon_dir_path = PathBuf::from(format!("/root/cl-external-{}", node_index));
+                std::fs::create_dir_all(macaroon_dir_path.as_path())?;
+                let macaroon_path = macaroon_dir_path.join("access.macaroon");
+                File::create(macaroon_path)?.write_all(&base64::decode_config(
+                    macaroon,
+                    base64::Config::new(base64::CharacterSet::UrlSafe, false),
+                )?)?;
+
+                Ok((
+                    format!("{}", address.host().unwrap()),
+                    rest_port,
+                    macaroon_dir_path,
+                ))
+            }
+        },
+    }
+}
+
+// annotateRtlNames :: [RTLNodes] -> HashMap<Name, RTLNode>
+fn get_rtl_node_map(nodes: Vec<RTLNode>) -> HashMap<String, RTLNode> {
+    let mut m = HashMap::new();
+    for node in nodes {
+        m.insert(node.ln_node.clone(), node.clone());
+    }
+    m
+}
+
+// toRtlDefault :: S9Node -> RTLNode
+fn to_rtl_default(
+    s9_node: &S9Node,
+    node_index: u8,
+    macaroon_path: PathBuf,
+    address: String,
+    rest_port: u16,
+) -> RTLNode {
+    RTLNode {
+        index: node_index,
+        ln_implementation: s9_node.typ.clone().into(),
+        ln_node: s9_node.name.clone(),
+        authentication: RTLNodeAuthentication { macaroon_path },
+        settings: RTLNodeSettings {
+            user_persona: RTLNodePersona::OPERATOR,
+            theme_mode: RTLNodeThemeMode::NIGHT,
+            theme_color: RTLNodeThemeColor::PURPLE,
+            fiat_conversion: false,
+            channel_backup_path: Some(format!("/root/backup/node-{}", node_index).into()),
+            ln_server_url: Some(format!("https://{}:{}", address, rest_port).into()),
+        },
+    }
+}
+
+// updateRTLNodeWithNewS9Data :: &S9Node -> RTLNode -> RTLNode
+fn to_rtl_from_previous(
+    prev_rtl_node: &RTLNode,
+    s9_node: &S9Node,
+    node_index: u8,
+    macaroon_path: PathBuf,
+    address: String,
+    rest_port: u16,
+) -> RTLNode {
+    RTLNode {
+        index: node_index,
+        ln_implementation: s9_node.typ.clone().into(),
+        ln_node: s9_node.name.clone(),
+        authentication: RTLNodeAuthentication { macaroon_path },
+        settings: RTLNodeSettings {
+            user_persona: prev_rtl_node.settings.user_persona.clone(),
+            theme_mode: prev_rtl_node.settings.theme_mode.clone(),
+            theme_color: prev_rtl_node.settings.theme_color.clone(),
+            fiat_conversion: prev_rtl_node.settings.fiat_conversion,
+            channel_backup_path: Some(format!("/root/backup/node-{}", node_index).into()),
+            ln_server_url: Some(format!("https://{}:{}", address, rest_port).into()),
+        },
+    }
+}
+// transform :: [S9Nodes] -> HashMap<Name, RTLNode> -> [RTLNodes] TODO
+
 fn main() -> Result<(), anyhow::Error> {
     let s9_config: S9Config = serde_yaml::from_reader(File::open("/root/start9/config.yaml")?)?;
     {
         let cfg_path = Path::new("/root/RTL-Config.json");
-        let mut cfg_seed: RTLConfig = if cfg_path.exists() {
+        let rtl_config_seed: RTLConfig = if cfg_path.exists() {
             serde_json::from_reader(File::open(&cfg_path)?)?
         } else {
             RTLConfig {
@@ -206,127 +329,36 @@ fn main() -> Result<(), anyhow::Error> {
             }
         };
 
-        let default_node_index = cfg_seed.default_node_index;
-        let sso = cfg_seed.sso;
-        let mut nodes: Vec<RTLNode> = Vec::new();
-        let mut multi_pass = Some(s9_config.password.clone());
-        let multi_pass_hashed = None;
-        let host = "0.0.0.0".parse().unwrap();
-        let port = 80;
-
         println!("{:?} nodes found", s9_config.nodes.len());
+
+        let mut nodes: Vec<RTLNode> = Vec::new();
+        let rtl_node_map = get_rtl_node_map(rtl_config_seed.nodes);
         let mut node_index = 0;
-        for s9_node_config in s9_config.nodes {
+        for s9_node in &s9_config.nodes {
             node_index += 1;
-            let (host, rest_port, macaroon_path) = match s9_node_config.clone().typ {
-                NodeType::Lnd => match s9_node_config.clone().connection_settings {
-                    S9NodeConnectionSettings::Internal => (
-                        format!("{}", "lnd.embassy"),
-                        8080,
-                        PathBuf::from("/mnt/lnd"),
-                    ),
-                    S9NodeConnectionSettings::External {
-                        address,
-                        rest_port,
-                        macaroon,
-                        cert: _,
-                    } => {
-                        let macaroon_dir_path =
-                            PathBuf::from(format!("/root/lnd-external-{}", node_index));
-                        std::fs::create_dir_all(macaroon_dir_path.as_path())?;
-                        let macaroon_path = macaroon_dir_path.join("admin.macaroon");
-                        File::create(macaroon_path)?.write_all(&base64::decode_config(
-                            macaroon,
-                            base64::Config::new(base64::CharacterSet::UrlSafe, false),
-                        )?)?;
-
-                        (
-                            format!("{}", address.host().unwrap()),
-                            rest_port,
-                            macaroon_dir_path,
-                        )
-                    }
-                },
-                NodeType::CLightning => match s9_node_config.clone().connection_settings {
-                    S9NodeConnectionSettings::Internal => (
-                        format!("{}", "c-lightning.embassy"),
-                        3001,
-                        PathBuf::from("/mnt/c-lightning"),
-                    ),
-                    S9NodeConnectionSettings::External {
-                        address,
-                        rest_port,
-                        macaroon,
-                        cert: _,
-                    } => {
-                        let macaroon_dir_path =
-                            PathBuf::from(format!("/root/cl-external-{}", node_index));
-                        std::fs::create_dir_all(macaroon_dir_path.as_path())?;
-                        let macaroon_path = macaroon_dir_path.join("access.macaroon");
-                        File::create(macaroon_path)?.write_all(&base64::decode_config(
-                            macaroon,
-                            base64::Config::new(base64::CharacterSet::UrlSafe, false),
-                        )?)?;
-
-                        (
-                            format!("{}", address.host().unwrap()),
-                            rest_port,
-                            macaroon_dir_path,
-                        )
-                    }
-                },
-            };
-
-            let mut default = RTLNode {
-                index: 1,
-                ln_implementation: RTLNodeType::LND,
-                ln_node: "Embassy LND".to_owned(),
-                authentication: RTLNodeAuthentication {
-                    macaroon_path: PathBuf::from(""),
-                },
-                settings: RTLNodeSettings {
-                    user_persona: RTLNodePersona::OPERATOR,
-                    theme_mode: RTLNodeThemeMode::NIGHT,
-                    theme_color: RTLNodeThemeColor::PURPLE,
-                    fiat_conversion: false,
-                    channel_backup_path: None,
-                    ln_server_url: None,
-                },
-            };
-            let node_seed = if let Some(ns) = cfg_seed
-                .nodes
-                .iter_mut()
-                .filter(|n| n.ln_node == s9_node_config.name)
-                .next()
-            {
-                ns
+            let (address, rest_port, macaroon_path) = apply_s9_node(s9_node, node_index)?;
+            let rtl_node = if rtl_node_map.contains_key(&s9_node.name) {
+                to_rtl_from_previous(
+                    rtl_node_map.get(&s9_node.name).unwrap(),
+                    &s9_node,
+                    node_index,
+                    macaroon_path,
+                    address,
+                    rest_port,
+                )
             } else {
-                &mut default
+                to_rtl_default(&s9_node, node_index, macaroon_path, address, rest_port)
             };
-
-            let index = node_index;
-            let ln_node = s9_node_config.name;
-            let ln_implementation = s9_node_config.typ.into();
-            let authentication = RTLNodeAuthentication { macaroon_path };
-            let mut settings = node_seed.settings.clone();
-            settings.channel_backup_path = Some(format!("/root/backup/node-{}", node_index).into());
-            settings.ln_server_url = Some(format!("https://{}:{}", host, rest_port).into());
-            nodes.push(RTLNode {
-                index,
-                ln_implementation,
-                ln_node,
-                authentication,
-                settings,
-            });
+            nodes.push(rtl_node);
         }
         let cfg = RTLConfig {
-            sso,
-            default_node_index,
-            host,
+            sso: rtl_config_seed.sso,
+            default_node_index: rtl_config_seed.default_node_index,
+            host: "0.0.0.0".parse().unwrap(),
             nodes,
-            port,
-            multi_pass,
-            multi_pass_hashed,
+            port: 80,
+            multi_pass: Some(s9_config.password.clone()),
+            multi_pass_hashed: None,
         };
         serde_json::to_writer_pretty(File::create("/root/RTL-Config-new.json")?, &cfg)?;
         std::fs::rename("/root/RTL-Config-new.json", &cfg_path)?;
