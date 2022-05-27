@@ -4,6 +4,7 @@ set -ea
 
 if [ $1 = "from" ]; then
     yq -i '.nodes = [{"type": "lnd", "name":"Embassy LND", "connection-settings": .lnd}] | del(.lnd)' /root/start9/config.yaml
+    rm -rf /root/lnd-external
     echo '{"configured": true }'
     exit 0
 elif [ $1 = "to" ]; then

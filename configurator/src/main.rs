@@ -47,7 +47,6 @@ enum S9NodeConnectionSettings {
         address: Uri,
         rest_port: u16,
         macaroon: String,
-        cert: String,
     },
 }
 
@@ -201,7 +200,6 @@ fn apply_s9_node(
                 address,
                 rest_port,
                 macaroon,
-                cert: _,
             } => {
                 let macaroon_dir_path = PathBuf::from(format!("/root/lnd-external-{}", node_index));
                 std::fs::create_dir_all(macaroon_dir_path.as_path())?;
@@ -228,7 +226,6 @@ fn apply_s9_node(
                 address,
                 rest_port,
                 macaroon,
-                cert: _,
             } => {
                 let macaroon_dir_path = PathBuf::from(format!("/root/cl-external-{}", node_index));
                 std::fs::create_dir_all(macaroon_dir_path.as_path())?;

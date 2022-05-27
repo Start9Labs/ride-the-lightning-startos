@@ -66,11 +66,6 @@ nodes:
                 description: Your admin.macaroon file, Base64URL encoded. This is the same as the value after "macaroon=" in your lndconnect URL.
                 nullable: false
                 masked: true
-              cert:
-                type: string
-                name: TLS Cert
-                description: Your tls.cert file, Base64URL encoded. This is the same as the value after "cert=" in your lndconnect URL.
-                nullable: false
       c-lightning:
         name:
           type: string
@@ -116,11 +111,6 @@ nodes:
                 description: Your C-Lightning-REST access.macaroon file, Base64URL encoded.
                 nullable: false
                 masked: true
-              cert:
-                type: string
-                name: TLS Cert
-                description: Your C-Lightning-REST certificate.pem file, Base64URL encoded.
-                nullable: false
 password:
   type: string
   name: Password
