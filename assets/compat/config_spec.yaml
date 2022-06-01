@@ -71,7 +71,7 @@ nodes:
           type: string
           name: Node Name
           description: Name of this node in the list
-          default: "Embassy Core Lightning (CLN)"
+          default: "Embassy CLN"
           nullable: false
         connection-settings:
           type: union
