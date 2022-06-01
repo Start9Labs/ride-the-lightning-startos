@@ -3,11 +3,13 @@
 export HOST_IP=$(ip -4 route list match 0/0 | awk '{print $3}')
 export RTL_CONFIG_PATH=/root
 
-echo start9/public > .backupignore
-echo start9/shared >> .backupignore
+rm -rf /root/cl-external-* /root/lnd-external-*
 
-lnd_type=$(yq e '.lnd.type' /root/start9/config.yaml)
-if [[ $lnd_type = "internal" ]]
+echo start9/public > /root/.backupignore
+echo start9/shared >> /root/.backupignore
+
+result=$(yq '.nodes.[] | select(.connection-settings.type == "internal")' /root/start9/config.yaml)
+if [[ ! -z $result ]]
   then
 
   if ! test -d /mnt/lnd
@@ -15,12 +17,6 @@ if [[ $lnd_type = "internal" ]]
     echo "LND mountpoint does not exist"
     exit 0
   fi
-
-  while ! test -f /mnt/lnd/tls.cert
-  do
-      echo "Waiting for LND cert to be generated..."
-      sleep 1
-  done
 
   while ! test -f /mnt/lnd/admin.macaroon
   do

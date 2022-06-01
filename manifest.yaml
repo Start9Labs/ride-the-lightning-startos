@@ -1,7 +1,9 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.12.2
-release-notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.12.2
+version: 0.12.3
+release-notes: |
+  - This release adds Core Lightning, or CLN (formerly c-lightning) compatibility and updates RTL to v0.12.3
+  - For more, see: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.12.3
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -10,7 +12,7 @@ marketing-site: https://twitter.com/RTL_App
 build: ["make"]
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
-  long: "A full function, device agnostic, web user interface for managing lightning node operations. It talks directly to the LND node running on your Embassy and is accessible from any Tor-enabled Browser!"
+  long: "A full function, device agnostic, web user interface for managing lightning node operations. It talks directly to the LND or CLN node running on your Embassy and is accessible from any Tor-enabled Browser!"
 assets:
   license: LICENSE
   icon: icon.png
@@ -24,6 +26,7 @@ main:
   mounts:
     main: /root
     lnd: /mnt/lnd
+    c-lightning: "/mnt/c-lightning"
   io-format: yaml
 health-checks:
   main:
@@ -61,6 +64,7 @@ config:
       - ride-the-lightning
       - /root
       - /mnt/assets/config_rules.yaml
+      - /mnt/assets/dependencies.yaml
     mounts:
       main: /root
       compat: /mnt/assets
@@ -87,6 +91,12 @@ volumes:
     volume-id: main
     path: /public
     readonly: true
+  c-lightning:
+    type: pointer
+    package-id: c-lightning
+    volume-id: main
+    path: /public
+    readonly: true
 interfaces:
   main:
     name: Browser Interface
@@ -107,8 +117,48 @@ dependencies:
     version: ">=0.13.4 <0.15.0"
     description: Used to communicate with the Lightning Network.
     requirement:
-      type: required
+      type: opt-out
+      how: Can opt to use the internal Core Lightning (CLN) instance instead of LND
     config: ~
+  c-lightning:
+    version: ">=0.10.1 <0.12.0"
+    description: Used to communicate with the Lightning Network.
+    requirement:
+      type: opt-out
+      how: Can opt to use the internal LND instance instead of LND
+    config:
+      check:
+        type: docker
+        image: compat
+        system: true
+        entrypoint: compat
+        args:
+          - dependency
+          - check
+          - ride-the-lightning
+          - "c-lightning"
+          - /data
+          - "/mnt/assets/c-lightning_rules.yaml"
+        mounts:
+          compat: /mnt/assets
+          main: /root
+        io-format: yaml
+      auto-configure:
+        type: docker
+        image: compat
+        system: true
+        entrypoint: compat
+        args:
+          - dependency
+          - "auto-configure"
+          - ride-the-lightning
+          - "c-lightning"
+          - /root
+          - "/mnt/assets/c-lightning_rules.yaml"
+        mounts:
+          compat: /mnt/assets
+          main: /root
+        io-format: yaml
 backup:
   create:
     type: docker
@@ -140,20 +190,24 @@ backup:
     io-format: yaml
 migrations:
   from:
-    ">=0.11.0 <0.12.2":
+    "<0.12.3":
       type: docker
       image: main
       system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
+      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+      args: ["from"]
       io-format: json
+      mounts:
+        main: /root
       inject: false
   to:
-    ">=0.11.0 <0.12.2":
+    "<0.12.3":
       type: docker
       image: main
       system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
+      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+      args: ["to"]
       io-format: json
+      mounts:
+        main: /root
       inject: false
