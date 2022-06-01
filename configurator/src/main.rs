@@ -257,7 +257,6 @@ fn to_rtl_default(
     }
 }
 
-// updateRTLNodeWithNewS9Data :: S9Node -> RTLNode -> RTLNode
 fn to_rtl(
     prev_rtl_node: Option<RTLNode>,
     s9_node: S9Node,
