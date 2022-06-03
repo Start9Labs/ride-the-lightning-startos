@@ -1,9 +1,10 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.12.3
+version: 0.12.3.1
 release-notes: |
   - This release adds Core Lightning, or CLN (formerly c-lightning) compatibility and updates RTL to v0.12.3
   - For more, see: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.12.3
+  - Minor patch release to fix a bug in 0.12.3 when running without LND installed
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -117,14 +118,14 @@ dependencies:
     version: ">=0.13.4 <0.15.0"
     description: Used to communicate with the Lightning Network.
     requirement:
-      type: opt-out
+      type: opt-in
       how: Can opt to use the internal Core Lightning (CLN) instance instead of LND
     config: ~
   c-lightning:
     version: ">=0.10.1 <0.12.0"
     description: Used to communicate with the Lightning Network.
     requirement:
-      type: opt-out
+      type: opt-in
       how: Can opt to use the internal LND instance instead of LND
     config:
       check:
@@ -200,6 +201,14 @@ migrations:
       mounts:
         main: /root
       inject: false
+    ">=0.12.3":
+      type: docker
+      image: main
+      system: false
+      entrypoint: "/bin/echo"
+      args: ['{"configured": true}']
+      io-format: json
+      inject: false
   to:
     "<0.12.3":
       type: docker
@@ -210,4 +219,12 @@ migrations:
       io-format: json
       mounts:
         main: /root
+      inject: false
+    ">=0.12.3":
+      type: docker
+      image: main
+      system: false
+      entrypoint: "/bin/echo"
+      args: ['{"configured": true}']
+      io-format: json
       inject: false
