@@ -22,7 +22,7 @@ ride-the-lightning.s9pk: manifest.yaml assets/compat/* image.tar instructions.md
 	embassy-sdk pack
 
 image.tar: Dockerfile docker_entrypoint.sh check-web.sh configurator/target/aarch64-unknown-linux-musl/release/configurator migrations/* $(RTL_GIT_FILE) $(HEALTH_CHECK)
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --no-cache --tag start9/ride-the-lightning/main:$(VERSION) --platform=linux/arm64 -o type=docker,dest=image.tar .
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --no-cache --tag start9/ride-the-lightning/main:$(VERSION) --platform=linux/arm64/v8 -o type=docker,dest=image.tar .
 
 configurator/target/aarch64-unknown-linux-musl/release/configurator: $(CONFIGURATOR_SRC)
 	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:aarch64-musl cargo +beta build --release
