@@ -58,7 +58,7 @@ export const dependencies: T.ExpectedExports.dependencies = {
     async check(effects, configInput) {
       effects.info("check c-lightning");
       const config = matchLndConfig.unsafeCast(configInput);
-      if (config.node.type !== "c-lightning") {
+      if (config.nodes.type !== "c-lightning") {
         return { error: "Must have CLN selected" };
       }
       return { result: null };

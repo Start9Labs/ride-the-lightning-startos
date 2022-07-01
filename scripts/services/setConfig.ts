@@ -5,10 +5,7 @@ export const setConfig: T.ExpectedExports.setConfig = async (
   effects: T.Effects,
   newConfig: T.Config,
 ) => {
-  const dependsOnCln: { [key: string]: string[] } = newConfig?.advanced.plugins.rest
-    ? { "c-lightning": [] }
-    : {};
-
+  const dependsOnCln: { [key: string]: string[] } = !!newConfig?.advanced.plugins.rest ? { "c-lightning": [] } : {};
   return compat.setConfig(effects, newConfig, {
     ...dependsOnCln,
   });

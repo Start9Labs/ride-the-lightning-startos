@@ -27,14 +27,14 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
         "variants": {
             "lnd": {
               "name": {
-                  "type": "string",
+                  "type": "string" as const,
                   "name": "Node Name",
                   "description": "Name of this node in the list",
                   "default": "Embassy LND",
                   "nullable": false
               },
               "connection-settings": {
-                  "type": "union",
+                  "type": "union" as const,
                   "name": "Connection Settings",
                   "description": "The Lightning Network Daemon node to connect to.",
                   "tag": {
@@ -51,13 +51,13 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
                     "internal": {},
                     "external": {
                         "address": {
-                          "type": "string",
+                          "type": "string" as const,
                           "name": "Public Address",
                           "description": "The public address of your LND REST server\nNOTE: RTL does not support a .onion URL here\n",
                           "nullable": false
                         },
                         "rest-port": {
-                          "type": "number",
+                          "type": "number" as const,
                           "name": "REST Port",
                           "description": "The port that your Lightning Network Daemon REST server is bound to",
                           "nullable": false,
@@ -66,7 +66,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
                           "default": 8080
                         },
                         "macaroon": {
-                          "type": "string",
+                          "type": "string" as const,
                           "name": "Macaroon",
                           "description": "Your admin.macaroon file, Base64URL encoded. This is the same as the value after \"macaroon=\" in your lndconnect URL.",
                           "nullable": false,
@@ -78,14 +78,14 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
             },
             "c-lightning": {
               "name": {
-                  "type": "string",
+                  "type": "string" as const,
                   "name": "Node Name",
                   "description": "Name of this node in the list",
                   "default": "Embassy CLN",
                   "nullable": false
               },
               "connection-settings": {
-                  "type": "union",
+                  "type": "union" as const,
                   "name": "Connection Settings",
                   "description": "The Core Lightning (CLN) node to connect to.",
                   "tag": {
@@ -102,13 +102,13 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
                     "internal": {},
                     "external": {
                         "address": {
-                          "type": "string",
+                          "type": "string" as const,
                           "name": "Public Address",
                           "description": "The public address of your C-Lightning-REST server\nNOTE: RTL does not support a .onion URL here\n",
                           "nullable": false
                         },
                         "rest-port": {
-                          "type": "number",
+                          "type": "number" as const,
                           "name": "REST Port",
                           "description": "The port that your C-Lightning-REST server is bound to",
                           "nullable": false,
@@ -117,7 +117,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
                           "default": 3001
                         },
                         "macaroon": {
-                          "type": "string",
+                          "type": "string" as const,
                           "name": "Macaroon",
                           "description": "Your C-Lightning-REST access.macaroon file, Base64URL encoded.",
                           "nullable": false,
@@ -131,7 +131,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
       }
   },
   "password": {
-      "type": "string",
+      "type": "string" as const,
       "name": "Password",
       "description": "The password for your Ride the Lightning dashboard",
       "nullable": false,
