@@ -18,7 +18,7 @@ verify: ride-the-lightning.s9pk
 install: ride-the-lightning.s9pk
 	embassy-cli package install ride-the-lightning.s9pk
 
-ride-the-lightning.s9pk: manifest.yaml assets/compat/* image.tar instructions.md $(ASSET_PATHS)
+ride-the-lightning.s9pk: manifest.yaml assets/compat/* image.tar instructions.md scripts/embassy.js $(ASSET_PATHS)
 	embassy-sdk pack
 
 image.tar: Dockerfile docker_entrypoint.sh check-web.sh configurator/target/aarch64-unknown-linux-musl/release/configurator migrations/* $(RTL_GIT_FILE) $(HEALTH_CHECK)
@@ -26,3 +26,11 @@ image.tar: Dockerfile docker_entrypoint.sh check-web.sh configurator/target/aarc
 
 configurator/target/aarch64-unknown-linux-musl/release/configurator: $(CONFIGURATOR_SRC)
 	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/configurator:/home/rust/src start9/rust-musl-cross:aarch64-musl cargo +beta build --release
+
+scripts/embassy.js: scripts/**/*.ts
+	deno bundle scripts/embassy.ts scripts/embassy.js
+
+clean:
+	rm -f image.tar
+	rm -f ride-the-lightning.s9pk
+	rm -f scripts/*.js

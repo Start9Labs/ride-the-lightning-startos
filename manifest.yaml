@@ -1,10 +1,8 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.12.3.1
+version: 0.12.3.2
 release-notes: |
-  - This release adds Core Lightning, or CLN (formerly c-lightning) compatibility and updates RTL to v0.12.3
-  - For more, see: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.12.3
-  - Minor patch release to fix a bug in 0.12.3 when running without LND installed
+  * Switch to using new EOS apis for faster configuration and properties
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -41,46 +39,11 @@ health-checks:
     inject: true
 config:
   get:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - get
-      - /root
-      - /mnt/assets/config_spec.yaml
-    mounts:
-      main: /root
-      compat: /mnt/assets
-    io-format: yaml
+    type: script
   set:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - set
-      - ride-the-lightning
-      - /root
-      - /mnt/assets/config_rules.yaml
-      - /mnt/assets/dependencies.yaml
-    mounts:
-      main: /root
-      compat: /mnt/assets
-    io-format: yaml
+    type: script
 properties:
-  type: docker
-  image: compat
-  system: true
-  entrypoint: compat
-  args:
-    - properties
-    - /root
-  mounts:
-    main: /root
-  io-format: yaml
+  type: script
 volumes:
   main:
     type: data
@@ -129,37 +92,9 @@ dependencies:
       how: Can opt to use the internal LND instance instead of LND
     config:
       check:
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - check
-          - ride-the-lightning
-          - "c-lightning"
-          - /data
-          - "/mnt/assets/c-lightning_rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /root
-        io-format: yaml
+        type: script
       auto-configure:
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - "auto-configure"
-          - ride-the-lightning
-          - "c-lightning"
-          - /root
-          - "/mnt/assets/c-lightning_rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /root
-        io-format: yaml
+        type: script
 backup:
   create:
     type: docker
