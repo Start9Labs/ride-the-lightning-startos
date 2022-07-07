@@ -9,7 +9,7 @@ COPY ./RTL/package.json /RTL/package.json
 COPY ./RTL/package-lock.json /RTL/package-lock.json
 
 # Install dependencies
-RUN npm install --only=prod
+RUN npm install --only=prod --force
 RUN wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_arm.tar.gz -O - |\
   tar xz && mv yq_linux_arm /usr/bin/yq
 
