@@ -11,7 +11,6 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
         "lnd"
       ],
       "spec": {
-        "type": "string" as const,
         "display-as": "{{name}}",
         "unique-by": "name",
         "name": "Node Implementation",
