@@ -26,7 +26,6 @@ main:
     main: /root
     lnd: /mnt/lnd
     c-lightning: "/mnt/c-lightning"
-  io-format: yaml
 health-checks:
   main:
     name: Web UI
