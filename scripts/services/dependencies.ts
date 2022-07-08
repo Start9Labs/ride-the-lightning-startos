@@ -14,21 +14,6 @@ const matchClnConfig = shape({
   }),
 });
 
-function times<T>(fn: (i: number) => T, amount: number): T[] {
-  const answer = new Array(amount);
-  for (let i = 0; i < amount; i++) {
-    answer[i] = fn(i);
-  }
-  return answer;
-}
-
-function randomItemString(input: string) {
-  return input[Math.floor(Math.random() * input.length)];
-}
-
-const serviceName = "ride-the-lightning";
-const fullChars =
-  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 type Check = {
   currentError(config: T.Config): string | void;
   fix(config: T.Config): T.Config;
