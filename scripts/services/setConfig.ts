@@ -1,14 +1,16 @@
-import { matches, compat, types as T } from "../deps.ts";
-const {shape, literal} = matches
-const matchIsRest = shape({advanced:shape({plugin: shape({rest: literal(true)})})}).test
+import { compat, types as T } from "../deps.ts";
 
 // deno-lint-ignore require-await
 export const setConfig: T.ExpectedExports.setConfig = async (
   effects: T.Effects,
   newConfig: T.Config,
 ) => {
-  const dependsOnCln: { [key: string]: string[] } = matchIsRest(newConfig) ? { "c-lightning": [] } : {};
+  // deno-lint-ignore no-explicit-any
+  const dependsOnCln: { [key: string]: string[] } = (newConfig as any) ?.nodes?.find((x: any) => x?.type ===  'c-lightning') ? { "c-lightning": [] } : {};
+  // deno-lint-ignore no-explicit-any
+  const dependsOnLnd: { [key: string]: string[] } = (newConfig as any) ?.nodes?.find((x: any) => x?.type ===  'lnd') ? { "lnd": [] } : {};
   return compat.setConfig(effects, newConfig, {
     ...dependsOnCln,
+    ...dependsOnLnd,
   });
 };
