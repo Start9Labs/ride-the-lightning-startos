@@ -1,6 +1,6 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.12.3.2
+version: 0.12.3.3
 release-notes: |
   * Switch to using new EOS apis for faster configuration and properties
 license: MIT
@@ -77,7 +77,7 @@ interfaces:
       - http
 dependencies:
   lnd:
-    version: ">=0.13.4 <0.15.0"
+    version: ">=0.13.4 <0.16.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: opt-in
