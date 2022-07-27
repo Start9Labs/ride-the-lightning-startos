@@ -83,6 +83,7 @@ struct RTLConfig {
     port: usize,
     multi_pass: Option<String>,
     multi_pass_hashed: Option<String>,
+    secret_2fa: Option<String>,
 }
 impl RTLConfig {
     fn default_with_pass(pass: String) -> RTLConfig {
@@ -94,10 +95,11 @@ impl RTLConfig {
                 rtl_s_s_o: 0,
             },
             nodes: Vec::new(),
-            multi_pass: Some(pass),
-            multi_pass_hashed: None,
             host: "0.0.0.0".parse().unwrap(),
             port: 80,
+            multi_pass: Some(pass),
+            multi_pass_hashed: None,
+            secret_2fa: None,
         }
     }
 }
@@ -204,9 +206,22 @@ fn write_macaroons_and_get_connection_details(
     node_index: usize,
 ) -> Result<(String, u16, PathBuf), anyhow::Error> {
     match (&s9_node.typ, &s9_node.connection_settings) {
-        (NodeType::Lnd, S9NodeConnectionSettings::Internal) => Ok(( String::from("lnd.embassy"), 8080, PathBuf::from("/mnt/lnd"),)),
-        (NodeType::CLightning, S9NodeConnectionSettings::Internal) => Ok(( String::from("c-lightning.embassy"), 3001, PathBuf::from("/mnt/c-lightning"),)),
-        (typ, S9NodeConnectionSettings::External { address, rest_port, macaroon }) => {
+        (NodeType::Lnd, S9NodeConnectionSettings::Internal) => {
+            Ok((String::from("lnd.embassy"), 8080, PathBuf::from("/mnt/lnd")))
+        }
+        (NodeType::CLightning, S9NodeConnectionSettings::Internal) => Ok((
+            String::from("c-lightning.embassy"),
+            3001,
+            PathBuf::from("/mnt/c-lightning"),
+        )),
+        (
+            typ,
+            S9NodeConnectionSettings::External {
+                address,
+                rest_port,
+                macaroon,
+            },
+        ) => {
             let (mac_path, mac_dir) = match typ {
                 NodeType::Lnd => {
                     let mac_dir = PathBuf::from(format!("/root/lnd-external-{}", node_index));
@@ -218,7 +233,10 @@ fn write_macaroons_and_get_connection_details(
                 }
             };
             std::fs::create_dir_all(mac_dir.as_path())?;
-            File::create(mac_path)?.write_all(&base64::decode_config(macaroon, base64::Config::new(base64::CharacterSet::UrlSafe, false))?)?;
+            File::create(mac_path)?.write_all(&base64::decode_config(
+                macaroon,
+                base64::Config::new(base64::CharacterSet::UrlSafe, false),
+            )?)?;
             Ok((address.host().unwrap().to_owned(), *rest_port, mac_dir))
         }
     }
@@ -311,7 +329,8 @@ fn main() -> Result<(), anyhow::Error> {
         .enumerate()
         .map(|(zero_index, s9_node)| {
             let one_index = zero_index + 1;
-            let (address, rest_port, macaroon_path) = write_macaroons_and_get_connection_details(&s9_node, one_index)?;
+            let (address, rest_port, macaroon_path) =
+                write_macaroons_and_get_connection_details(&s9_node, one_index)?;
             Ok(to_rtl(
                 rtl_node_map.remove(&s9_node.name),
                 s9_node,
