@@ -35,8 +35,8 @@ FROM arm64v8/node:16-stretch-slim as runner
 RUN apt update
 RUN apt install -y bash curl bash
 
-ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-arm64 /usr/local/bin/tini
-RUN chmod +x /usr/local/bin/tini
+# ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-arm64 /usr/local/bin/tini
+# RUN chmod +x /usr/local/bin/tini
 
 WORKDIR /RTL
 
@@ -45,7 +45,7 @@ COPY --from=builder /RTL/package.json ./package.json
 COPY --from=builder /RTL/frontend ./frontend
 COPY --from=builder /RTL/backend ./backend
 COPY --from=builder /RTL/node_modules/ ./node_modules
-# COPY --from=builder "/tini" /sbin/tini
+COPY --from=builder "/tini" /sbin/tini
 
 # FROM node:16-alpine
 
