@@ -127,40 +127,10 @@ backup:
     io-format: yaml
 migrations:
   from:
-    "<0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+    "*":
+      type: script
       args: ["from"]
-      io-format: json
-      mounts:
-        main: /root
-      inject: false
-    ">=0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
-      io-format: json
-      inject: false
   to:
-    "<0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+    "*":
+      type: script
       args: ["to"]
-      io-format: json
-      mounts:
-        main: /root
-      inject: false
-    ">=0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
-      io-format: json
-      inject: false

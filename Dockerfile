@@ -33,7 +33,7 @@ RUN npm prune --production
 FROM arm64v8/node:16-stretch-slim as runner
 
 RUN apt update
-RUN apt install -y bash curl bash
+RUN apt install -y bash curl iproute2 wget
 
 # ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-arm64 /usr/local/bin/tini
 # RUN chmod +x /usr/local/bin/tini
@@ -59,8 +59,8 @@ COPY --from=builder "/tini" /sbin/tini
 
 # # Install dependencies
 # RUN npm install --omit=dev
-# RUN wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_arm.tar.gz -O - |\
-#   tar xz && mv yq_linux_arm /usr/bin/yq
+RUN wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_arm.tar.gz -O - |\
+  tar xz && mv yq_linux_arm /usr/bin/yq
 
 # COPY ./RTL /RTL
 
