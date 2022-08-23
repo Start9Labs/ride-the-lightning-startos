@@ -1,8 +1,10 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.12.3.3
+version: 0.13.0
 release-notes: |
-  * Bug fix: don't delete 2fa secret when restarting
+  * Update upstream to 0.13.0
+  * Update migrations to JS
+  * Add validation to macaroon config field
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -125,40 +127,10 @@ backup:
     io-format: yaml
 migrations:
   from:
-    "<0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+    "*":
+      type: script
       args: ["from"]
-      io-format: json
-      mounts:
-        main: /root
-      inject: false
-    ">=0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
-      io-format: json
-      inject: false
   to:
-    "<0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: /usr/local/bin/migrations/lt_0_12_3.sh
+    "*":
+      type: script
       args: ["to"]
-      io-format: json
-      mounts:
-        main: /root
-      inject: false
-    ">=0.12.3":
-      type: docker
-      image: main
-      system: false
-      entrypoint: "/bin/echo"
-      args: ['{"configured": true}']
-      io-format: json
-      inject: false
