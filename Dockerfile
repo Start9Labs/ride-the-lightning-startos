@@ -35,9 +35,6 @@ FROM arm64v8/node:16-stretch-slim as runner
 RUN apt update
 RUN apt install -y bash curl iproute2 wget
 
-# ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-arm64 /usr/local/bin/tini
-# RUN chmod +x /usr/local/bin/tini
-
 WORKDIR /RTL
 
 COPY --from=builder /RTL/rtl.js ./rtl.js
@@ -47,22 +44,8 @@ COPY --from=builder /RTL/backend ./backend
 COPY --from=builder /RTL/node_modules/ ./node_modules
 COPY --from=builder "/tini" /sbin/tini
 
-# FROM node:16-alpine
-
-# RUN apk update
-# RUN apk add --no-cache bash tini curl bash
-
-# WORKDIR /RTL
-
-# COPY ./RTL/package.json /RTL/package.json
-# COPY ./RTL/package-lock.json /RTL/package-lock.json
-
-# # Install dependencies
-# RUN npm install --omit=dev
 RUN wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_arm.tar.gz -O - |\
   tar xz && mv yq_linux_arm /usr/bin/yq
-
-# COPY ./RTL /RTL
 
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
