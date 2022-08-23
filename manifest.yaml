@@ -3,8 +3,8 @@ title: Ride the Lightning
 version: 0.13.0
 release-notes: |
   * Update upstream to 0.13.0
-  * Update migrations to JS (in progress)
-  * [Add validation to cert and macaroon config fields](https://github.com/Start9Labs/ride-the-lightning-wrapper/issues/15) (in progress)
+  * Update migrations to JS
+  * Add validation to macaroon config field
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL

@@ -71,7 +71,9 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
                   "name": "Macaroon",
                   "description": "Your admin.macaroon file, Base64URL encoded. This is the same as the value after \"macaroon=\" in your lndconnect URL.",
                   "nullable": false,
-                  "masked": true
+                  "masked": true,
+                  "pattern": "[=A-Za-z0-9_-]+",
+                  "pattern-description": "Macaroon must be encoded in Base64URL format (only A-Z, a-z, 0-9, _, - and = allowed)",
                 }
               }
             }
