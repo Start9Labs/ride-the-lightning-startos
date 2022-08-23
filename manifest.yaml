@@ -2,9 +2,11 @@ id: ride-the-lightning
 title: Ride the Lightning
 version: 0.13.0
 release-notes: |
-  * Update upstream to 0.13.0
-  * Update migrations to JS
+  * Update upstream to [0.13.0](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.13.0)
+    * Now with Liquidity Ads for CLN
   * Add validation to macaroon config field
+  * Don't delete 2fa creds on restart
+  * Update migrations to JS
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
