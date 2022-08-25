@@ -1,8 +1,8 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.13.0
+version: 0.13.1
 release-notes: |
-  * Update upstream to [0.13.0](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.13.0)
+  * Update upstream to [0.13.1](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.13.1)
     * Now with Liquidity Ads for CLN
   * Add validation to macaroon config field
   * Don't delete 2fa creds on restart
