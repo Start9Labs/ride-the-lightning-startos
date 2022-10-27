@@ -3,7 +3,9 @@
 # ---------------
 FROM node:16-stretch-slim as builder
 
-ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-arm64 /tini
+ARG PLATFORM
+
+ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${PLATFORM} /tini
 RUN chmod +x /tini
 
 WORKDIR /RTL
@@ -30,7 +32,10 @@ RUN npm prune --production
 # ---------------
 # Release App
 # ---------------
-FROM arm64v8/node:16-stretch-slim as runner
+FROM node:16-stretch-slim as runner
+
+ARG ARCH
+ARG PLATFORM
 
 RUN apt update
 RUN apt install -y bash curl iproute2 wget
@@ -44,14 +49,16 @@ COPY --from=builder /RTL/backend ./backend
 COPY --from=builder /RTL/node_modules/ ./node_modules
 COPY --from=builder "/tini" /sbin/tini
 
-RUN wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_arm.tar.gz -O - |\
-  tar xz && mv yq_linux_arm /usr/bin/yq
+RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${PLATFORM} && chmod +x /usr/local/bin/yq
+
+# RUN wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_arm.tar.gz -O - |\
+#   tar xz && mv yq_linux_arm /usr/bin/yq
 
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
 ADD ./check-web.sh /usr/local/bin/check-web.sh
 RUN chmod +x /usr/local/bin/check-web.sh
-ADD ./configurator/target/aarch64-unknown-linux-musl/release/configurator /usr/local/bin/configurator
+ADD ./configurator/target/${ARCH}-unknown-linux-musl/release/configurator /usr/local/bin/configurator
 RUN chmod +x /usr/local/bin/configurator
 ADD ./migrations /usr/local/bin/migrations
 RUN chmod a+x /usr/local/bin/migrations/*
