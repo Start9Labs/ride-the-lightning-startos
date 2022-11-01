@@ -29,12 +29,7 @@ health-checks:
   main:
     name: Web UI
     success-message: RTL is ready to visit in a web browser
-    type: docker
-    image: main
-    entrypoint: check-web.sh
-    args: []
-    io-format: json
-    inject: true
+    type: script
 config:
   get:
     type: script
