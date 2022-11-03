@@ -17,14 +17,7 @@ assets:
   icon: icon.png
   instructions: instructions.md
 main:
-  type: docker
-  image: main
-  entrypoint: docker_entrypoint.sh
-  args: []
-  mounts:
-    main: /root
-    lnd: /mnt/lnd
-    c-lightning: "/mnt/c-lightning"
+  type: script
 health-checks:
   main:
     name: Web UI
