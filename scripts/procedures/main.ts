@@ -1,11 +1,10 @@
-import { types as T, util } from "../deps.ts";
+import { types as T } from "../deps.ts";
 
 export const main: T.ExpectedExports.main = async (effects) => {
-  await effects.runDaemon(
+  return await effects.runDaemon(
     {
       command: "docker_entrypoint.sh",
       args: [],
     },
   ).wait();
-  return util.ok;
 };
