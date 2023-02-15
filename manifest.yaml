@@ -96,33 +96,9 @@ dependencies:
         type: script
 backup:
   create:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - create
-      - /mnt/backup
-      - /root/data
-    mounts:
-      BACKUP: /mnt/backup
-      main: /root/data
-    io-format: yaml
+    type: script
   restore:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - restore
-      - /mnt/backup
-      - /root/data
-    mounts:
-      BACKUP: /mnt/backup
-      main: /root/data
-    io-format: yaml
+    type: script
 migrations:
   from:
     "*":
