@@ -83,6 +83,8 @@ struct RTLConfig {
     port: usize,
     multi_pass: Option<String>,
     multi_pass_hashed: Option<String>,
+    // RTL breaks with a very unhelpful error if you write keys with null values to the config file
+    #[serde(skip_serializing_if = "Option::is_none")]
     secret_2fa: Option<String>,
 }
 impl RTLConfig {
@@ -317,7 +319,11 @@ fn main() -> Result<(), anyhow::Error> {
     let s9_config: S9Config = serde_yaml::from_reader(File::open("/root/start9/config.yaml")?)?;
     let cfg_path = Path::new("/root/RTL-Config.json");
     let mut cfg: RTLConfig = if cfg_path.exists() {
-        serde_json::from_reader(File::open(&cfg_path)?)?
+        // Allow user to update password
+        let mut existing_cfg: RTLConfig = serde_json::from_reader(File::open(&cfg_path)?)?;
+        existing_cfg.multi_pass = Some(s9_config.password.clone());
+        existing_cfg.multi_pass_hashed = None;
+        existing_cfg
     } else {
         RTLConfig::default_with_pass(s9_config.password.clone())
     };
