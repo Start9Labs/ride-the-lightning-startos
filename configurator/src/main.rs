@@ -141,6 +141,12 @@ struct RTLNodeSettings {
     theme_color: RTLNodeThemeColor,
     theme_mode: RTLNodeThemeMode,
     user_persona: RTLNodePersona,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    enable_offers: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    unannounced_channels: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    currency_unit: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -273,6 +279,9 @@ fn to_rtl_default(
             fiat_conversion: false,
             channel_backup_path: Some(format!("/root/backup/node-{}", node_index).into()),
             ln_server_url: Some(format!("https://{}:{}", address, rest_port).into()),
+            enable_offers: None,
+            unannounced_channels: None,
+            currency_unit: None,
         },
     }
 }
@@ -291,6 +300,9 @@ fn to_rtl(
         def.settings.theme_color = prev.settings.theme_color;
         def.settings.theme_mode = prev.settings.theme_mode;
         def.settings.fiat_conversion = prev.settings.fiat_conversion;
+        def.settings.enable_offers = prev.settings.enable_offers;
+        def.settings.unannounced_channels = prev.settings.unannounced_channels;
+        def.settings.currency_unit = prev.settings.currency_unit;
     }
     def
 }
