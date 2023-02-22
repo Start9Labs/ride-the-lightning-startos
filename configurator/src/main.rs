@@ -83,6 +83,8 @@ struct RTLConfig {
     port: usize,
     multi_pass: Option<String>,
     multi_pass_hashed: Option<String>,
+    // RTL breaks with a very unhelpful error if you write keys with null values to the config file
+    #[serde(skip_serializing_if = "Option::is_none")]
     secret_2fa: Option<String>,
 }
 impl RTLConfig {
@@ -139,6 +141,12 @@ struct RTLNodeSettings {
     theme_color: RTLNodeThemeColor,
     theme_mode: RTLNodeThemeMode,
     user_persona: RTLNodePersona,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    enable_offers: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    unannounced_channels: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    currency_unit: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -271,6 +279,9 @@ fn to_rtl_default(
             fiat_conversion: false,
             channel_backup_path: Some(format!("/root/backup/node-{}", node_index).into()),
             ln_server_url: Some(format!("https://{}:{}", address, rest_port).into()),
+            enable_offers: None,
+            unannounced_channels: None,
+            currency_unit: None,
         },
     }
 }
@@ -289,6 +300,9 @@ fn to_rtl(
         def.settings.theme_color = prev.settings.theme_color;
         def.settings.theme_mode = prev.settings.theme_mode;
         def.settings.fiat_conversion = prev.settings.fiat_conversion;
+        def.settings.enable_offers = prev.settings.enable_offers;
+        def.settings.unannounced_channels = prev.settings.unannounced_channels;
+        def.settings.currency_unit = prev.settings.currency_unit;
     }
     def
 }
@@ -317,7 +331,11 @@ fn main() -> Result<(), anyhow::Error> {
     let s9_config: S9Config = serde_yaml::from_reader(File::open("/root/start9/config.yaml")?)?;
     let cfg_path = Path::new("/root/RTL-Config.json");
     let mut cfg: RTLConfig = if cfg_path.exists() {
-        serde_json::from_reader(File::open(&cfg_path)?)?
+        // Allow user to update password
+        let mut existing_cfg: RTLConfig = serde_json::from_reader(File::open(&cfg_path)?)?;
+        existing_cfg.multi_pass = Some(s9_config.password.clone());
+        existing_cfg.multi_pass_hashed = None;
+        existing_cfg
     } else {
         RTLConfig::default_with_pass(s9_config.password.clone())
     };
