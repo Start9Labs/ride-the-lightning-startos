@@ -19,7 +19,7 @@ jobs:
         with:
           toolchain: stable
       - name: Get EmbassyOS Hash
-        run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os HEAD | awk '{ print $1}')" >> $GITHUB_ENV
+        run: echo "EMBASSYHASH=$(git ls-remote https://github.com/Start9Labs/embassy-os --branch latest | awk '{ print $1}')" >> $GITHUB_ENV
       - name: Cache Packages
         uses: actions/cache@v3
         id: packageCache
@@ -30,7 +30,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-synapse-${{ env.EMBASSYHASH }}
+          key: ${{ runner.os }}-ride-the-lightning-${{ env.EMBASSYHASH }}
       - name: Install Dependencies
         run: |
           sudo snap install yq deno
@@ -41,7 +41,7 @@ jobs:
         id: packageManager
         if: steps.packageCache.outputs.cache-hit != 'true'
         run: |
-          cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git;
+          cd ~/ && git clone https://github.com/Start9Labs/embassy-os.git --branch latest;
           cd embassy-os;
           git submodule update --init --recursive
           cd backend;
@@ -54,7 +54,7 @@ jobs:
           make
       - name: Generate sha256 checksum
         run: |
-          sha256sum synapse.s9pk > synapse.s9pk.sha256
+          sha256sum ride-the-lightning.s9pk > ride-the-lightning.s9pk.sha256
       - name: Generate changelog
         run: |
           echo "## What's Changed" > change-log.txt
@@ -65,8 +65,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          name: Synapse ${{ github.ref_name }}
+          name: Ride The Lightning ${{ github.ref_name }}
           body_path: change-log.txt
           files: |
-            synapse.s9pk
-            synapse.s9pk.sha256
+            ride-the-lightning.s9pk
+            ride-the-lightning.s9pk.sha256
