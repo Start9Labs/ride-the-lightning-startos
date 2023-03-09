@@ -1,3 +1,3 @@
 [submodule "RTL"]
 	path = RTL
-	url = git@github.com:Ride-The-Lightning/RTL.git
+	url = https://github.com/Ride-The-Lightning/RTL.git
