@@ -1,10 +1,8 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.13.6
+version: 0.13.6.1
 release-notes: |
-  * Update upstream to [v0.13.6](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.13.6)
-  * Update CLN dependency requirement to accommodate up to v23.10
-  * Fix password updates and in-app config saves
+  * Update LND dependency to v0.16.0
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -78,7 +76,7 @@ interfaces:
       - http
 dependencies:
   lnd:
-    version: ">=0.13.4 <0.16.0"
+    version: ">=0.13.4 <0.17.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: opt-in
