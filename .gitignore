@@ -1,4 +1,6 @@
-image.tar
-ride-the-lightning.s9pk
+*.s9pk
+procedures/*.js
+node_modules/
+.DS_Store
 .vscode/
 docker-images
