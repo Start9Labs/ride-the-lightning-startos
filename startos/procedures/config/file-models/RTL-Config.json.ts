@@ -1,19 +1,19 @@
 import { matches } from 'start-sdk/lib'
 import { FileHelper } from 'start-sdk/lib/util'
 
-const { object, array, string, number, anyOf, literal, boolean } = matches
+const { object, array, string, natural, anyOf, literal, boolean } = matches
 
 const shape = object({
   SSO: object({
     logout_redirect_link: string,
     rtl_cookie_path: string,
-    rtl_s_s_o: number,
+    rtl_s_s_o: natural,
   }),
-  default_node_index: number,
+  default_node_index: natural,
   host: string,
   nodes: array(
     object({
-      index: number,
+      index: natural,
       ln_implementation: anyOf(literal(0), literal(1)), // 0=LND 1=CLN
       ln_node: string,
       Authentication: object({
@@ -38,7 +38,7 @@ const shape = object({
       }),
     }),
   ),
-  port: number,
+  port: natural,
   multi_pass: string,
   multi_pass_hashed: string.optional(),
   secret_2fa: string.optional(),

@@ -7,6 +7,7 @@ import exportInterfaces from 'start-sdk/lib/mainFn/exportInterfaces'
 import { ExpectedExports } from 'start-sdk/lib/types'
 import { WrapperData } from '../wrapperData'
 import { HealthReceipt } from 'start-sdk/lib/health'
+import { manifest } from '../manifest'
 
 export const main: ExpectedExports.main = setupMain<WrapperData>(
   async ({ effects, utils, started }) => {
@@ -77,20 +78,20 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
       started,
       interfaceReceipt, // Provide the interfaceReceipt to prove it was completed
       healthReceipts, // Provide the healthReceipts or [] to prove they were at least considered
-    }).addDaemon('ws', {
-      command: ['-g', '--', 'node', 'rtl'], // The command to start the daemon
+    }).addDaemon('main', {
+      command: ['node', 'rtl'], // The command to start the daemon
       env: {
-        HOST_IP: `$(ip -4 route list match 0/0 | awk '{print $3}')`,
+        HOST_IP: await effects.getContainerIp(),
         RTL_CONFIG_PATH: '/root',
       },
       requires: [],
       ready: {
-        display: 'Server Ready',
+        display: 'Service Ready',
         // The function to run to determine the health status of the daemon
         fn: () =>
-          utils.checkPortListening(3000, {
-            successMessage: 'Server is live',
-            errorMessage: 'Server is unreachable',
+          utils.checkPortListening(80, {
+            successMessage: `${manifest.title} is live`,
+            errorMessage: `${manifest.title} is unreachable`,
           }),
       },
     })

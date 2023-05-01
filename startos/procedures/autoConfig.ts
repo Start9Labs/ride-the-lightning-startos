@@ -10,7 +10,6 @@ import { ConfigSpec as CLNSpec } from 'c-lightning-wrapper/startos/procedures/co
  * See Hello Moon for an example
  */
 export const autoConfig = setupAutoConfig<
-  // @TODO we need to set the error message when config not met
   WrapperData,
   ConfigSpec,
   Manifest,
