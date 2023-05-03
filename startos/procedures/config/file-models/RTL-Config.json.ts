@@ -1,5 +1,5 @@
 import { matches } from 'start-sdk/lib'
-import { FileHelper } from 'start-sdk/lib/util'
+import FileHelper from 'start-sdk/lib/util/fileHelper'
 
 const { object, array, string, natural, anyOf, literal, boolean } = matches
 

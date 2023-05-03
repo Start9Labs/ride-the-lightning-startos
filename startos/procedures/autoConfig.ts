@@ -1,7 +1,7 @@
-import { setupAutoConfig } from 'start-sdk/lib/autoconfig'
 import { ConfigSpec } from './config/spec'
 import { WrapperData } from '../wrapperData'
 import { Manifest } from '../manifest'
+import { setupAutoConfig } from 'start-sdk/lib/autoconfig/setupAutoConfig'
 import { ConfigSpec as CLNSpec } from 'c-lightning-wrapper/startos/procedures/config/spec'
 
 /**

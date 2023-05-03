@@ -1,4 +1,7 @@
-import { Config, Value, List, Variants } from 'start-sdk/lib/config/builder'
+import { Config } from 'start-sdk/lib/config/builder/config'
+import { List } from 'start-sdk/lib/config/builder/list'
+import { Value } from 'start-sdk/lib/config/builder/value'
+import { Variants } from 'start-sdk/lib/config/builder/variants'
 
 export const nodes = Value.list(
   List.obj(
@@ -156,5 +159,4 @@ export const configSpec = Config.of({
   nodes,
 })
 
-export const matchConfigSpec = configSpec.validator()
-export type ConfigSpec = typeof matchConfigSpec._TYPE
+export type ConfigSpec = typeof configSpec.validator._TYPE

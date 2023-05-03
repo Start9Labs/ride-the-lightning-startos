@@ -85,5 +85,11 @@ export const save: Save<WrapperData, ConfigSpec, Manifest> = async ({
     currentDeps.push(dependencies.running('lnd'))
   if (input.nodes.some((n) => n.union.unionSelectKey === 'c-lightning'))
     currentDeps.push(dependencies.running('c-lightning'))
-  return effects.setDependencies(currentDeps)
+
+  const dependenciesReceipt = await effects.setDependencies(currentDeps)
+
+  return {
+    dependenciesReceipt,
+    restart: true,
+  }
 }

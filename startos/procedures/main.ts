@@ -1,13 +1,11 @@
-import {
-  Daemons,
-  NetworkInterfaceBuilder,
-  setupMain,
-} from 'start-sdk/lib/mainFn'
+import { setupMain } from 'start-sdk/lib/mainFn'
 import exportInterfaces from 'start-sdk/lib/mainFn/exportInterfaces'
 import { ExpectedExports } from 'start-sdk/lib/types'
 import { WrapperData } from '../wrapperData'
-import { HealthReceipt } from 'start-sdk/lib/health'
 import { manifest } from '../manifest'
+import { NetworkInterfaceBuilder } from 'start-sdk/lib/mainFn/NetworkInterfaceBuilder'
+import { HealthReceipt } from 'start-sdk/lib/health/HealthReceipt'
+import { Daemons } from 'start-sdk/lib/mainFn/Daemons'
 
 export const main: ExpectedExports.main = setupMain<WrapperData>(
   async ({ effects, utils, started }) => {
@@ -27,15 +25,27 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
      * Naming convention reference: https://developer.mozilla.org/en-US/docs/Web/API/Location
      */
 
+    // set up a reverse proxy to enable https for LAN
+    await effects.reverseProxy({
+      bind: {
+        port: 443,
+        ssl: true,
+      },
+      dst: {
+        port: 80,
+        ssl: false,
+      },
+    })
+
     // ------------ web interface ------------
 
     // tor
     const torHostname = utils.torHostName('torHostname')
-    const webTorHost = await torHostname.bindTor(80, 80)
-    const webTorOrigin = webTorHost.createOrigin('http')
+    const torHostTcp = await torHostname.bindTor(80, 80)
+    const torOriginHttp = torHostTcp.createOrigin('http')
     // lan
-    const webLanHost = await utils.bindLan(80)
-    const webLanOrigins = webLanHost.createOrigins('https')
+    const lanHostSsl = await utils.bindLan(443)
+    const lanOriginsHttps = lanHostSsl.createOrigins('https')
 
     let webInterface = new NetworkInterfaceBuilder({
       effects,
@@ -49,10 +59,10 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
     })
 
     const webReceipt = await webInterface.exportAddresses([
-      webTorOrigin,
-      webLanOrigins.local,
-      ...webLanOrigins.ipv4,
-      ...webLanOrigins.ipv6,
+      torOriginHttp,
+      lanOriginsHttps.local,
+      ...lanOriginsHttps.ipv4,
+      ...lanOriginsHttps.ipv6,
     ])
 
     // Export all address receipts for all interfaces to obtain interface receipt

@@ -1,7 +1,9 @@
-import { setupInit, setupInstall, setupUninstall } from 'start-sdk/lib/inits'
 import { WrapperData } from '../wrapperData'
 import { migrations } from './migrations'
 import { rtlConfig } from './config/file-models/RTL-Config.json'
+import { setupInstall } from 'start-sdk/lib/inits/setupInstall'
+import { setupUninstall } from 'start-sdk/lib/inits/setupUninstall'
+import { setupInit } from 'start-sdk/lib/inits/setupInit'
 
 /**
  * Here you define arbitrary code that runs once, on fresh install only
