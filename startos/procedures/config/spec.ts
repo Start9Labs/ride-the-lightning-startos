@@ -1,7 +1,7 @@
-import { Config } from 'start-sdk/lib/config/builder/config'
-import { List } from 'start-sdk/lib/config/builder/list'
-import { Value } from 'start-sdk/lib/config/builder/value'
-import { Variants } from 'start-sdk/lib/config/builder/variants'
+import { Config } from '@start9labs/start-sdk/lib/config/builder/config'
+import { List } from '@start9labs/start-sdk/lib/config/builder/list'
+import { Value } from '@start9labs/start-sdk/lib/config/builder/value'
+import { Variants } from '@start9labs/start-sdk/lib/config/builder/variants'
 
 export const nodes = Value.list(
   List.obj(

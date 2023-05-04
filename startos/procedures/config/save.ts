@@ -1,8 +1,8 @@
 import { ConfigSpec } from './spec'
 import { WrapperData } from '../../wrapperData'
-import { Save } from 'start-sdk/lib/config/setupConfig'
+import { Save } from '@start9labs/start-sdk/lib/config/setupConfig'
 import { Manifest } from '../../manifest'
-import { Dependency } from 'start-sdk/lib/types'
+import { Dependency } from '@start9labs/start-sdk/lib/types'
 import { rtlConfig } from './file-models/RTL-Config.json'
 
 /**
