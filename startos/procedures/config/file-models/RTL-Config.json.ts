@@ -44,4 +44,4 @@ const shape = object({
   secret_2fa: string.optional(),
 })
 
-export const rtlConfig = FileHelper.json('RTL-Config.json', 'root', shape)
+export const rtlConfig = FileHelper.json('RTL-Config.json', shape)

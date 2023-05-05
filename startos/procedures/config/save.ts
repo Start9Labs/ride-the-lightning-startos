@@ -4,6 +4,7 @@ import { Save } from '@start9labs/start-sdk/lib/config/setupConfig'
 import { Manifest } from '../../manifest'
 import { Dependency } from '@start9labs/start-sdk/lib/types'
 import { rtlConfig } from './file-models/RTL-Config.json'
+import { writeFileSync } from 'fs'
 
 /**
  * This function executes on config save
@@ -18,41 +19,33 @@ export const save: Save<WrapperData, ConfigSpec, Manifest> = async ({
 }) => {
   // save config
   const config = (await rtlConfig.read(effects))!
-  const nodes: typeof config.nodes = input.nodes.map((node, i) => {
-    const index = i + 1
-    const imp = node.union.unionSelectKey
-    const { name, connectionSettings } = node.union.unionValueKey
+  const nodes: typeof config.nodes = input.nodes.map((node, index) => {
+    const { implementation, name, connectionSettings } = node
+    const hyphenatedName = name.replace(/\s+/g, '-')
 
-    let hostname: string
-    let rest_port: number
+    let ln_server_url: string
     let macaroon_path: string
-
     // internal
     if (connectionSettings.unionSelectKey === 'internal') {
-      if (imp === 'lnd') {
-        hostname = 'lnd.embassy'
-        rest_port = 8080
+      if (implementation === 'lnd') {
+        ln_server_url = `lnd.embassy:8080`
         macaroon_path = '/mnt/lnd'
       } else {
-        hostname = 'c-lightning.embassy'
-        rest_port = 3001
+        ln_server_url = 'c-lightning.embassy:3001'
         macaroon_path = '/mnt/c-lightning'
       }
       // external
     } else {
-      hostname = connectionSettings.unionValueKey.hostname
-      rest_port = connectionSettings.unionValueKey.rest_port
-      macaroon_path =
-        imp === 'lnd'
-          ? `/root/lnd-external-${index}/admin.macaroon`
-          : `/root/cl-external-${index}/access.macaroon`
+      ln_server_url = connectionSettings.unionValueKey.ln_server_url
+      macaroon_path = `/root/external-macaroons/${hyphenatedName}.macaroon`
+      writeFileSync(macaroon_path, connectionSettings.unionValueKey.macaroon)
     }
 
     const savedNode = config.nodes.find((n) => n.ln_node === name)
 
     return {
-      index,
-      ln_implementation: imp === 'lnd' ? 0 : 1,
+      index: index + 1,
+      ln_implementation: implementation === 'lnd' ? 0 : 1,
       ln_node: name,
       Authentication: {
         macaroon_path,
@@ -60,10 +53,11 @@ export const save: Save<WrapperData, ConfigSpec, Manifest> = async ({
       Settings: savedNode?.Settings || {
         user_persona: 1,
         theme_mode: 1,
-        theme_color: 0,
+        theme_color: (index < 5 ? index : index % 5) as 0 | 1 | 2 | 3 | 4,
         fiat_conversion: false,
-        channel_backup_path: `/root/backup/node-${index}`,
-        ln_server_url: `https://${hostname}:${rest_port}`,
+        channel_backup_path: `/root/backup/${hyphenatedName}`,
+        ln_server_url,
+        // @TODO test if these are needed
         enable_offers: undefined,
         unannounced_channels: undefined,
         currency_unit: undefined,
@@ -73,7 +67,7 @@ export const save: Save<WrapperData, ConfigSpec, Manifest> = async ({
 
   await rtlConfig.write(
     {
-      ...config!,
+      ...config,
       nodes,
     },
     effects,
@@ -81,9 +75,9 @@ export const save: Save<WrapperData, ConfigSpec, Manifest> = async ({
 
   // determine dependencies
   let currentDeps: Dependency[] = []
-  if (input.nodes.some((n) => n.union.unionSelectKey === 'lnd'))
+  if (input.nodes.some((n) => n.implementation === 'lnd'))
     currentDeps.push(dependencies.running('lnd'))
-  if (input.nodes.some((n) => n.union.unionSelectKey === 'c-lightning'))
+  if (input.nodes.some((n) => n.implementation === 'cln'))
     currentDeps.push(dependencies.running('c-lightning'))
 
   const dependenciesReceipt = await effects.setDependencies(currentDeps)

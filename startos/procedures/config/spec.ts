@@ -14,136 +14,61 @@ export const nodes = Value.list(
     },
     {
       spec: Config.of({
-        union: Value.union(
+        implementation: Value.select({
+          name: 'Implementation',
+          description:
+            'The underlying Lightning Network node implementation: currently, LND or Core Lightning',
+          required: { default: null },
+          values: {
+            lnd: 'LND',
+            cln: 'Core Lightning',
+          },
+          immutable: true,
+        }),
+        name: Value.text({
+          name: 'Node Name',
+          description: 'Name of this node in the list',
+          required: {
+            default: null,
+          },
+          immutable: true,
+          placeholder: 'LND/CLN Node 1',
+        }),
+        connectionSettings: Value.union(
           {
-            name: 'Type',
+            name: 'Connection Settings',
             description:
-              '- LND: Lightning Network Daemon from Lightning Labs\n- CLN: Core Lightning from Blockstream',
-            required: { default: null },
+              '- Internal: A Lightning node running on this server.\n- External: A Lightning node running on a remote server (advanced).',
+            required: { default: 'internal' },
+            immutable: true,
           },
           Variants.of({
-            lnd: {
-              name: 'lnd',
+            internal: { name: 'Internal', spec: Config.of({}) },
+            external: {
+              name: 'External (advanced)',
               spec: Config.of({
-                name: Value.text({
-                  name: 'Node Name',
-                  required: {
-                    default: 'Start9 LND',
-                  },
-                  description: 'Name of this node in the list',
+                ln_server_url: Value.text({
+                  name: 'REST Server URL',
+                  required: { default: null },
+                  description: `The fully qualified URL of your node's REST server, including protocol and port.\nNOTE: RTL does not support a .onion URL here`,
+                  placeholder: 'https://<hostname>.com:8080',
                 }),
-                connectionSettings: Value.union(
-                  {
-                    name: 'Connection Settings',
-                    description:
-                      '- Internal: The Lightning Network Daemon service installed to your Embassy.\n- External: A Lightning Network Daemon instance running on a remote device (advanced).\n',
-                    required: { default: 'internal' },
-                  },
-                  Variants.of({
-                    internal: { name: 'Internal', spec: Config.of({}) },
-                    external: {
-                      name: 'External',
-                      spec: Config.of({
-                        hostname: Value.text({
-                          name: 'Public Address',
-                          required: { default: null },
-                          description:
-                            'The public address of your LND REST server\nNOTE: RTL does not support a .onion URL here\n',
-                        }),
-                        rest_port: Value.number({
-                          name: 'REST Port',
-                          description:
-                            'The port that your Lightning Network Daemon REST server is bound to',
-                          required: {
-                            default: 8080,
-                          },
-                          min: 1,
-                          max: 65535,
-                          integer: true,
-                        }),
-                        macaroon: Value.text({
-                          name: 'Macaroon',
-                          required: {
-                            default: null,
-                          },
-                          description:
-                            'Your admin.macaroon file, Base64URL encoded. This is the same as the value after "macaroon=" in your lndconnect URL.',
-                          masked: true,
-                          patterns: [
-                            {
-                              regex: '[=A-Za-z0-9_-]+',
-                              description:
-                                'Macaroon must be encoded in Base64URL format (only A-Z, a-z, 0-9, _, - and = allowed)',
-                            },
-                          ],
-                        }),
-                      }),
-                    },
-                  }),
-                ),
-              }),
-            },
-            'c-lightning': {
-              name: 'Core Lightning',
-              spec: Config.of({
-                name: Value.text({
-                  name: 'Node Name',
+                macaroon: Value.text({
+                  name: 'Macaroon',
                   required: {
-                    default: 'Start9 CLN',
+                    default: null,
                   },
-                  description: 'Name of this node in the list',
-                }),
-                connectionSettings: Value.union(
-                  {
-                    name: 'Connection Settings',
-                    description:
-                      '- Internal: The Core Lightning (CLN) service installed to your Embassy.\n- External: A Core Lightning (CLN) instance running on a remote device (advanced).\n',
-                    required: { default: 'internal' },
-                  },
-                  Variants.of({
-                    internal: { name: 'Internal', spec: Config.of({}) },
-                    external: {
-                      name: 'External',
-                      spec: Config.of({
-                        hostname: Value.text({
-                          name: 'Public Address',
-                          required: {
-                            default: null,
-                          },
-                          description:
-                            'The public address of your Core Lightning REST server\nNOTE: RTL does not support a .onion URL here\n',
-                        }),
-                        rest_port: Value.number({
-                          name: 'REST Port',
-                          description:
-                            'The port that your Core Lightning REST server is bound to',
-                          required: {
-                            default: 3001,
-                          },
-                          min: 1,
-                          max: 65535,
-                          integer: true,
-                        }),
-                        macaroon: Value.text({
-                          name: 'Macaroon',
-                          required: {
-                            default: null,
-                          },
-                          description:
-                            'Your Core Lightning REST access.macaroon file, Base64URL encoded.',
-                          masked: true,
-                          patterns: [
-                            {
-                              regex: '[=A-Za-z0-9_-]+',
-                              description:
-                                'Macaroon must be encoded in Base64URL format (only A-Z, a-z, 0-9, _, - and = allowed)',
-                            },
-                          ],
-                        }),
-                      }),
+                  description:
+                    'Your admin.macaroon (LND) or access.macaroon (CLN), Base64URL encoded.',
+                  masked: true,
+                  patterns: [
+                    {
+                      regex: '[=A-Za-z0-9_-]+',
+                      description:
+                        'Macaroon must be encoded in Base64URL format (only A-Z, a-z, 0-9, _, - and = allowed)',
                     },
-                  }),
-                ),
+                  ],
+                }),
               }),
             },
           }),
