@@ -13,25 +13,20 @@ export const read: Read<WrapperData, ConfigSpec> = async ({
   effects,
   utils,
 }) => {
-  const config = (await rtlConfig.read(effects))!
+  const { nodes } = (await rtlConfig.read(effects))!
 
   return {
-    nodes: config.nodes.map((n) => ({
-      implementation: n.ln_implementation === 0 ? 'lnd' : 'cln',
-      name: n.ln_node,
-      connectionSettings: {
-        unionSelectKey: ['/mnt/lnd', '/mnt/c-lightning'].includes(
-          n.Authentication.macaroon_path,
-        )
-          ? 'internal'
-          : 'external',
-        unionValueKey: {
-          ln_server_url: n.Settings.ln_server_url,
-          macaroon: readFileSync(n.Authentication.macaroon_path, {
-            encoding: 'base64',
-          }),
-        },
-      },
-    })),
+    internalLnd: nodes.some((n) => n.index === 1),
+    internalCln: nodes.some((n) => n.index === 2),
+    remoteNodes: nodes
+      .filter((n) => ![1, 2].includes(n.index))
+      .map((n) => ({
+        implementation: n.ln_implementation === 0 ? 'lnd' : 'cln',
+        ln_node: n.ln_node,
+        ln_server_url: n.Settings.ln_server_url,
+        macaroon: readFileSync(n.Authentication.macaroon_path, {
+          encoding: 'base64',
+        }),
+      })),
   }
 }

@@ -30,8 +30,6 @@ export const manifest = setupManifest({
   volumes: {
     // This is the image where files from the project asset directory will go
     main: 'data',
-    lnd: 'pointer',
-    cln: 'pointer',
   },
   containers: {
     main: {
@@ -41,8 +39,6 @@ export const manifest = setupManifest({
       mounts: {
         // Specifies where on the service's file system its persistence directory should be mounted prior to service startup
         main: '/root',
-        lnd: '/mnt/lnd',
-        cln: '/mnt/c-lightning',
       },
     },
   },
