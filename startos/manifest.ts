@@ -65,7 +65,7 @@ export const manifest = setupManifest({
       description: 'Used to communicate with the Lightning Network',
       requirement: {
         type: 'opt-in',
-        how: 'Enable Core Lightning (CLN) in config settings',
+        how: 'Enable CLN in config settings',
       },
     },
   },

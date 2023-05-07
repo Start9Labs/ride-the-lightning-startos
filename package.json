@@ -5,7 +5,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "git+https://github.com/Start9Labs/start-sdk#4c4435ae2cabb92f53e1785374115e8003c29396"
+    "@start9labs/start-sdk": "git+https://github.com/Start9Labs/start-sdk#1d5357cfc74ad082adfacd7201e3a4587c90f5b4"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

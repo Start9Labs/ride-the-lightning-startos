@@ -2,7 +2,8 @@ import { ConfigSpec } from './spec'
 import { WrapperData } from '../../wrapperData'
 import { Read } from '@start9labs/start-sdk/lib/config/setupConfig'
 import { rtlConfig } from './file-models/RTL-Config.json'
-import { readFileSync } from 'fs'
+import { readFile } from 'fs/promises'
+import { hasInternal } from '../../utils'
 
 /**
  * This function executes on config get
@@ -16,17 +17,23 @@ export const read: Read<WrapperData, ConfigSpec> = async ({
   const { nodes } = (await rtlConfig.read(effects))!
 
   return {
-    internalLnd: nodes.some((n) => n.index === 1),
-    internalCln: nodes.some((n) => n.index === 2),
-    remoteNodes: nodes
-      .filter((n) => ![1, 2].includes(n.index))
-      .map((n) => ({
-        implementation: n.ln_implementation === 0 ? 'lnd' : 'cln',
-        ln_node: n.ln_node,
-        ln_server_url: n.Settings.ln_server_url,
-        macaroon: readFileSync(n.Authentication.macaroon_path, {
-          encoding: 'base64',
-        }),
-      })),
+    internalLnd: hasInternal(nodes, 'lnd'),
+    internalCln: hasInternal(nodes, 'c-lightning'),
+    remoteNodes: await Promise.all(
+      nodes
+        .filter(
+          (n) =>
+            !n.Settings.lnServerUrl.includes('lnd.embassy') &&
+            !n.Settings.lnServerUrl.includes('c-lightning.embassy'),
+        )
+        .map(async (n) => ({
+          lnImplementation: n.lnImplementation,
+          lnNode: n.lnNode,
+          lnServerUrl: n.Settings.lnServerUrl,
+          macaroon: await readFile(n.Authentication.macaroonPath, {
+            encoding: 'base64',
+          }),
+        })),
+    ),
   }
 }

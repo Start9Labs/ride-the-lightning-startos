@@ -3,6 +3,7 @@ import { WrapperData } from '../../wrapperData'
 import { createAction } from '@start9labs/start-sdk/lib/actions/createAction'
 import { Value } from '@start9labs/start-sdk/lib/config/builder/value'
 import { randomPassword } from '../../utils'
+import { rtlConfig } from '../config/file-models/RTL-Config.json'
 
 /**
  * This is an example Action
@@ -39,6 +40,12 @@ export const resetPassword = createAction<WrapperData, typeof input>(
   },
   async ({ effects, utils, input }) => {
     const password = input.password
+
+    // Save password in RTL-config.json
+    const config = (await rtlConfig.read(effects))!
+    config.multiPass = password
+    config.multiPassHashed = ''
+    await rtlConfig.write(config, effects)
 
     // Save password to vault
     await effects.vault.set({ key: 'password', value: password })

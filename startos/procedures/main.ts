@@ -8,6 +8,7 @@ import { HealthReceipt } from '@start9labs/start-sdk/lib/health/HealthReceipt'
 import { Daemons } from '@start9labs/start-sdk/lib/mainFn/Daemons'
 import { dependencyMounts } from './dependencyMounts'
 import { rtlConfig } from './config/file-models/RTL-Config.json'
+import { hasInternal } from '../utils'
 
 export const main: ExpectedExports.main = setupMain<WrapperData>(
   async ({ effects, utils, started }) => {
@@ -21,13 +22,15 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
 
     const { nodes } = (await rtlConfig.read(effects))!
 
-    if (nodes.some((n) => n.index === 1))
+    if (hasInternal(nodes, 'lnd')) {
       // @TODO maybe mountDependency should take dependencyMounts.lnd and automatically mount all volumes and paths listed in dependencyMounts.lnd
       // @TODO how to best handle failure. i.e dependency is not installed
       await utils.mountDependency(dependencyMounts.lnd.main.root)
+    }
 
-    if (nodes.some((n) => n.index === 2))
+    if (hasInternal(nodes, 'c-lightning')) {
       await utils.mountDependency(dependencyMounts['c-lightning'].main.root)
+    }
 
     /**
      * ======================== Interfaces ========================
@@ -103,7 +106,6 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
     }).addDaemon('main', {
       command: ['node', 'rtl'], // The command to start the daemon
       env: {
-        HOST_IP: await effects.getContainerIp(),
         RTL_CONFIG_PATH: '/root',
       },
       requires: [],

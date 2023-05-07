@@ -10,18 +10,18 @@ export const remoteNodes = Value.list(
     },
     {
       spec: Config.of({
-        implementation: Value.select({
+        lnImplementation: Value.select({
           name: 'Implementation',
           description:
-            'The underlying Lightning Network node implementation: currently, LND or Core Lightning',
+            'The underlying Lightning Network node implementation: currently, LND or CLN',
           required: { default: null },
           values: {
-            lnd: 'LND',
-            cln: 'Core Lightning',
+            LND: 'LND',
+            CLN: 'CLN',
           },
           immutable: true,
         }),
-        ln_node: Value.text({
+        lnNode: Value.text({
           name: 'Node Name',
           description: 'Name of this node in the list',
           required: {
@@ -36,7 +36,7 @@ export const remoteNodes = Value.list(
             },
           ],
         }),
-        ln_server_url: Value.text({
+        lnServerUrl: Value.text({
           name: 'REST Server URL',
           required: { default: null },
           description: `The fully qualified URL of your node's REST server, including protocol and port.\nNOTE: RTL does not support a .onion URL here`,
@@ -59,8 +59,8 @@ export const remoteNodes = Value.list(
           ],
         }),
       }),
-      displayAs: '{{ln_node}}',
-      uniqueBy: 'ln_node',
+      displayAs: '{{lnNode}}',
+      uniqueBy: 'lnNode',
     },
   ),
 )
@@ -73,9 +73,9 @@ export const configSpec = Config.of({
     default: false,
   }),
   internalCln: Value.toggle({
-    name: 'Core Lightning (internal)',
+    name: 'CLN (internal)',
     description:
-      'Enable to connect RTL with the Core Lightning node on your Start9 server',
+      'Enable to connect RTL with the CLN node on your Start9 server',
     default: false,
   }),
   remoteNodes,

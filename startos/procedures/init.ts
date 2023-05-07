@@ -18,19 +18,13 @@ const install = setupInstall<WrapperData>(async ({ effects, utils }) => {
   // create RTL config file with defaults
   await rtlConfig.write(
     {
-      default_node_index: 1,
-      SSO: {
-        logout_redirect_link: '',
-        rtl_cookie_path: '',
-        rtl_s_s_o: 0,
-      },
+      SSO: {},
       nodes: [],
       host: '0.0.0.0',
       port: 80,
-      multi_pass: password,
-      // @TODO test if these are needed
-      multi_pass_hashed: undefined,
-      secret_2fa: undefined,
+      multiPass: password,
+      multiPassHashed: '',
+      secret2fa: '',
     },
     effects,
   )
