@@ -23,13 +23,11 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
     const { nodes } = (await rtlConfig.read(effects))!
 
     if (hasInternal(nodes, 'lnd')) {
-      // @TODO maybe mountDependency should take dependencyMounts.lnd and automatically mount all volumes and paths listed in dependencyMounts.lnd
-      // @TODO how to best handle failure. i.e dependency is not installed
-      await utils.mountDependency(dependencyMounts.lnd.main.root)
+      await utils.mountDependency(dependencyMounts.lnd)
     }
 
     if (hasInternal(nodes, 'c-lightning')) {
-      await utils.mountDependency(dependencyMounts['c-lightning'].main.root)
+      await utils.mountDependency(dependencyMounts['c-lightning'])
     }
 
     /**
@@ -41,20 +39,53 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
      */
 
     // set up a reverse proxy to enable https for LAN
-    await effects.reverseProxy({
-      bind: {
-        port: 443,
-        ssl: true,
-      },
-      dst: {
-        port: 80,
-        ssl: false,
-      },
-    })
+    // await effects.reverseProxy({
+    //   bind: {
+    //     port: 443,
+    //     ssl: true,
+    //   },
+    //   dst: {
+    //     port: 80,
+    //     ssl: false,
+    //   },
+    // })
 
     // ------------ web interface ------------
 
     // tor
+    const multiHostname = utils.getMultiHostname('multi')
+    const multiBindingHttp = await multiHostname.bindHttp({
+      internal: 80,
+      external: 80,
+    })
+    bindHttp = async (port: number) => {
+      await effects.reverseProxy({
+        bind: {
+          port: 443,
+          ssl: true,
+        },
+        dst: {
+          port,
+          ssl: false,
+        },
+      })
+      await multiHostname.bind({
+        protocol: 'http',
+        internal: 80,
+        preferredExternal: 80,
+      })
+      await multiHostname.bind({
+        protocol: 'https',
+        internal: 443,
+        preferredExternal: 443,
+      })
+    }
+    const multiBinding = await multiHostname.bind({
+      protocol: 'ssh',
+      internal: 22,
+      external: 22, // requested external
+    })
+
     const torHostname = utils.torHostName('torHostname')
     const torHostTcp = await torHostname.bindTor(80, 80)
     const torOriginHttp = torHostTcp.createOrigin('http')
@@ -75,9 +106,7 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
 
     const webReceipt = await webInterface.export([
       torOriginHttp,
-      lanOriginsHttps.local,
-      ...lanOriginsHttps.ipv4,
-      ...lanOriginsHttps.ipv6,
+      ...lanOriginsHttps.all,
     ])
 
     // Export all address receipts for all interfaces to obtain interface receipt

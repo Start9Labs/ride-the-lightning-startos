@@ -1,24 +1,18 @@
-import { Manifest as CLNManifest } from 'c-lightning-wrapper/startos/manifest'
-import { Manifest as LNDManifest } from 'lnd-wrapper/startos/manifest'
+import { manifest as clnManifest } from 'c-lightning-wrapper/startos/manifest'
+import { manifest as lndManifest } from 'lnd-wrapper/startos/manifest'
 
-export const dependencyMounts = setupDependencyMounts<{
-  'c-lightning': CLNManifest
-  lnd: LNDManifest
-}>({
-  'c-lightning': {
-    main: {
-      root: {
-        path: '/',
-        readonly: true,
-      },
-    },
-  },
-  lnd: {
-    main: {
-      root: {
-        path: '/',
-        readonly: true,
-      },
-    },
-  },
-})
+export const dependencyMounts = setupDependencyMounts()
+  .addPath({
+    name: 'root',
+    manifest: clnManifest,
+    volume: 'main',
+    path: '/',
+    readonly: true,
+  })
+  .addPath({
+    name: 'root',
+    manifest: lndManifest,
+    volume: 'main',
+    path: '/',
+    readonly: true,
+  })
