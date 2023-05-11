@@ -1,11 +1,11 @@
-import { Migration } from '@start9labs/start-sdk/lib/inits/migrations/Migration'
+import { sdk } from '../../sdk'
 import { rtlConfig } from '../config/file-models/RTL-Config.json'
-import { dependencyMounts } from '../dependencyMounts'
 import { rmdir } from 'fs/promises'
+import { dependencyMounts } from '../dependencies/dependencyMounts'
 
-export const v0_13_6_2 = new Migration({
+export const v0_13_6_2 = sdk.Migration.of({
   version: '0.13.6.2',
-  up: async ({ effects }) => {
+  up: async ({ effects, utils }) => {
     await rmdir('/root/lnd-external') // from 0.12.3 migration
 
     const config = (await rtlConfig.read(effects))!

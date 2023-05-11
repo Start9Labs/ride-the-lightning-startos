@@ -1,9 +1,5 @@
 import { setupManifest } from '@start9labs/start-sdk/lib/manifest/setupManifest'
-import { actionsMetadata } from './procedures/actions'
 
-/**
- * In this function you define static properties of the service
- */
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
   title: 'Ride The Lightning',
@@ -42,7 +38,6 @@ export const manifest = setupManifest({
       },
     },
   },
-  actions: actionsMetadata,
   alerts: {
     install: null,
     update: null,

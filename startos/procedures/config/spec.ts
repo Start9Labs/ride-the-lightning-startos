@@ -1,6 +1,5 @@
-import { Config } from '@start9labs/start-sdk/lib/config/builder/config'
-import { List } from '@start9labs/start-sdk/lib/config/builder/list'
-import { Value } from '@start9labs/start-sdk/lib/config/builder/value'
+import { sdk } from '../../sdk'
+const { Config, Value, List } = sdk
 
 export const remoteNodes = Value.list(
   List.obj(

@@ -1,16 +1,15 @@
-import { setupMain } from '@start9labs/start-sdk/lib/mainFn'
+import { sdk } from '../sdk'
 import exportInterfaces from '@start9labs/start-sdk/lib/mainFn/exportInterfaces'
 import { ExpectedExports } from '@start9labs/start-sdk/lib/types'
-import { WrapperData } from '../wrapperData'
 import { manifest } from '../manifest'
 import { NetworkInterfaceBuilder } from '@start9labs/start-sdk/lib/mainFn/NetworkInterfaceBuilder'
 import { HealthReceipt } from '@start9labs/start-sdk/lib/health/HealthReceipt'
 import { Daemons } from '@start9labs/start-sdk/lib/mainFn/Daemons'
-import { dependencyMounts } from './dependencyMounts'
+import { dependencyMounts } from './dependencies/dependencyMounts'
 import { rtlConfig } from './config/file-models/RTL-Config.json'
 import { hasInternal } from '../utils'
 
-export const main: ExpectedExports.main = setupMain<WrapperData>(
+export const main: ExpectedExports.main = sdk.setupMain(
   async ({ effects, utils, started }) => {
     /**
      * ======================== Setup ========================
@@ -23,11 +22,11 @@ export const main: ExpectedExports.main = setupMain<WrapperData>(
     const { nodes } = (await rtlConfig.read(effects))!
 
     if (hasInternal(nodes, 'lnd')) {
-      await utils.mountDependency(dependencyMounts.lnd)
+      await utils.mountDependencies(dependencyMounts.lnd)
     }
 
     if (hasInternal(nodes, 'c-lightning')) {
-      await utils.mountDependency(dependencyMounts['c-lightning'])
+      await utils.mountDependencies(dependencyMounts['c-lightning'])
     }
 
     /**
