@@ -14,23 +14,27 @@ export const v0_13_6_2 = sdk.Migration.of({
     await effects.vault.set({ key: 'password', value: config.multiPass })
 
     // update nodes to accommodate new config approach
-    config.nodes = config.nodes.map((n, index) => {
-      if (n.Settings.lnServerUrl === 'lnd.embassy:8080') {
-        n.lnNode = 'Internal-LND'
-        n.index = 1
-        n.Authentication.macaroonPath =
-          dependencyMounts.lnd.main.root.mountpoint
-      } else if (n.Settings.lnServerUrl === 'c-lightning.embassy:3001') {
-        n.lnNode = 'Internal-CLN'
-        n.index = 2
-        n.Authentication.macaroonPath =
-          dependencyMounts['c-lightning'].main.root.mountpoint
-      } else {
-        n.index = index + 2
-      }
+    config.nodes = await Promise.all(
+      config.nodes.map(async (n, index) => {
+        if (n.Settings.lnServerUrl === 'lnd.embassy:8080') {
+          n.lnNode = 'Internal-LND'
+          n.index = 1
+          n.Authentication.macaroonPath = await utils.mountDependencies(
+            dependencyMounts.lnd.main.rootDir,
+          )
+        } else if (n.Settings.lnServerUrl === 'c-lightning.embassy:3001') {
+          n.lnNode = 'Internal-CLN'
+          n.index = 2
+          n.Authentication.macaroonPath = await utils.mountDependencies(
+            dependencyMounts['c-lightning'].main.rootDir,
+          )
+        } else {
+          n.index = index + 2
+        }
 
-      return n
-    })
+        return n
+      }),
+    )
     await rtlConfig.write(config, effects)
 
     // remove old start9 dir

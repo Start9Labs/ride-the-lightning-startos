@@ -57,7 +57,9 @@ export const save = sdk.setupConfigSave(
           lnImplementation: 'LND',
           lnNode: 'Internal LND',
           lnServerUrl: `lnd.embassy:8080`,
-          macaroonPath: dependencyMounts.lnd.main.root.mountpoint,
+          macaroonPath: await utils.mountDependencies(
+            dependencyMounts.lnd.main.rootDir,
+          ),
           channelBackupPath,
         }),
       )
@@ -73,7 +75,9 @@ export const save = sdk.setupConfigSave(
           lnImplementation: 'CLN',
           lnNode: 'Internal CLN',
           lnServerUrl: 'c-lightning.embassy:3001',
-          macaroonPath: dependencyMounts['c-lightning'].main.root.mountpoint,
+          macaroonPath: await utils.mountDependencies(
+            dependencyMounts['c-lightning'].main.rootDir,
+          ),
           channelBackupPath,
         }),
       )
