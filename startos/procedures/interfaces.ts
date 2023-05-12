@@ -2,7 +2,7 @@ import { sdk } from '../sdk'
 import { configSpec } from './config/spec'
 
 export const uiPort = 80
-export const webUiInterfaceId = 'webui'
+export const uiId = 'webui'
 
 /**
  * ======================== Interfaces ========================
@@ -16,7 +16,7 @@ export const setInterfaces = sdk.setupInterfaces(
     const multiOrigin = await multi.bindPort(uiPort, { protocol: 'http' })
     const multiInterface = utils.createInterface({
       name: 'Web UI',
-      id: 'webui',
+      id: uiId,
       description: 'Web user interface for RTL',
       ui: true,
       username: null,

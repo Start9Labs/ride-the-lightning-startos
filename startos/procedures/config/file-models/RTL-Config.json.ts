@@ -1,7 +1,7 @@
-import { matches } from '@start9labs/start-sdk/lib'
 import FileHelper from '@start9labs/start-sdk/lib/util/fileHelper'
+import { matches } from '@start9labs/start-sdk/lib'
 
-const { object, array, string, natural, anyOf, literal, boolean } = matches
+const { object, array, string, natural, anyOf, literal } = matches
 
 const shape = object({
   SSO: object({}),

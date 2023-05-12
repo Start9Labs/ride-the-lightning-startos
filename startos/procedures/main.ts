@@ -1,6 +1,5 @@
 import { sdk } from '../sdk'
 import { ExpectedExports } from '@start9labs/start-sdk/lib/types'
-import { manifest } from '../manifest'
 import { HealthReceipt } from '@start9labs/start-sdk/lib/health/HealthReceipt'
 import { Daemons } from '@start9labs/start-sdk/lib/mainFn/Daemons'
 import { dependencyMounts } from './dependencies/dependencyMounts'
@@ -58,8 +57,8 @@ export const main: ExpectedExports.main = sdk.setupMain(
         // The function to run to determine the health status of the daemon
         fn: () =>
           utils.checkPortListening(uiPort, {
-            successMessage: `${manifest.title} is live`,
-            errorMessage: `${manifest.title} is unreachable`,
+            successMessage: 'Web interface is ready',
+            errorMessage: 'Web interface is unreachable',
           }),
       },
     })
