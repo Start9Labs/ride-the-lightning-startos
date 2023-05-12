@@ -18,3 +18,4 @@ export const dependencyMounts = sdk
     path: '/',
     readonly: true,
   })
+  .build()

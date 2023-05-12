@@ -4,6 +4,7 @@ import { Dependency } from '@start9labs/start-sdk/lib/types'
 import { RtlConfig, rtlConfig } from './file-models/RTL-Config.json'
 import { writeFile, mkdir } from 'fs/promises'
 import { dependencyMounts } from '../dependencies/dependencyMounts'
+import { setInterfaces } from '../interfaces'
 
 export const save = sdk.setupConfigSave(
   configSpec,
@@ -134,6 +135,7 @@ export const save = sdk.setupConfigSave(
     const dependenciesReceipt = await effects.setDependencies(currentDeps)
 
     return {
+      interfacesReceipt: await setInterfaces({ effects, utils, input }),
       dependenciesReceipt,
       restart: true,
     }
