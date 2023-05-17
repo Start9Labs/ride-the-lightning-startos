@@ -14,7 +14,7 @@ const shape = object({
     object({
       index: natural,
       lnImplementation: anyOf(literal('LND'), literal('CLN')),
-      lnNode: string,
+      lnNode: string, // human readable name of the node
       Authentication: object({
         macaroonPath: string,
       }),

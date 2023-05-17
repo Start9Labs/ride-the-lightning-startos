@@ -52,7 +52,7 @@ export const resetPassword = sdk.createAction(
     return {
       message: 'Password changed successfully and saved to your Vault.',
       value: {
-        value: input.password,
+        value: password,
         copyable: true,
         qr: false,
       },

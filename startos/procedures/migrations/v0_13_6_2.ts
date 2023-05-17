@@ -1,7 +1,12 @@
 import { sdk } from '../../sdk'
 import { rtlConfig } from '../config/file-models/RTL-Config.json'
-import { rmdir } from 'fs/promises'
+import { readFile, rmdir } from 'fs/promises'
 import { dependencyMounts } from '../dependencies/dependencyMounts'
+import { load } from 'js-yaml'
+
+type ConfigYaml = {
+  password: string
+}
 
 export const v0_13_6_2 = sdk.Migration.of({
   version: '0.13.6.2',
@@ -10,8 +15,13 @@ export const v0_13_6_2 = sdk.Migration.of({
 
     const config = (await rtlConfig.read(effects))!
 
+    // get old config.yaml
+    const configYaml = load(
+      await readFile('/root/start9/config.yaml', 'utf-8'),
+    ) as ConfigYaml
+
     // Save password to vault
-    await effects.vault.set({ key: 'password', value: config.multiPass })
+    await effects.vault.set({ key: 'password', value: configYaml.password })
 
     // update nodes to accommodate new config approach
     config.nodes = await Promise.all(
