@@ -24,16 +24,12 @@ export const manifest = setupManifest({
     instructions: 'assets/instructions.md',
   },
   volumes: {
-    // This is the image where files from the project asset directory will go
     main: 'data',
   },
   containers: {
     main: {
-      // Identifier for the main image volume, which will be used when other actions need to mount to this volume.
       image: 'main',
-      // Specifies where to mount the data volume(s), if there are any. Mounts for pointer dependency volumes are also denoted here. These are necessary if data needs to be read from / written to these volumes.
       mounts: {
-        // Specifies where on the service's file system its persistence directory should be mounted prior to service startup
         main: '/root',
       },
     },
