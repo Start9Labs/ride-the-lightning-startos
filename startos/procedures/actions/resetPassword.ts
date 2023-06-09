@@ -47,7 +47,7 @@ export const resetPassword = sdk.createAction(
     await rtlConfig.write(config, effects)
 
     // Save password to vault
-    await utils.vault.set('password', password)
+    await utils.store.setOwn('/password', password)
 
     return {
       message: 'Password changed successfully and saved to your Vault.',

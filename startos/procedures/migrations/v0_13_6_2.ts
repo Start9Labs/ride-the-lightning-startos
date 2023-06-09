@@ -21,7 +21,7 @@ export const v0_13_6_2 = sdk.Migration.of({
     ) as ConfigYaml
 
     // Save password to vault
-    await utils.vault.set('password', configYaml.password)
+    await utils.store.setOwn('/password', configYaml.password)
 
     // update nodes to accommodate new config approach
     config.nodes = await Promise.all(
