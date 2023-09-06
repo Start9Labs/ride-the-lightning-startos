@@ -18,7 +18,7 @@ export const setInterfaces = sdk.setupInterfaces(
       description: 'Web user interface for RTL',
       hasPrimary: false,
       disabled: false,
-      ui: true,
+      type: 'ui',
       username: null,
       path: '',
       search: {},
