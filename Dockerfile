@@ -50,16 +50,3 @@ COPY --from=builder /RTL/node_modules/ ./node_modules
 COPY --from=builder "/tini" /sbin/tini
 
 RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${PLATFORM} && chmod +x /usr/local/bin/yq
-
-ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
-RUN chmod +x /usr/local/bin/docker_entrypoint.sh
-ADD ./check-web.sh /usr/local/bin/check-web.sh
-RUN chmod +x /usr/local/bin/check-web.sh
-ADD ./configurator/target/${ARCH}-unknown-linux-musl/release/configurator /usr/local/bin/configurator
-RUN chmod +x /usr/local/bin/configurator
-ADD ./migrations /usr/local/bin/migrations
-RUN chmod a+x /usr/local/bin/migrations/*
-
-EXPOSE 80
-
-ENTRYPOINT ["/usr/local/bin/docker_entrypoint.sh"]
