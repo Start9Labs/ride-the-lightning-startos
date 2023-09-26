@@ -32,13 +32,13 @@ RUN npm prune --production --legacy-peer-deps
 # ---------------
 # Release App
 # ---------------
-FROM node:16-stretch-slim as runner
+FROM node:16-alpine as runner
 
 ARG ARCH
 ARG PLATFORM
 
-RUN apt update
-RUN apt install -y bash curl iproute2 wget
+RUN apk update && \
+apk add --no-cache bash curl iproute2 wget
 
 WORKDIR /RTL
 
