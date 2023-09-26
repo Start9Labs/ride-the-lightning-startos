@@ -1,8 +1,8 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.13.6.1
+version: 0.14.0
 release-notes: |
-  * Update LND and CLN dependency versioning
+  * Update upstream to v0.14.0 [Release Notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.14.0)
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
