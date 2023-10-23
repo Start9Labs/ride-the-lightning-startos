@@ -38,10 +38,13 @@ RUN npm prune --production --legacy-peer-deps
 FROM node:16-alpine as runner
 
 ARG ARCH
-ARG PLATFORM
 
 RUN apk update && \
-apk add --no-cache bash curl iproute2 wget
+  apk add --no-cache \
+  bash \
+  curl \
+  iproute2 \
+  yq
 
 WORKDIR /RTL
 
@@ -51,8 +54,6 @@ COPY --from=builder /RTL/frontend ./frontend
 COPY --from=builder /RTL/backend ./backend
 COPY --from=builder /RTL/node_modules/ ./node_modules
 COPY --from=builder "/tini" /sbin/tini
-
-RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${PLATFORM} && chmod +x /usr/local/bin/yq
 
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
