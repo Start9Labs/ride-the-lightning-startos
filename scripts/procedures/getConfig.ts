@@ -31,7 +31,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
             "type": "string",
             "name": "Node Name",
             "description": "Name of this node in the list",
-            "default": "Embassy LND",
+            "default": "StartOS LND",
             "nullable": false
           },
           "connection-settings": {
@@ -41,7 +41,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
             "tag": {
               "id": "type",
               "name": "Type",
-              "description": "- Internal: The Lightning Network Daemon service installed to your Embassy.\n- External: A Lightning Network Daemon instance running on a remote device (advanced).\n",
+              "description": "- Internal: The Lightning Network Daemon service installed to your StartOS server.\n- External: A Lightning Network Daemon instance running on a remote device (advanced).\n",
               "variant-names": {
                 "internal": "Internal",
                 "external": "External"
@@ -84,7 +84,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
             "type": "string",
             "name": "Node Name",
             "description": "Name of this node in the list",
-            "default": "Embassy CLN",
+            "default": "StartOS CLN",
             "nullable": false
           },
           "connection-settings": {
@@ -94,7 +94,7 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
             "tag": {
               "id": "type",
               "name": "Type",
-              "description": "- Internal: The Core Lightning (CLN) service installed to your Embassy.\n- External: A Core Lightning (CLN) instance running on a remote device (advanced).\n",
+              "description": "- Internal: The Core Lightning (CLN) service installed to your StartOS server.\n- External: A Core Lightning (CLN) instance running on a remote device (advanced).\n",
               "variant-names": {
                 "internal": "Internal",
                 "external": "External"
