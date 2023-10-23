@@ -1,12 +1,15 @@
 # ---------------
 # Install Dependencies
 # ---------------
-FROM node:16-stretch-slim as builder
+FROM node:16-buster-slim as builder
 
 ARG PLATFORM
 
 ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${PLATFORM} /tini
 RUN chmod +x /tini
+
+RUN apt-get update && apt-get install -y python3 make g++
+ENV PYTHON=/usr/bin/python3
 
 WORKDIR /RTL
 
