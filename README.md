@@ -14,7 +14,7 @@ This project wraps [ride-the-lightning](https://github.com/Ride-The-Lightning/RT
 
 ## Build environment
 
-Before building the lnbits package, your build environment must be setup for building StartOS services. Instructions for setting up the proper build environment can be found in the [Developer Docs](https://docs.start9.com/latest/developer-docs/packaging).
+Before building the Ride The Lightning package, your build environment must be setup for building StartOS services. Instructions for setting up the proper build environment can be found in the [Developer Docs](https://docs.start9.com/latest/developer-docs/packaging).
 
 ## Cloning
 
