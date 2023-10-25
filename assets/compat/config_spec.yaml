@@ -26,7 +26,7 @@ nodes:
           type: string
           name: Node Name
           description: Name of this node in the list
-          default: "Embassy LND"
+          default: "StartOS LND"
           nullable: false
         connection-settings:
           type: union
@@ -36,7 +36,7 @@ nodes:
             id: type
             name: Type
             description: |
-              - Internal: The Lightning Network Daemon service installed to your Embassy.
+              - Internal: The Lightning Network Daemon service installed to your StartOS server.
               - External: A Lightning Network Daemon instance running on a remote device (advanced).
             variant-names:
               internal: Internal
@@ -71,7 +71,7 @@ nodes:
           type: string
           name: Node Name
           description: Name of this node in the list
-          default: "Embassy CLN"
+          default: "StartOS CLN"
           nullable: false
         connection-settings:
           type: union
@@ -81,7 +81,7 @@ nodes:
             id: type
             name: Type
             description: |
-              - Internal: The Core Lightning (CLN) service installed to your Embassy.
+              - Internal: The Core Lightning (CLN) service installed to your StartOS server.
               - External: A Core Lightning (CLN) instance running on a remote device (advanced).
             variant-names:
               internal: Internal

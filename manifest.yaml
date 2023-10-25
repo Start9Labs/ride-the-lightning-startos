@@ -1,8 +1,9 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.13.6.1
+version: 0.14.1
 release-notes: |
-  * Update LND and CLN dependency versioning
+  * Update upstream to v0.14.1 [Release Notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.14.1)
+  * Increment LND dependency version
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -11,7 +12,7 @@ marketing-site: https://twitter.com/RTL_App
 build: ["make"]
 description:
   short: "A full function, device agnostic, web user interface for managing lightning node operations"
-  long: "A full function, device agnostic, web user interface for managing lightning node operations. It talks directly to the LND or CLN node running on your Embassy and is accessible from any Tor-enabled Browser!"
+  long: "A full function, device agnostic, web user interface for managing lightning node operations. It talks directly to the LND or CLN node running on your StartOS server and is accessible from any Tor-enabled Browser!"
 assets:
   license: LICENSE
   icon: icon.png
@@ -76,7 +77,7 @@ interfaces:
       - http
 dependencies:
   lnd:
-    version: ">=0.13.4 <0.17.0"
+    version: ">=0.13.4 <0.18.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: opt-in

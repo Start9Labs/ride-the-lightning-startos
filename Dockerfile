@@ -1,12 +1,14 @@
 # ---------------
 # Install Dependencies
 # ---------------
-FROM node:16-stretch-slim as builder
+FROM node:16-alpine as builder
 
-ARG PLATFORM
+RUN apk add --no-cache \
+  python3 \
+  make \
+  g++
 
-ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${PLATFORM} /tini
-RUN chmod +x /tini
+ENV PYTHON=/usr/bin/python3
 
 WORKDIR /RTL
 
@@ -32,13 +34,16 @@ RUN npm prune --production --legacy-peer-deps
 # ---------------
 # Release App
 # ---------------
-FROM node:16-stretch-slim as runner
+FROM node:16-alpine as runner
 
 ARG ARCH
-ARG PLATFORM
 
-RUN apt update
-RUN apt install -y bash curl iproute2 wget
+RUN apk add --no-cache \
+  bash \
+  curl \
+  iproute2 \
+  yq \
+  tini
 
 WORKDIR /RTL
 
@@ -47,9 +52,6 @@ COPY --from=builder /RTL/package.json ./package.json
 COPY --from=builder /RTL/frontend ./frontend
 COPY --from=builder /RTL/backend ./backend
 COPY --from=builder /RTL/node_modules/ ./node_modules
-COPY --from=builder "/tini" /sbin/tini
-
-RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${PLATFORM} && chmod +x /usr/local/bin/yq
 
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
