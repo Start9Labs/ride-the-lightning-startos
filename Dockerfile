@@ -1,14 +1,13 @@
 # ---------------
 # Install Dependencies
 # ---------------
-FROM node:16-buster-slim as builder
+FROM node:16-alpine as builder
 
-ARG PLATFORM
+RUN apk add --no-cache \
+  python3 \
+  make \
+  g++
 
-ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-${PLATFORM} /tini
-RUN chmod +x /tini
-
-RUN apt-get update && apt-get install -y python3 make g++
 ENV PYTHON=/usr/bin/python3
 
 WORKDIR /RTL
@@ -39,12 +38,12 @@ FROM node:16-alpine as runner
 
 ARG ARCH
 
-RUN apk update && \
-  apk add --no-cache \
+RUN apk add --no-cache \
   bash \
   curl \
   iproute2 \
-  yq
+  yq \
+  tini
 
 WORKDIR /RTL
 
@@ -53,7 +52,6 @@ COPY --from=builder /RTL/package.json ./package.json
 COPY --from=builder /RTL/frontend ./frontend
 COPY --from=builder /RTL/backend ./backend
 COPY --from=builder /RTL/node_modules/ ./node_modules
-COPY --from=builder "/tini" /sbin/tini
 
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
