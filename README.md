@@ -24,6 +24,8 @@ Clone the project locally. Note the submodule link to the original project(s).
 git clone git@github.com:Start9Labs/ride-the-lightning-wrapper.git
 cd ride-the-lightning-wrapper
 git submodule update --init
+cd RTL
+npm install --omit=dev
 ```
 
 ## Building
