@@ -107,22 +107,22 @@ export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
                 "address": {
                   "type": "string",
                   "name": "Public Address",
-                  "description": "The public address of your C-Lightning-REST server\nNOTE: RTL does not support a .onion URL here\n",
+                  "description": "The public address of your CLNRest server\nNOTE: RTL does not support a .onion URL here\n",
                   "nullable": false
                 },
                 "rest-port": {
                   "type": "number",
-                  "name": "REST Port",
-                  "description": "The port that your C-Lightning-REST server is bound to",
+                  "name": "CLNRest Port",
+                  "description": "The port that your CLNRest server is bound to",
                   "nullable": false,
                   "range": "[0,65535]",
                   "integral": true,
-                  "default": 3001
+                  "default": 3010
                 },
                 "macaroon": {
                   "type": "string",
-                  "name": "Macaroon",
-                  "description": "Your C-Lightning-REST access.macaroon file, Base64URL encoded.",
+                  "name": "Rune",
+                  "description": "Your CLNRest unrestricted Rune, Base64URL encoded.",
                   "nullable": false,
                   "masked": true
                 }
