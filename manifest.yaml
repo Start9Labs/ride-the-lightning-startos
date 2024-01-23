@@ -83,7 +83,7 @@ dependencies:
       how: Can opt to use the internal Core Lightning (CLN) instance instead of LND
     config: ~
   c-lightning:
-    version: ">=23.11.1 <24.0.0"
+    version: ">=23.11.2.1 <24.0.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: opt-in
