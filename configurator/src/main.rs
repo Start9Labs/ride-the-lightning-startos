@@ -60,13 +60,13 @@ pub enum NodeType {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum RTLNodeType {
     LND,
-    CLN,
+    CLT,
 }
 
 impl From<NodeType> for RTLNodeType {
     fn from(nt: NodeType) -> RTLNodeType {
         match nt {
-            NodeType::CLightning => RTLNodeType::CLN,
+            NodeType::CLightning => RTLNodeType::CLT,
             NodeType::Lnd => RTLNodeType::LND,
         }
     }
