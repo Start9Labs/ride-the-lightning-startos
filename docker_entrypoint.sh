@@ -23,7 +23,7 @@ if [[ ! -z $result ]]
   while ! test -f /mnt/lnd/admin.macaroon
   do
     echo "Waiting for LND admin macaroon to be generated..."
-    sleep 1
+    sleep 30
   done
 fi
 
@@ -37,10 +37,10 @@ if [[ ! -z $result ]]
     exit 0
   fi
 
-  while ! test -f /mnt/c-lightning/access.macaroon
+  while ! test -f /mnt/c-lightning/clnrest_rune
   do
-    echo "Waiting for c-Lightning-REST access macaroon to be generated..."
-    sleep 1
+    echo "Waiting for clnrest_rune to be generated..."
+    sleep 30
   done
 fi
 

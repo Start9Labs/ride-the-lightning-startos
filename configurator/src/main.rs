@@ -129,7 +129,10 @@ struct RTLNode {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct RTLNodeAuthentication {
-    macaroon_path: PathBuf,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    macaroon_path: Option<PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rune_path: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -212,15 +215,16 @@ pub enum Property {
 fn write_macaroons_and_get_connection_details(
     s9_node: &S9Node,
     node_index: usize,
-) -> Result<(String, u16, PathBuf), anyhow::Error> {
+) -> Result<(String, u16, Option<PathBuf>, Option<PathBuf>), anyhow::Error> {
     match (&s9_node.typ, &s9_node.connection_settings) {
         (NodeType::Lnd, S9NodeConnectionSettings::Internal) => {
-            Ok((String::from("lnd.embassy"), 8080, PathBuf::from("/mnt/lnd")))
+            Ok((String::from("lnd.embassy"), 8080, Some(PathBuf::from("/mnt/lnd")), None))
         }
         (NodeType::CLightning, S9NodeConnectionSettings::Internal) => Ok((
             String::from("c-lightning.embassy"),
-            3001,
-            PathBuf::from("/mnt/c-lightning"),
+            3010,
+            None,
+            Some(PathBuf::from("/mnt/c-lightning/clnrest_rune")),
         )),
         (
             typ,
@@ -230,22 +234,31 @@ fn write_macaroons_and_get_connection_details(
                 macaroon,
             },
         ) => {
-            let (mac_path, mac_dir) = match typ {
+            let (mac_path, mac_dir, rune_path) = match typ {
                 NodeType::Lnd => {
                     let mac_dir = PathBuf::from(format!("/root/lnd-external-{}", node_index));
-                    (mac_dir.join("admin.macaroon"), mac_dir)
+                    (mac_dir.join("admin.macaroon"), Some(mac_dir), None)
                 }
                 NodeType::CLightning => {
                     let mac_dir = PathBuf::from(format!("/root/cl-external-{}", node_index));
-                    (mac_dir.join("access.macaroon"), mac_dir)
+                    (mac_dir.join("access.macaroon"), None, Some(mac_dir.join("clnrest_rune")))
                 }
             };
-            std::fs::create_dir_all(mac_dir.as_path())?;
-            File::create(mac_path)?.write_all(&base64::decode_config(
-                macaroon,
-                base64::Config::new(base64::CharacterSet::UrlSafe, false),
-            )?)?;
-            Ok((address.host().unwrap().to_owned(), *rest_port, mac_dir))
+            match mac_dir.is_some() && rune_path.is_none() {
+                true => {
+                    std::fs::create_dir_all(mac_dir.as_ref().unwrap().as_path())?;
+                    File::create(mac_path)?.write_all(&base64::decode_config(
+                        macaroon,
+                        base64::Config::new(base64::CharacterSet::UrlSafe, false),
+                    )?)?;
+                },
+                false => {
+                    std::fs::create_dir_all(rune_path.as_ref().unwrap().as_path())?;
+                    let content = format!("LIGHTNING_RUNE=\"{}\"", macaroon);
+                    File::create(mac_path)?.write_all(content.as_bytes())?;
+                }
+            }
+            Ok((address.host().unwrap().to_owned(), *rest_port, mac_dir, rune_path))
         }
     }
 }
@@ -263,7 +276,8 @@ fn get_rtl_node_map(nodes: Vec<RTLNode>) -> HashMap<String, RTLNode> {
 fn to_rtl_default(
     s9_node: S9Node,
     node_index: usize,
-    macaroon_path: PathBuf,
+    macaroon_path: Option<PathBuf>,
+    rune_path: Option<PathBuf>,
     address: String,
     rest_port: u16,
 ) -> RTLNode {
@@ -271,7 +285,10 @@ fn to_rtl_default(
         index: node_index,
         ln_implementation: s9_node.typ.into(),
         ln_node: s9_node.name,
-        authentication: RTLNodeAuthentication { macaroon_path },
+        authentication: RTLNodeAuthentication {
+            macaroon_path,
+            rune_path,
+        },
         settings: RTLNodeSettings {
             user_persona: RTLNodePersona::OPERATOR,
             theme_mode: RTLNodeThemeMode::NIGHT,
@@ -290,11 +307,12 @@ fn to_rtl(
     prev_rtl_node: Option<RTLNode>,
     s9_node: S9Node,
     node_index: usize,
-    macaroon_path: PathBuf,
+    macaroon_path: Option<PathBuf>,
+    rune_path: Option<PathBuf>,
     address: String,
     rest_port: u16,
 ) -> RTLNode {
-    let mut def = to_rtl_default(s9_node, node_index, macaroon_path, address, rest_port);
+    let mut def = to_rtl_default(s9_node, node_index, macaroon_path, rune_path, address, rest_port);
     if let Some(prev) = prev_rtl_node {
         def.settings.user_persona = prev.settings.user_persona;
         def.settings.theme_color = prev.settings.theme_color;
@@ -347,13 +365,14 @@ fn main() -> Result<(), anyhow::Error> {
         .enumerate()
         .map(|(zero_index, s9_node)| {
             let one_index = zero_index + 1;
-            let (address, rest_port, macaroon_path) =
+            let (address, rest_port, macaroon_path, rune_path) =
                 write_macaroons_and_get_connection_details(&s9_node, one_index)?;
             Ok(to_rtl(
                 rtl_node_map.remove(&s9_node.name),
                 s9_node,
                 one_index,
                 macaroon_path,
+                rune_path,
                 address,
                 rest_port,
             ))
