@@ -85,5 +85,5 @@ export const migration: T.ExpectedExports.migration = compat.migrations
         ),
       },
     },
-    "0.15.0",
+    "0.15.0.1",
   );
