@@ -1,8 +1,8 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.15.0
+version: 0.15.0.1
 release-notes: |
-  * Update upstream to v0.15.0 [Release Notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.0)
+  * Bump max Core Lightning dependency version
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
@@ -83,7 +83,7 @@ dependencies:
       how: Can opt to use the internal Core Lightning (CLN) instance instead of LND
     config: ~
   c-lightning:
-    version: ">=23.11.2.1 <24.0.0"
+    version: ">=23.11.2.1 <25.0.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: opt-in
