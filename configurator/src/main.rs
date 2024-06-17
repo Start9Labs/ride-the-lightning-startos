@@ -120,9 +120,9 @@ struct RTLNode {
     index: usize,
     ln_implementation: RTLNodeType,
     ln_node: String,
-    #[serde(rename = "Authentication")]
+    #[serde(alias = "Authentication")]
     authentication: RTLNodeAuthentication,
-    #[serde(rename = "Settings")]
+    #[serde(alias = "Settings")]
     settings: RTLNodeSettings,
 }
 
