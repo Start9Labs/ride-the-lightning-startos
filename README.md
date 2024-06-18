@@ -10,7 +10,7 @@ This project wraps [ride-the-lightning](https://github.com/Ride-The-Lightning/RT
 - [yq](https://mikefarah.gitbook.io/yq)
 - [deno](https://deno.land/)
 - [make](https://www.gnu.org/software/make/)
-- [start-sdk](https://github.com/Start9Labs/start-os/tree/sdk/backend)
+- [start-sdk](https://github.com/Start9Labs/start-os/blob/v0.3.5.1/core/install-sdk.sh)
 
 ## Build environment
 
@@ -25,7 +25,7 @@ git clone git@github.com:Start9Labs/ride-the-lightning-wrapper.git
 cd ride-the-lightning-wrapper
 git submodule update --init
 cd RTL
-npm install --omit=dev
+npm install --omit=dev --legacy-peer-deps
 ```
 
 ## Building
@@ -58,10 +58,11 @@ start-cli auth login
 #Enter your StartOS password
 start-cli --host https://server-name.local package install ride-the-lightning.s9pk
 ```
-**Tip:** You can also install the ride-the-lightning.s9pk using **Sideload Service** under the **StartOS > SETTINGS** section.
 
-## Verify Install
+If you already have your `start-cli` config file setup with a default `host`, you can install simply by running:
 
-Go to your StartOS Services page, select **ride-the-lightning**, configure and start the service.
+```
+make install
+```
 
-**Done!** 
+> **Tip:** You can also install the `ride-the-lightning.s9pk` using **Sideload Service** under the **System > Manage** section.
