@@ -1,0 +1,257 @@
+<div fxLayout="column" fxFlex="colWidth" fxLayoutAlign="space-between stretch">
+  <form *ngIf="calledFrom === 'home'" #sendPaymentForm="ngForm" fxLayout="column" fxLayoutAlign="space-between stretch" fxLayout.gt-sm="row wrap">
+    <mat-form-field fxLayout="column" fxFlex="100">
+      <mat-label>Payment Request</mat-label>
+      <textarea #paymentReq="ngModel" matInput name="paymentRequest" tabindex="1" required [perfectScrollbar] [ngModel]="paymentRequest" (ngModelChange)="onPaymentRequestEntry($event)" (matTextareaAutosize)="true"></textarea>
+      <mat-hint *ngIf="paymentRequest && paymentDecodedHintPre !== ''" fxLayout="row wrap" fxFlex="100">
+        {{paymentDecodedHintPre}}
+        <span *ngIf="convertedCurrency && convertedCurrency.iconType === 'FA' && paymentDecodedHintPre !== ''" fxLayoutAlign="center center" class="mr-3px">
+          <fa-icon [icon]="convertedCurrency.symbol" />
+        </span>
+        <span *ngIf="convertedCurrency && convertedCurrency.iconType === 'SVG' && paymentDecodedHintPre !== ''" fxLayoutAlign="center center" class="mr-3px" [innerHTML]="convertedCurrency.symbol"></span>
+        {{paymentDecodedHintPost}}
+      </mat-hint>
+      <mat-error *ngIf="!paymentRequest">Payment request is required.</mat-error>
+    </mat-form-field>
+    <div fxLayout="row" class="mt-1">
+      <button class="mr-1" mat-stroked-button color="primary" tabindex="2" type="reset" (click)="resetData()">Clear Field</button>
+      <button mat-flat-button color="primary" tabindex="3" (click)="onSendPayment()">Send Payment</button>
+    </div>
+  </form>
+  <div *ngIf="calledFrom === 'transactions'" fxLayout="row">
+    <button mat-flat-button color="primary" tabindex="3" (click)="openSendPaymentModal()">Send Payment</button>
+  </div>
+  <div *ngIf="calledFrom === 'transactions'" fxLayout="column" fxLayoutAlign="start stretch">
+    <div fxLayout="column" fxLayoutAlign="start stretch" fxLayout.gt-sm="row wrap" class="page-sub-title-container mt-1">
+      <div fxFlex="70" fxLayoutAlign="start start" fxLayoutAlign.gt-sm="start center">
+        <fa-icon class="page-title-img mr-1" [icon]="faHistory" />
+        <span class="page-title">Payments History</span>
+      </div>
+      <div fxFlex.gt-xs="30" fxLayoutAlign.gt-xs="space-between center" fxLayout="row" fxLayoutAlign="space-between stretch">
+        <mat-form-field fxLayout="column" fxFlex="49">
+          <mat-label>Filter By</mat-label>
+        <mat-select tabindex="1" name="filterBy" [(ngModel)]="selFilterBy" (selectionChange)="selFilter=''; applyFilter()">
+            <perfect-scrollbar><mat-option *ngFor="let column of ['all'].concat(displayedColumns.slice(0, -1))" [value]="column">{{getLabel(column)}}</mat-option></perfect-scrollbar>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field fxLayout="column" fxFlex="49">
+          <mat-label>Filter</mat-label>
+        <input matInput name="filter" [(ngModel)]="selFilter" (input)="applyFilter()" (keyup)="applyFilter()">
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start start">
+      <div fxLayout="column" fxLayoutAlign="start center" fxFlex="colWidth" class="table-container" [perfectScrollbar]>
+        <mat-progress-bar *ngIf="apiCallStatus.status === apiCallStatusEnum.INITIATED" mode="indeterminate" />
+        <table #table mat-table fxFlex="colWidth" matSort [matSortActive]="tableSetting.sortBy" [matSortDirection]="tableSetting.sortOrder" [dataSource]="payments" [ngClass]="{'error-border': errorMessage !== ''}">
+          <ng-container matColumnDef="firstPartTimestamp">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>Date/Time</th>
+            <td *matCellDef="let payment" mat-cell>{{payment?.firstPartTimestamp | date:'dd/MMM/y HH:mm'}}</td>
+          </ng-container>
+          <ng-container matColumnDef="id">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>ID</th>
+            <td *matCellDef="let payment" mat-cell>
+              <div class="ellipsis-parent" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                <span class="ellipsis-child">{{payment?.id}}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="recipientNodeId">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>Destination Node ID</th>
+            <td *matCellDef="let payment" mat-cell>
+              <div class="ellipsis-parent" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                <span class="ellipsis-child">{{payment?.recipientNodeId}}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="recipientNodeAlias">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>Destination</th>
+            <td *matCellDef="let payment" mat-cell>
+              <div class="ellipsis-parent" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                <span class="ellipsis-child">{{payment?.recipientNodeAlias}}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="description">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>Description</th>
+            <td *matCellDef="let payment" mat-cell>
+              <div class="ellipsis-parent" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                <span class="ellipsis-child">{{payment?.description}}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="paymentHash">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>Payment Hash</th>
+            <td *matCellDef="let payment" mat-cell>
+              <div class="ellipsis-parent" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                <span class="ellipsis-child">{{payment?.paymentHash}}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="paymentPreimage">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>Preimage</th>
+            <td *matCellDef="let payment" mat-cell>
+              <div class="ellipsis-parent" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                <span class="ellipsis-child">{{payment?.paymentPreimage}}</span>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="recipientAmount">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header arrowPosition="before">Amount (Sats)</th>
+            <td *matCellDef="let payment" mat-cell><span fxLayoutAlign="end center">{{(payment?.recipientAmount) | number}}</span></td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th *matHeaderCellDef mat-header-cell>
+              <div class="bordered-box table-actions-select" fxLayoutAlign="center center">
+                <mat-select placeholder="Actions" tabindex="1" class="mr-0">
+                  <mat-select-trigger />
+                  <mat-option (click)="onDownloadCSV()">Download CSV</mat-option>
+                </mat-select>
+              </div>
+           </th>
+            <td *matCellDef="let payment" mat-cell fxLayoutAlign="end center">
+              <button mat-stroked-button color="primary" type="button" tabindex="4" class="table-actions-button" (click)="onPaymentClick(payment)">View Info</button>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="no_payment">
+            <td *matFooterCellDef  mat-footer-cell colspan="4">
+              <p *ngIf="(!payments?.data || payments?.data?.length<1) && apiCallStatus.status === apiCallStatusEnum.COMPLETED">No payment available.</p>
+              <p *ngIf="(!payments?.data || payments?.data?.length<1) && apiCallStatus.status === apiCallStatusEnum.INITIATED">Getting payments...</p>
+              <p *ngIf="(!payments?.data || payments?.data?.length<1) && apiCallStatus.status === apiCallStatusEnum.ERROR">{{errorMessage}}</p>
+            </td>
+          </ng-container>
+
+        <!-- Payment Group Row Start -->
+        <ng-container matColumnDef="group_firstPartTimestamp">
+          <td *matCellDef="let payment" mat-cell>
+            <span fxLayoutAlign="start center" class="part-row-span">
+              Total Attempts: {{payment?.parts?.length || 0}}
+            </span>
+            <ng-container *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="start center" class="part-row-span">
+                {{part.timestamp | date:'dd/MMM/y HH:mm'}}
+              </span>
+            </ng-container>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_id">
+          <td *matCellDef="let payment" mat-cell>
+            <div fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+              <span class="ellipsis-child">{{payment?.id}}</span>
+            </div>
+            <span *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="start center" class="part-row-span">
+                <span fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                  <span class="ellipsis-child">{{part.id}}</span>
+                </span>
+              </span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_recipientNodeId">
+          <td *matCellDef="let payment" mat-cell>
+            <div fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+              <span class="ellipsis-child">{{payment?.recipientNodeId}}</span>
+            </div>
+            <span *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="start center" class="part-row-span">
+                <span  fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                  <span class="ellipsis-child">{{part.toChannelId}}</span>
+                </span>
+              </span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_recipientNodeAlias">
+          <td *matCellDef="let payment" mat-cell>
+            <div fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+              <span class="ellipsis-child">{{payment?.recipientNodeAlias}}</span>
+            </div>
+            <span *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="start center" class="part-row-span">
+                <span  fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                  <span class="ellipsis-child">{{part.toChannelAlias}}</span>
+                </span>
+              </span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_recipientAmount">
+          <td *matCellDef="let payment" mat-cell>
+            <span fxLayoutAlign="end center" class="part-row-span">{{payment?.recipientAmount | number:'1.0-0'}}</span>
+            <span *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="end center" class="part-row-span">
+                {{part.amount | number:'1.0-0'}}
+              </span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_description">
+          <td *matCellDef="let payment" mat-cell>
+            <div fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+              <span class="ellipsis-child">{{payment?.description}}</span>
+            </div>
+            <span *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="start center" class="part-row-span">
+                <span  fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                  <span class="ellipsis-child">Fee Paid: {{part.feesPaid | number:'1.0-0'}} (Sats)</span>
+                </span>
+              </span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_paymentHash">
+          <td *matCellDef="let payment" mat-cell>
+            <div fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+              <span class="ellipsis-child">{{payment?.paymentHash}}</span>
+            </div>
+            <span *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="start center" class="part-row-span">
+                <span  fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                  <span class="ellipsis-child">Fee Paid: {{part.feesPaid | number:'1.0-0'}} (Sats)</span>
+                </span>
+              </span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_paymentPreimage">
+          <td *matCellDef="let payment" mat-cell>
+            <div fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+              <span class="ellipsis-child">{{payment?.paymentPreimage}}</span>
+            </div>
+            <span *ngIf="payment?.is_expanded">
+              <span *ngFor="let part of payment?.parts" fxLayoutAlign="start center" class="part-row-span">
+                <span  fxLayoutAlign="start center" class="ellipsis-parent part-row-span" [ngStyle]="{'width': (screenSize === screenSizeEnum.XS) ? '6rem' : colWidth}">
+                  <span class="ellipsis-child">Fee Paid: {{part.feesPaid | number:'1.0-0'}} (Sats)</span>
+                </span>
+              </span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="group_actions">
+          <td *matCellDef="let payment" mat-cell>
+            <span fxLayoutAlign="end center" class="part-group-head">
+              <button mat-flat-button class="btn-part-expand" color="primary" type="button" tabindex="5" (click)="payment.is_expanded = !payment.is_expanded">{{payment?.is_expanded ? 'Hide' : 'Show'}}</button>
+            </span>
+            <div *ngIf="payment?.is_expanded">
+              <div *ngFor="let part of payment?.parts; index as i" class="part-group-details" fxLayoutAlign="end center">
+                <button mat-stroked-button class="btn-part-info" color="primary" type="button" tabindex="6" (click)="onPartClick(part, payment)">View {{i + 1}}</button>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+        <tr *matRowDef="let row; columns: partColumns; when: is_group;" mat-row></tr>
+        <!-- Payment Group Row End -->
+
+          <tr *matFooterRowDef="['no_payment']" mat-footer-row [ngClass]="{'display-none': payments?.data?.length>0}"></tr>
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+        </table>
+      </div>
+    </div>
+    <!-- Remove below one line after paginator api is fixed -->
+    <mat-paginator class="mb-1" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [showFirstLastButtons]="screenSize === screenSizeEnum.XS ? false : true" />
+    <!-- Uncomment after paginator api is fixed -->
+    <!-- <mat-paginator class="mb-1" [length]="totalRecords" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [showFirstLastButtons]="screenSize === screenSizeEnum.XS ? false : true" (page)="onPageChange($event)" /> -->
+  </div>
+</div>

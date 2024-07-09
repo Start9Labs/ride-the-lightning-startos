@@ -1,0 +1,93 @@
+import request from 'request-promise';
+import { Logger } from '../../utils/logger.js';
+import { Common } from '../../utils/common.js';
+let options = null;
+const logger = Logger;
+const common = Common;
+export const arrangeBalances = (body) => {
+    if (!body.confirmed) {
+        body.confirmed = 0;
+    }
+    if (!body.unconfirmed) {
+        body.unconfirmed = 0;
+    }
+    body.total = +body.confirmed + +body.unconfirmed;
+    body.btc_total = +body.btc_confirmed + +body.btc_unconfirmed;
+    return body;
+};
+export const getNewAddress = (req, res, next) => {
+    logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'Generating New Address..' });
+    options = common.getOptions(req);
+    if (options.error) {
+        return res.status(options.statusCode).json({ message: options.message, error: options.error });
+    }
+    options.url = req.session.selectedNode.settings.lnServerUrl + '/getnewaddress';
+    options.form = {};
+    request.post(options).then((body) => {
+        logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'New Address Generated', data: body });
+        res.status(200).json(body);
+    }).catch((errRes) => {
+        const err = common.handleError(errRes, 'OnChain', 'Get New Address Error', req.session.selectedNode);
+        return res.status(err.statusCode).json({ message: err.message, error: err.error });
+    });
+};
+export const getBalance = (req, res, next) => {
+    logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'Getting On Chain Balance..' });
+    options = common.getOptions(req);
+    if (options.error) {
+        return res.status(options.statusCode).json({ message: options.message, error: options.error });
+    }
+    options.url = req.session.selectedNode.settings.lnServerUrl + '/onchainbalance';
+    options.form = {};
+    if (common.read_dummy_data) {
+        common.getDummyData('OnChainBalance', req.session.selectedNode.lnImplementation).then((data) => { res.status(200).json(arrangeBalances(data)); });
+    }
+    else {
+        request.post(options).then((body) => {
+            logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'On Chain Balance Received', data: body });
+            res.status(200).json(arrangeBalances(body));
+        }).
+            catch((errRes) => {
+            const err = common.handleError(errRes, 'OnChain', 'Get Balance Error', req.session.selectedNode);
+            return res.status(err.statusCode).json({ message: err.message, error: err.error });
+        });
+    }
+};
+export const getTransactions = (req, res, next) => {
+    logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'Getting On Chain Transactions..' });
+    options = common.getOptions(req);
+    if (options.error) {
+        return res.status(options.statusCode).json({ message: options.message, error: options.error });
+    }
+    options.url = req.session.selectedNode.settings.lnServerUrl + '/onchaintransactions';
+    options.form = {
+        count: req.query.count,
+        skip: req.query.skip
+    };
+    logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'Getting On Chain Transactions Options', data: options.form });
+    request.post(options).then((body) => {
+        logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'On Chain Transactions Received', data: body });
+        res.status(200).json(body);
+    }).catch((errRes) => {
+        const err = common.handleError(errRes, 'OnChain', 'Get Transactions Error', req.session.selectedNode);
+        return res.status(err.statusCode).json({ message: err.message, error: err.error });
+    });
+};
+export const sendFunds = (req, res, next) => {
+    const { address, amount, blocks } = req.body;
+    logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'OnChain', msg: 'Sending On Chain Funds..' });
+    options = common.getOptions(req);
+    if (options.error) {
+        return res.status(options.statusCode).json({ message: options.message, error: options.error });
+    }
+    options.url = req.session.selectedNode.settings.lnServerUrl + '/sendonchain';
+    options.form = { address: address, amountSatoshis: amount, confirmationTarget: blocks };
+    logger.log({ selectedNode: req.session.selectedNode, level: 'DEBUG', fileName: 'Onchain', msg: 'Send Funds Options', data: options.form });
+    request.post(options).then((body) => {
+        logger.log({ selectedNode: req.session.selectedNode, level: 'INFO', fileName: 'Onchain', msg: 'On Chain Funds Sent', data: body });
+        res.status(201).json(body);
+    }).catch((errRes) => {
+        const err = common.handleError(errRes, 'OnChain', 'Send Funds Error', req.session.selectedNode);
+        return res.status(err.statusCode).json({ message: err.message, error: err.error });
+    });
+};

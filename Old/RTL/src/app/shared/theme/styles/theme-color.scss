@@ -1,0 +1,1186 @@
+@use '@angular/material' as mat;
+@use 'sass:math' as math;
+@import "constants";
+@import "mixins";
+
+@mixin theme-color($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary);
+  $primary-lighter: mat.get-color-from-palette($primary, lighter);
+  $primary-darker: mat.get-color-from-palette($primary, darker);
+  $accent: map-get($theme, accent);
+  $accent-color: mat.get-color-from-palette($accent);
+  $warn: map-get($theme, warn);
+  $warn-color: mat.get-color-from-palette($warn);
+  $foreground: map-get($theme, foreground);
+  $foreground-base: mat.get-color-from-palette($foreground, base); // 1
+  $foreground-text: mat.get-color-from-palette($foreground, text); //.87
+  $foreground-secondary-text: mat.get-color-from-palette($foreground, secondary-text); // .54
+  $foreground-disabled: mat.get-color-from-palette($foreground, disabled); // .38
+  $foreground-divider: mat.get-color-from-palette($foreground, divider); // .12
+  $background: map-get($theme, background);
+  $background-color: mat.get-color-from-palette($background, card);
+  $hover-background: rgba(0, 0, 0, 0.04);
+  $hover-background-dark: rgba(255, 255, 255, 0.06);
+
+  .mat-expansion-panel.flat-expansion-panel {
+    box-shadow: none;
+    padding: 0;
+    border-radius: 2px;
+    background: none;
+  }
+
+  .mat-progress-bar-buffer {
+    background-color: mat.get-color-from-palette($primary, 100);
+  }
+
+  .foreground-text {
+    color: $foreground-text !important;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+    word-break: break-all;
+  }
+
+  .foreground-secondary-text {
+    color: $foreground-secondary-text !important;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    min-height: ($gap*3);
+  }
+
+  .foreground.mat-progress-spinner circle, .foreground.mat-spinner circle {
+    stroke: $foreground-text;
+  }
+
+  .mat-toolbar-row, .mat-toolbar-single-row {
+    height: $toolbar-height;
+  }
+
+  .lnd-info{
+    border-bottom: 1px solid $foreground-divider;
+  }
+
+  a {
+    color: $primary-color;
+  }
+
+  .horizontal-button .fa-icon-small {
+    fill: white;
+    color: white;
+  }
+
+  .h-active-link {
+    border-bottom: 2px solid white;
+  }
+
+  .mat-icon-36 {
+    color: $foreground-secondary-text;
+  }
+  
+  .mat-primary .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple),
+  .mat-primary .mat-option.mat-selected:not(.mat-option-multiple):not(.mat-option-disabled) {
+    background: none;
+    font-weight: 900;
+  }
+
+  .validation-error-icon {
+    position: relative;
+    top: 2px;
+    left: 4px;
+  }
+
+  .genseed-message {
+    width:10%;
+    color: $primary-color;
+  }
+
+  .border-primary {
+    border: 1px solid $primary-color;
+  }
+
+  .border-accent {
+    border: 1px solid $accent-color;
+  }
+
+  .border-warn {
+    border: 1px solid $warn-color;
+  }
+
+  .material-icons.primary { color: $primary-color; }
+
+  .material-icons.accent { color: $accent-color; }
+
+  .validation-error-message {
+    position: relative;
+    margin-top: 0.4px;
+    width:100%;
+    color: $warn-color;
+  }
+
+  .mat-vertical-content {
+    padding: 0  0 ($gap*1.5);
+  }
+
+  .row-disabled {
+    background-color: gray;
+    .mat-icon {
+      cursor: not-allowed;
+    }
+  }
+  .mat-mdc-card-content, .mat-mdc-card-subtitle, .mat-mdc-card-title {
+    color: $foreground-secondary-text;
+  }
+  .mat-menu-panel {
+    min-width: ($gap*8);
+  }
+  
+  .horizontal-button {
+    height: $toolbar-height;
+    border-radius: 0;
+    &:hover {
+      background: $primary-lighter;
+      color: $accent-color;
+    }
+  }
+
+  .mat-stroked-button.mat-primary.horizontal-button-show {
+    line-height: ($gap*3);
+    border-radius: 1($gap*2.5);
+    background-color: white;
+    color: $primary-color;
+    &:hover {
+      @include mat.elevation(4);
+    }
+    &:hover .mat-button-focus-overlay {
+      opacity: 0.09;
+    }
+  }
+
+  .mat-dialog-container {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  
+  .mat-button, .mat-icon-button, .mat-stroked-button, .mat-mdc-unelevated-button {
+    border-radius: 2px;
+  }
+  
+  .cc-data-block {
+    & .cc-data-title {
+      & .material-icons.mat-icon.mat-mdc-tooltip-trigger {
+        min-height: unset;
+      }
+      font-weight: 500;
+      min-width: 180px;
+      @include for_screensize(phone) {
+        min-width: 100px;
+      }
+    }
+    & .cc-data-value {
+      color: $foreground-base;
+    }
+  }
+  
+  .mat-cell, .mat-header-cell, .mat-footer-cell {
+    border-bottom-width: 1px;
+    border-bottom-style: solid; 
+    border-bottom-color: $foreground-divider;
+  }
+
+  .mdc-list-item__primary-text {
+    place-content: flex-start;
+    align-items: center;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: flex;
+  }
+
+  .svg-donation {
+    opacity: 0.67;
+    width: 1.5rem;
+    margin-right: 10px;
+  }
+  
+  .mat-mdc-option:hover:not(.mdc-list-item--disabled), .mat-mdc-option:focus:not(.mdc-list-item--disabled), .mat-mdc-option.mat-mdc-option-active, .mat-mdc-option.mdc-list-item--selected:not(.mat-mdc-option-multiple):not(.mdc-list-item--disabled), 
+  .mat-mdc-menu-item:hover:not([disabled]), .mat-mdc-menu-item.cdk-program-focused:not([disabled]), .mat-mdc-menu-item.cdk-keyboard-focused:not([disabled]), .mat-mdc-menu-item-highlighted:not([disabled]) {
+    color: $primary-color;
+    & .mdc-list-item__primary-text, & .fa-icon, & .fa-icon-small, & .svg-donation {
+      color: $primary-color;
+      opacity: 1;
+    }
+  }
+  table.mat-mdc-table {
+    border: 1px solid $foreground-divider;
+    border-radius: 2px;
+    background: none;
+    & thead tr th:not(:first-of-type), tbody tr td:not(:first-of-type) {
+      padding-left: ($gap*1.25);
+    }
+    & tbody tr td.mat-mdc-cell {
+      @include for_screensize(tab-land) {
+        white-space: unset;
+      }
+      @include for_screensize(tab-port) {
+        white-space: unset;
+      }
+      @include for_screensize(phone) {
+        white-space: unset;
+      }
+    }
+    & tfoot tr td {
+      & p {
+        padding-left: $gap*3;
+      }
+    }
+    &.error-border {
+      border: 1px solid red;
+      box-shadow: 0 3px 1px -2px rgba(255,0,0,.2), 0 2px 2px 0 rgba(255,0,0,.14), 0 1px 5px 0 rgba(255,0,0,.12) !important;
+    }
+  }
+
+  .bordered-box {
+    border: 1px solid $foreground-divider;
+    border-radius: 2px;
+    background: none;
+    &.read-only {
+      background-color: $hover-background;
+    }
+  }
+
+  .mat-expansion-panel {
+    border: 1px solid $foreground-divider;
+    &.error-border {
+      border: 1px solid red;
+    }
+  }
+
+  .more-button {
+    color: $foreground-base;
+  }
+
+  .mat-icon-button.more-button-short {
+    height: ($gap*2);
+    line-height: ($gap*2);
+    & .mat-icon {
+      line-height: ($gap*2);
+    }
+  }
+
+  .dashboard-tabs-group {
+    & .mdc-tab__text-label:last-child {
+      padding-right: 0;
+      & .more-button {
+        position: absolute;
+        right: math.div($gap, 2);
+        top: math.div($gap, 2);
+        max-width: ($gap*3);
+      }
+    }
+  }
+
+  .modal-info-header {
+    color: $foreground-text;
+    font-weight: 500;
+    padding: $gap $gap $gap $gap*2;
+    @include for_screensize(tab-land) {
+      padding: $gap $gap $gap $gap;
+    }
+    @include for_screensize(tab-port) {
+      padding: $gap $gap $gap math.div($gap, 2);
+    }
+    @include for_screensize(phone) {
+      padding: $gap $gap $gap math.div($gap, 4);
+    }
+    & .page-title-img svg {
+      color: $foreground-text;
+    }
+  }
+
+  .mat-badge-medium.mat-badge-above .mat-badge-content {
+    top: -1px;
+  }
+
+  .tab-badge {
+    & .mat-badge-content {
+      font-size: 90%;
+      padding-bottom: 2px;
+      &.mat-badge-active {
+        background: $primary-color;
+      }
+    }
+  }
+
+  .mat-badge-medium.mat-badge-after .mat-badge-content {
+    right: unset;
+    margin-left: $gap !important;
+    @include for_screensize(phone) {
+      margin-left: 0 !important;
+    }
+  }
+
+  .rtl-select-overlay {
+    min-width: ($gap*22) !important;
+    @include for_screensize(tab-port) {
+      min-width: ($gap*20);
+    }
+    @include for_screensize(phone) {
+      min-width: ($gap*14);
+    }
+  }
+
+  .table-actions-select {
+    border-color: $foreground-disabled;
+    padding: math.div($gap, 2) $gap;
+    margin: $gap 0;
+    min-height: ($gap*4.5);
+    float: right;
+    min-width: $table-actions-min-width;
+    & .mat-select-placeholder {
+      color: $foreground-text;
+    }
+  }
+
+  .table-actions-button {
+    min-width: $table-actions-min-width;
+  }
+
+  .mat-select-panel .mat-option.mat-active {
+    background: none;
+  }
+
+  .mat-drawer-inner-container {
+    overflow: hidden;
+  }
+
+  .mat-fa-icon-button {
+    width: ($gap*2.5);
+    height: ($gap*2.5);
+    line-height: ($gap*2.5);
+  }
+
+  .balances-info-pie-chart {
+    & .legend-label:nth-child(1) .legend-label-color {
+      background-color: mat.get-color-from-palette($primary, 200) !important;
+    }
+
+    & .legend-label:nth-child(2) .legend-label-color {
+      background-color: mat.get-color-from-palette($primary, 600) !important;
+    }
+  }
+
+  .dashboard-card {
+    & .dashboard-divider {
+      border-top-width: 2px;
+    }
+    & .mat-mdc-card-header .mat-mdc-card-title {
+      min-height: ($gap*5);
+      margin-bottom: 0 0 $gap 0;
+    }
+    & .dashboard-info-value {
+      font-weight: 700;
+    }
+    & .dashboard-info-title {
+      font-weight: 500;
+      .material-icons.mat-icon.mat-mdc-tooltip-trigger {
+        min-height: math.div($min-form-ctrl-height, 3);
+      }
+    }
+    & .dashboard-node-dot {
+      margin: 0 0 -2px ($gap*1.25);
+      border: 1px solid $foreground-base;
+    }    
+    & .dashboard-node-square {
+      display: inline-flex;
+      width: $dot-size;
+      height: $dot-size;
+      margin-right: ($gap*1.25);
+    }    
+    & .dashboard-capacity-header {
+      font-weight: 700;
+    }
+    & .mat-icon-button.more-button {
+      width: ($gap*2.5);
+      max-width: ($gap*2.5);
+    }
+  }
+
+  .color-warn {
+    color: $warn-color;
+  }
+  
+  .fill-warn {
+    fill: $warn-color;
+  }
+
+  .alert {
+    border: 1px solid $foreground-secondary-text;
+    color: $foreground-base;
+    background-color: $hover-background;
+
+    &.alert-info {
+      border: 1px solid $blue-color;
+      background-color: $blue-background-color;
+      color: $blue-color;
+        & .alert-icon.ng-fa-icon {
+          color: $blue-color;
+        }
+        & a {
+          color: $blue-color;
+        }        
+      }
+  
+    &.alert-warn {
+      border: 1px solid $yellow-alert-color; 
+      background-color: $yellow-background-color;
+      color: $yellow-alert-color;
+      & .alert-icon.ng-fa-icon {
+        color: $yellow-alert-color;
+      }
+      & a {
+        color: $yellow-alert-color;
+      }
+    }
+  
+    &.alert-danger {
+      border: 1px solid $red-color;
+      background-color: $red-background-color;
+      color: $red-color;
+      overflow-wrap: break-word;
+      & .alert-icon.ng-fa-icon {
+        color: $red-color;
+      }
+    }    
+  
+    &.alert-success {
+      border: 1px solid $green-color;
+      background-color: $green-background-color;
+      color: $green-color;
+      & .alert-icon.ng-fa-icon {
+        color: $green-color;
+      }
+    }
+  }
+  .mat-form-field-appearance-legacy .mat-form-field-prefix .mat-datepicker-toggle-default-icon,
+  .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-datepicker-toggle-default-icon {
+    width: ($gap*2); 
+  }
+
+  .button-link-dashboard {
+    line-height: 0px;
+    font-weight: 600;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .failed-status {
+    color: $warn-color;
+  }
+
+  .material-icons.icon-failed-status {
+    fill: $warn-color;
+    height: ($gap*2.5);
+  }
+
+  .svg-fill-primary {
+    fill: $primary-color;
+  }
+
+  .svg-fill-primary-lighter {
+    fill: $primary-lighter;
+  }
+
+  .mat-expansion-panel-header[aria-disabled='true'] {
+    color: $foreground-text;
+  }
+
+  .mat-chip-list-wrapper input.mat-input-element, .mat-chip-list-wrapper .mat-standard-chip {
+    margin: $gap math.div($gap, 4);
+    min-height: ($gap*3);
+  }
+
+  .dashboard-card-content .underline, 
+  .mat-mdc-tab-header .mat-mdc-tab-label-container, .mat-mdc-tab-nav-bar.mat-mdc-tab-header .mat-mdc-tab-link-container {
+    border-bottom: 1px solid $foreground-divider;
+    margin-bottom: $gap;
+  }
+
+  .mat-mdc-option.mdc-list-item:hover, .mat-mdc-option.mdc-list-item.mat-mdc-option-active {
+    fa-icon svg path {
+      fill: $primary-color;
+    }
+    & .currency-icon {
+      color: $primary-color;
+      & path {
+        fill: $primary-color;
+      }
+    }
+  }
+
+  .mat-mdc-form-field-hint .currency-icon {
+    color: $primary-color;
+    & path {
+      fill: $primary-color;
+    }
+  }
+
+  .fa-icon-primary {
+    color: $primary-color;
+    &:hover {
+      cursor: pointer;
+      @include mat.elevation(4);
+    }
+  }
+  
+  ngx-charts-bar-vertical, ngx-charts-bar-vertical-2d {
+    & text {
+      fill: $foreground-text;
+    }
+    .ngx-charts .grid-panel.odd rect {
+      fill: none;
+    }  
+  }
+  .mat-paginator-container {
+    padding: 0;
+  }
+
+  .invoice-animation-container {
+    position: relative;
+    width: 100%;
+    -moz-transform: translateY(0%);
+    -ms-transform: translateY(0%);
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+
+  .invoice-animation-div {
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .invoice-animation-div .particles-circle {
+    position: absolute;
+    background-color: $primary-color;
+    width: 30px;
+    height: 30px;
+    top: 10px;
+    left: 50%;
+    margin-top: -13px;
+    margin-left: -45%;
+    z-index: -1;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    -moz-transform: scale(0);
+    -ms-transform: scale(0);
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    visibility: hidden;
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(odd) {
+    border: solid 2px $primary-color;
+    background-color: transparent;
+  }
+  @keyframes particles-1 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 199px;
+      top: 201px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(1) {
+    animation: particles-1 2.5s 0.025s;
+  }
+  @keyframes particles-2 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -40px;
+      top: 82px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(2) {
+    animation: particles-2 2.5s 0.05s;
+  }
+  @keyframes particles-3 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 162px;
+      top: 109px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(3) {
+    animation: particles-3 2.5s 0.075s;
+  }
+  @keyframes particles-4 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 223px;
+      top: 78px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(4) {
+    animation: particles-4 2.5s 0.1s;
+  }
+  @keyframes particles-5 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 184px;
+      top: 113px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(5) {
+    animation: particles-5 2.5s 0.125s;
+  }
+  @keyframes particles-6 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -42px;
+      top: -238px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(6) {
+    animation: particles-6 2.5s 0.15s;
+  }
+  @keyframes particles-7 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 150px;
+      top: -98px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(7) {
+    animation: particles-7 2.5s 0.175s;
+  }
+  @keyframes particles-8 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 62px;
+      top: 225px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(8) {
+    animation: particles-8 2.5s 0.2s;
+  }
+  @keyframes particles-9 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 113px;
+      top: 86px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(9) {
+    animation: particles-9 2.5s 0.225s;
+  }
+  @keyframes particles-10 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 229px;
+      top: -127px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(10) {
+    animation: particles-10 2.5s 0.25s;
+  }
+  @keyframes particles-11 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 243px;
+      top: -106px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(11) {
+    animation: particles-11 2.5s 0.275s;
+  }
+  @keyframes particles-12 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -168px;
+      top: 138px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(12) {
+    animation: particles-12 2.5s 0.3s;
+  }
+  @keyframes particles-13 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -124px;
+      top: 62px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(13) {
+    animation: particles-13 2.5s 0.325s;
+  }
+  @keyframes particles-14 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 246px;
+      top: 30px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(14) {
+    animation: particles-14 2.5s 0.35s;
+  }
+  @keyframes particles-15 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -22px;
+      top: -171px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(15) {
+    animation: particles-15 2.5s 0.375s;
+  }
+  @keyframes particles-16 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -144px;
+      top: 115px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(16) {
+    animation: particles-16 2.5s 0.4s;
+  }
+  @keyframes particles-17 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 209px;
+      top: 84px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(17) {
+    animation: particles-17 2.5s 0.425s;
+  }
+  @keyframes particles-18 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 84px;
+      top: -190px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(18) {
+    animation: particles-18 2.5s 0.45s;
+  }
+  @keyframes particles-19 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -94px;
+      top: 208px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(19) {
+    animation: particles-19 2.5s 0.475s;
+  }
+  @keyframes particles-20 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 147px;
+      top: 203px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(20) {
+    animation: particles-20 2.5s 0.5s;
+  }
+  @keyframes particles-21 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 178px;
+      top: 206px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(21) {
+    animation: particles-21 2.5s 0.525s;
+  }
+  @keyframes particles-22 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -10px;
+      top: -226px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(22) {
+    animation: particles-22 2.5s 0.55s;
+  }
+  @keyframes particles-23 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 3px;
+      top: 222px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(23) {
+    animation: particles-23 2.5s 0.575s;
+  }
+  @keyframes particles-24 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -182px;
+      top: -44px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(24) {
+    animation: particles-24 2.5s 0.6s;
+  }
+  @keyframes particles-25 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -146px;
+      top: 166px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(25) {
+    animation: particles-25 2.5s 0.625s;
+  }
+  @keyframes particles-26 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 144px;
+      top: 218px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(26) {
+    animation: particles-26 2.5s 0.65s;
+  }
+  @keyframes particles-27 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 48px;
+      top: 222px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(27) {
+    animation: particles-27 2.5s 0.675s;
+  }
+  @keyframes particles-28 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -48px;
+      top: 50px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(28) {
+    animation: particles-28 2.5s 0.7s;
+  }
+  @keyframes particles-29 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -228px;
+      top: -15px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(29) {
+    animation: particles-29 2.5s 0.725s;
+  }
+  @keyframes particles-30 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 91px;
+      top: -199px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(30) {
+    animation: particles-30 2.5s 0.75s;
+  }
+  @keyframes particles-31 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -40px;
+      top: 104px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(31) {
+    animation: particles-31 2.5s 0.775s;
+  }
+  @keyframes particles-32 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -102px;
+      top: 4px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(32) {
+    animation: particles-32 2.5s 0.8s;
+  }
+  @keyframes particles-33 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -26px;
+      top: -89px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(33) {
+    animation: particles-33 2.5s 0.825s;
+  }
+  @keyframes particles-34 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: -151px;
+      top: -149px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(34) {
+    animation: particles-34 2.5s 0.85s;
+  }
+  @keyframes particles-35 {
+    from {
+      transform: scale(1);
+      visibility: visible;
+    }
+    to {
+      left: 186px;
+      top: 200px;
+      transform: scale(0);
+      visibility: hidden;
+    }
+  }
+  .invoice-animation-div .particles-circle:nth-of-type(35) {
+    animation: particles-35 2.5s 0.875s;
+  }
+
+  .wiggle {
+    animation: 0.5s wiggle ease-in-out infinite;
+  }
+
+  @keyframes wiggle {
+    0% {
+      transform: rotate(-3deg);
+    }
+    20% {
+      transform: rotate(20deg);
+    }
+    40% {
+      transform: rotate(-15deg);
+    }
+    60% {
+      transform: rotate(5deg);;
+    }
+    90% {
+      transform: rotate(-1deg);;
+    }
+    100% {
+      transform: rotate(0deg);;
+    }
+  }
+
+  .shockwave {
+    animation: shockwaveJump 1s ease-out infinite;
+    
+    &:after {
+      @include afterBg;
+      animation: shockwave 1s .65s ease-out infinite;
+    }
+    
+    &:before {
+      @include afterBg;
+      animation: shockwave 1s .5s ease-out infinite;
+    }
+  }
+
+  @keyframes shockwaveJump {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.08);
+    }
+    50% {
+      transform: scale(0.98);
+    }
+    55% {
+      transform: scale(1.02);
+    }
+    60% {
+      transform: scale(0.98);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes shockwave {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 2px rgba(0,0,0,0.15), inset 0 0 1px rgba(0,0,0,0.15);
+    }
+    95% {
+      box-shadow: 0 0 50px rgba(0,0,0,0), inset 0 0 30px rgba(0,0,0,0);
+    }
+    100% {
+      transform: scale(2.25);
+
+    }
+  }
+
+}

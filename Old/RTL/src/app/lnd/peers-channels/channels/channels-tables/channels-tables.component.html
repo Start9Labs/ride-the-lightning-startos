@@ -1,0 +1,32 @@
+<div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between stretch" class="padding-gap-x">
+  <div fxLayout="row">
+    <button mat-flat-button color="primary" type="submit" tabindex="1" (click)="onOpenChannel()">Open Channel</button>
+  </div>
+  <div fxLayout="column" fxFlex="100" class="bordered-box">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="activeLink" (selectedTabChange)="onSelectedTabChange($event)">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span matBadgeOverlap="false" class="tab-badge" matBadge="{{numOpenChannels}}">Open</span>
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span matBadgeOverlap="false" class="tab-badge" matBadge="{{numPendingChannels}}">Pending</span>
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span matBadgeOverlap="false" class="tab-badge" matBadge="{{numClosedChannels}}">Closed</span>
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span matBadgeOverlap="false" class="tab-badge" matBadge="{{numActiveHTLCs}}">Active HTLCs</span>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+    <div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between stretch" class="padding-gap-x-large">
+      <router-outlet />
+    </div>
+  </div>
+</div>

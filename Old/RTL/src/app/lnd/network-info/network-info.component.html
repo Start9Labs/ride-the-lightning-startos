@@ -1,0 +1,105 @@
+<div fxLayout="column" fxLayoutAlign="space-between stretch" class="mb-4">
+  <mat-grid-list *ngIf="selNode.settings.userPersona !== userPersonaEnum.OPERATOR" cols="3" rowHeight="330px">
+    <mat-grid-tile *ngFor="let card of nodeCards" class="node-grid-tile" [colspan]="card.cols" [rowspan]="card.rows">
+      <div fxLayout="column" fxLayoutAlign="stretch start" fxFlex="100" class="h-100">
+        <div fxLayout="row" fxLayoutAlign="start start" class="w-100">
+          <div fxLayout="row" fxLayoutAlign="start start" class="page-title-container">
+            <fa-icon class="mr-1" [icon]="card.icon" />
+            <span>{{card.title}}</span>
+          </div>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="stretch center" fxLayout.gt-sm="row" fxLayoutAlign.gt-sm="center stretch" class="w-100 h-93">
+          <mat-card fxLayout="row" fxFlex="95" fxLayoutAlign="start stretch" class="dashboard-card w-96 h-93">
+            <mat-card-content fxLayout="column" fxFlex="100" class="mt-2"
+              [ngClass]="{'dashboard-card-content': true, 
+              'error-border': (card.id === 'node' && apiCallStatusNodeInfo.status === apiCallStatusEnum.ERROR) ||
+                            (card.id === 'status' && (apiCallStatusChannels.status === apiCallStatusEnum.ERROR || apiCallStatusPendingChannels.status === apiCallStatusEnum.ERROR)) ||
+                            (card.id === 'fee' && apiCallStatusFees.status === apiCallStatusEnum.ERROR)}">
+              <mat-progress-bar *ngIf="(card.id === 'node' && apiCallStatusNodeInfo.status === apiCallStatusEnum.INITIATED) ||
+                  (card.id === 'status' && (apiCallStatusChannels.status === apiCallStatusEnum.INITIATED || apiCallStatusPendingChannels.status === apiCallStatusEnum.INITIATED)) ||
+                  (card.id === 'fee' && apiCallStatusFees.status === apiCallStatusEnum.INITIATED)"
+                mode="indeterminate" />
+              <div fxLayout="column" fxFlex="100" [ngSwitch]="card.id">
+                <rtl-node-info *ngSwitchCase="'node'" fxFlex="100" [information]="information" [showColorFieldSeparately]="true" />
+                <rtl-channel-status-info *ngSwitchCase="'status'" fxFlex="100" [channelsStatus]="channelsStatus" [errorMessage]="errorMessages[3] + ' ' + errorMessages[4]" />
+                <rtl-fee-info *ngSwitchCase="'fee'" fxFlex="100" [fees]="fees" [errorMessage]="errorMessages[2]" />
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-grid-tile>
+  </mat-grid-list>
+  <div fxLayout="row" fxLayoutAlign="start end" class="page-title-container" [ngClass]="{'mt-1': screenSize !== screenSizeEnum.XS}">
+    <fa-icon class="page-title-img mr-1" [icon]="faProjectDiagram" />
+    <span class="page-title">Network</span>
+  </div>
+  <mat-grid-list cols="3" rowHeight="250px">
+    <mat-grid-tile *ngFor="let card of networkCards" fxLayout="row" [colspan]="card.cols" [rowspan]="card.rows">
+      <mat-card fxLayout="row" fxFlex="95" fxLayoutAlign="start stretch" class="dashboard-card h-93">
+        <mat-card-content fxLayout="column" fxFlex="100" [ngClass]="{'dashboard-card-content': true, 'error-border': apiCallStatusNetwork.status === apiCallStatusEnum.ERROR}">
+          <mat-progress-bar *ngIf="apiCallStatusNetwork.status === apiCallStatusEnum.INITIATED" mode="indeterminate" />
+          <div fxLayout="column" fxFlex="100" [ngSwitch]="card.id">
+            <div *ngSwitchCase="'general'" fxFlex="100"><ng-container *ngTemplateOutlet="apiCallStatusNetwork.status === apiCallStatusEnum.ERROR ? errorBlock : generalBlock" /></div>
+            <div *ngSwitchCase="'channels'" fxFlex="100"><ng-container *ngTemplateOutlet="apiCallStatusNetwork.status === apiCallStatusEnum.ERROR ? errorBlock : channelsBlock" /></div>
+            <div *ngSwitchCase="'degrees'" fxFlex="100"><ng-container *ngTemplateOutlet="apiCallStatusNetwork.status === apiCallStatusEnum.ERROR ? errorBlock : degreesBlock" /></div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
+
+<ng-template #errorBlock>
+  <div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between" class="p-2">
+    <p>{{errorMessages[1]}}</p>
+  </div>
+</ng-template>
+<ng-template #generalBlock>
+  <div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between" class="mt-2">
+    <div>
+      <h4 class="dashboard-info-title">Network Capacity</h4>
+      <div class="overflow-wrap dashboard-info-value">{{networkInfo.total_network_capacity | number}} Sats</div>
+    </div>
+    <div>
+      <h4 class="dashboard-info-title">Number of Nodes</h4>
+      <div class="overflow-wrap dashboard-info-value">{{networkInfo.num_nodes | number}}</div>
+    </div>
+    <div>
+      <h4 class="dashboard-info-title">Number of Channels</h4>
+      <span class="overflow-wrap dashboard-info-value">{{networkInfo.num_channels | number}}</span>
+    </div>
+  </div>
+</ng-template>
+<ng-template #channelsBlock>
+  <div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between" class="mt-2">
+    <div>
+      <h4 class="dashboard-info-title">Max Channel Size</h4>
+      <div class="overflow-wrap dashboard-info-value">{{networkInfo.max_channel_size | number}}</div>
+    </div>
+    <div>
+      <h4 class="dashboard-info-title">Avg Channel Size</h4>
+      <div class="overflow-wrap dashboard-info-value">{{networkInfo.avg_channel_size | number}}</div>
+    </div>
+    <div>
+      <h4 class="dashboard-info-title">Min Channel Size</h4>
+      <span class="overflow-wrap dashboard-info-value">{{networkInfo.min_channel_size | number}}</span>
+    </div>
+  </div>
+</ng-template>
+<ng-template #degreesBlock>
+  <div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between" class="mt-2">
+    <div>
+      <h4 class="dashboard-info-title">Max Out Degree</h4>
+      <div class="overflow-wrap dashboard-info-value">{{networkInfo.max_out_degree | number}}</div>
+    </div>
+    <div>
+      <h4 class="dashboard-info-title">Avg Out Degree</h4>
+      <div class="overflow-wrap dashboard-info-value">{{networkInfo.avg_out_degree | number:'1.0-2'}}</div>
+    </div>
+    <div fxFlex="20">
+      <h4 class="dashboard-info-title"></h4>
+      <span class="overflow-wrap dashboard-info-value"></span>
+    </div>
+  </div>
+</ng-template>

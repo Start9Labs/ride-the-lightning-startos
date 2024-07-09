@@ -1,0 +1,34 @@
+<div *ngIf="errorMessage?.trim() === ''; else errorBlock" fxLayout="column" fxLayoutAlign="space-between stretch" fxFlex="100" [ngClass]="{'mb-4': screenSize === screenSizeEnum.XS || screenSize === screenSizeEnum.SM, 'mb-2': screenSize === screenSizeEnum.MD, 'mb-1': screenSize === screenSizeEnum.LG || screenSize === screenSizeEnum.XL}">
+  <div fxLayout="column" fxFlex="8" fxLayoutAlign="end start">
+    <span class="dashboard-capacity-header this-channel-capacity">Total Capacity</span>
+    <mat-hint class="font-size-90">{{totalLiquidity | number:'1.0-0'}} Sats</mat-hint>
+    <mat-progress-bar class="dashboard-progress-bar this-channel-bar" mode="determinate" color="accent" value="100" />
+  </div>
+  <div fxLayout="column" fxFlex="3" fxLayoutAlign="end stretch"><mat-divider class="dashboard-divider" /></div>
+  <div fxLayout="column" fxFlex.gt-sm="88" fxFlex="84" fxLayoutAlign="start start" [perfectScrollbar]>
+    <div *ngIf="allChannels && allChannels.length > 0;  else noChannelBlock" fxLayout="column" fxFlex="100"class="w-100">
+      <div *ngFor="let channel of allChannels" class="mt-2">
+        <a class="dashboard-capacity-header" [routerLink]="['../connections/channels/open']" [state]="{filterColumn: channel.alias ? 'alias' : 'shortChannelId', filterValue: channel.alias || channel.shortChannelId}" matTooltip="{{channel.alias || channel.shortChannelId}}" matTooltipDisabled="{{(channel.alias || channel.shortChannelId).length < 26}}">
+          {{(channel.alias || channel.shortChannelId) | slice:0:24}}{{(channel.alias || channel.shortChannelId).length > 25 ? '...' : ''}}
+        </a>
+        <div fxLayout="row" fxLayoutAlign="space-between start" class="w-100">
+          <mat-hint *ngIf="direction === 'In'" fxFlex="100" fxLayoutAlign="start center" class="font-size-90 color-primary"><strong class="font-weight-900 mr-5px">Capacity: </strong>{{channel.toRemote || 0 | number:'1.0-0'}} Sats</mat-hint>
+          <mat-hint *ngIf="direction === 'Out'" fxFlex="100" fxLayoutAlign="start center" class="font-size-90 color-primary"><strong class="font-weight-900 mr-5px">Capacity: </strong>{{channel.toLocal || 0 | number:'1.0-0'}} Sats</mat-hint>
+        </div>
+        <mat-progress-bar *ngIf="direction === 'In'" class="dashboard-progress-bar" mode="determinate" value="{{(totalLiquidity > 0) ? ((+channel.toRemote || 0)/(totalLiquidity) * 100) : 0}}" />
+        <mat-progress-bar *ngIf="direction === 'Out'" class="dashboard-progress-bar" mode="determinate" value="{{(totalLiquidity > 0) ? ((+channel.toLocal || 0)/(totalLiquidity) * 100) : 0}}" />
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #noChannelBlock>
+  <div fxLayout="row" fxFlex="100" fxLayoutAlign="space-between start" class="mt-1">
+    No channels available.
+    <button *ngIf="direction === 'Out'" mat-stroked-button color="primary" tabindex="1" (click)="goToChannels()">Open Channel</button>
+  </div>
+</ng-template>
+<ng-template #errorBlock>
+  <div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between" class="p-2">
+    <p>{{errorMessage}}</p>
+  </div>
+</ng-template>

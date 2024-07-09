@@ -1,0 +1,1716 @@
+@use 'sass:math' as math;
+@import 'constants';
+@import 'mixins';
+
+html {
+  width: 100%;
+  height: 99%;
+  line-height: 1.5;
+  overflow-x: hidden;
+  font-family: $font-family !important;
+  font-size: 95%;
+  @include for_screensize(tab-port) {
+    font-size: 90%;
+  }
+  @include for_screensize(phone) {
+    font-size: 80%;
+  }
+}
+
+body {
+  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.rtl-container{
+  position:absolute;
+  width: 100%;
+  height: 100%;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  overflow: hidden;
+  .mat-menu-panel .mat-menu-content {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .mat-nested-tree-node-child>.mat-tree-node {
+    padding-left: ($gap*5);
+  }
+}
+
+.mat-sidenav-container .mat-sidenav-content {
+  height: 95vh;
+  min-height: 95vh;
+}
+
+.sidenav {
+  width: $regular-sidenav-width !important;
+  height: 100%;
+  overflow: hidden !important;
+}  
+
+span.page-text, .mat-mdc-slide-toggle, .material-icons.mat-icon.mat-mdc-tooltip-trigger {
+  min-height: $min-form-ctrl-height;
+}
+
+.mat-mdc-checkbox {
+  min-height: $min-form-chbox-height;
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+}
+
+.horizontal-menu{
+  padding: 0;
+  z-index: 999;  
+  position: fixed;
+  top: 0;
+  height: $toolbar-height;
+  overflow: visible;
+}
+
+.inner-sidenav-content {
+  position: relative;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;  
+  padding: $gap*1.5;
+  @include for_screensize(tab-port) {
+    padding: $gap;
+  }
+  @include for_screensize(phone) {
+    padding: $gap math.div($gap, 2);
+  }
+}
+
+.top-50 {
+  top: 50px;
+}
+
+*{
+  margin: 0;
+  padding: 0;
+}
+
+.rtl-spinner{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  background: #fff;
+  z-index: 999999;
+  visibility: visible;
+  opacity: 1;
+  h4{
+    margin-top: ($gap*1.25);
+  }
+}
+
+.spinner-dialog-panel {
+  & .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  overflow: hidden;
+}
+
+button.mdc-button {
+  @include for_screensize(tab-land) {
+    min-width: 50px;
+  }
+  @include for_screensize(tab-port) {
+    min-width: 40px;
+  }
+  @include for_screensize(phone) {
+    min-width: 20px;
+  }
+}
+
+button.mdc-button.mat-mdc-button-base {
+  font-size: 103%;
+  font-weight: 500;
+  font-family: $font-family;
+  &.mat-mdc-unelevated-button {
+    margin-bottom: $gap * 2;
+  }
+}
+
+.mat-mdc-icon-button.mat-mdc-button-base.btn-icon-small {
+  height: 40px;
+  padding: ($gap*1.5);
+}
+
+.mdc-floating-label {
+  will-change: unset !important;  
+}
+
+.mat-mdc-form-field.mat-form-field-disabled {
+  cursor: not-allowed;
+  & .mat-mdc-text-field-wrapper.mdc-text-field--disable {
+    cursor: not-allowed;
+  }
+  & .mdc-floating-label.mat-mdc-floating-label {
+    cursor: not-allowed;
+  }
+  & .mat-mdc-input-element.mat-mdc-form-field-input-control {
+    cursor: not-allowed;
+  }
+}
+.mat-mdc-slide-toggle .mdc-switch.mdc-switch--disabled {
+  cursor: not-allowed;
+}
+.padding-gap {
+  padding: $gap !important;
+  @include for_screensize(tab-port) {
+    padding: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding: math.div($gap, 4) !important;
+  }
+}
+
+.padding-gap-x {
+  padding: 0 $gap 0 $gap !important;
+  @include for_screensize(tab-land) {
+    padding: 0 math.div($gap, 2) 0 math.div($gap, 2) !important;
+  }
+  @include for_screensize(tab-port) {
+    padding: 0 math.div($gap, 2) 0 math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding: 0 math.div($gap, 4) 0 math.div($gap, 4) !important;
+  }
+}
+
+.padding-gap-large {
+  padding: $gap * 2 !important;
+  @include for_screensize(tab-land) {
+    padding: $gap * 4 !important;
+  }
+  @include for_screensize(tab-port) {
+    padding: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding: math.div($gap, 4) !important;
+  }
+}
+
+.padding-gap-x-large {
+  padding: 0 ($gap*2) 0 ($gap*2) !important;
+  @include for_screensize(tab-land) {
+    padding: 0 ($gap) 0 ($gap) !important;
+  }
+  @include for_screensize(tab-port) {
+    padding: 0 math.div($gap, 2) 0 math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding: 0 math.div($gap, 4) 0 math.div($gap, 4) !important;
+  }
+}
+
+.padding-gap-bottom-large {
+  padding-bottom: $gap*2 !important;
+  @include for_screensize(tab-port) {
+    padding-bottom: $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding-bottom: math.div($gap, 4) !important;
+  }
+}
+
+.overflow-wrap {
+  overflow-wrap: break-word !important;
+  overflow: hidden;
+}
+
+.mat-mdc-card {
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 2px !important;
+}
+
+.mat-mdc-card-original {
+  padding: ($gap*2) !important;
+  border-radius: 4px !important;
+}
+
+.mat-mdc-form-field-flex .mat-mdc-form-field-icon-suffix, .mat-mdc-form-field-flex .mat-mdc-form-field-icon-prefix  {
+  padding-right: $gap * 2;
+}
+
+mat-card-content.mat-mdc-card-content:first-child {
+  padding-top: 0;
+}
+.card-content-gap {
+  padding: $gap*1.2 $gap*2 !important;
+  height: 100%;
+  @include for_screensize(tab-port) {
+    padding: $gap $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding: math.div($gap, 2) math.div($gap, 4) !important;
+  }
+}
+
+.routing-tabs-block .mat-mdc-tab-body-wrapper {
+  padding: 0 !important;
+  min-height: 100px;
+}
+
+.mat-mdc-card-actions{
+  display: block;
+  margin-bottom: ($gap*2);
+  padding-left: math.div($gap, 1.5);
+  padding-right: math.div($gap, 1.5);
+}
+
+.mat-mdc-card-content, .mat-mdc-card-subtitle, .mat-mdc-card-title {
+  display: block;
+  margin-bottom: ($gap*2);
+  & form {
+    overflow: hidden;
+  }
+}
+
+.mat-mdc-card-title {
+  font-size: 125%;
+}
+
+.mat-mdc-card-subtitle {
+  font-size: 120%;
+}
+
+.mat-mdc-card-header-text {
+  margin: 0 !important;
+  line-height: 1;
+}
+
+.mat-form-field-wrapper {
+  width: 100%;
+}
+
+.mat-mdc-select{
+  margin: 0 ($gap*2) 0 0;
+}
+
+.green {
+  color: $green-color !important;
+}
+
+.yellow {
+  color: $yellow-color !important;
+}
+
+.red {
+  color: $red-color !important;
+}
+
+.grey {
+  color: $grey-color !important;
+}
+
+.mt-1px {
+  margin-top: 1px !important;
+}
+
+.mt-2px {
+  margin-top: 2px !important;
+}
+
+.mt-4px {
+  margin-top: 4px !important;
+}
+
+.mt-5px {
+  margin-top: 5px !important;
+}
+
+.my-2px {
+  margin: 2px 0 !important;
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.mt-1 {
+  margin-top: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    margin-top: $gap !important;
+  }
+  @include for_screensize(phone) {
+    margin-top: $gap !important;
+  }
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-2px {
+  margin-bottom: 2px !important;
+}
+
+.mb-5px {
+  margin-bottom: 5px !important;
+}
+
+.mb-1 {
+  margin-bottom: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    margin-bottom: $gap !important;
+  }
+  @include for_screensize(phone) {
+    margin-bottom: $gap !important;
+  }
+}
+
+.mb-6 {
+  margin-bottom: ($gap*7.5) !important;
+  @include for_screensize(tab-port) {
+    margin-bottom: ($gap*6) !important;
+  }
+  @include for_screensize(phone) {
+    margin-bottom: ($gap*6) !important;
+  }
+}
+
+.ml-0 {
+  margin-left: 0 !important;
+}
+
+.ml-half {
+  margin-left: math.div($gap, 2) !important;
+}
+
+.ml-1 {
+  margin-left: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    margin-left: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    margin-left: 2px !important;
+  }
+}
+
+.ml-minus-1 {
+  margin-left: -($gap*1.25) !important;
+}
+
+.mr-0 {
+  margin-right: 0 !important;
+}
+
+.mr-3px {
+  margin-right: 3px !important;
+}
+
+.mr-5px {
+  margin-right: 5px !important;
+}
+
+.mr-1 {
+  margin-right: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    margin-right: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    margin-right: 2px !important;
+  }
+}
+
+.mx-1 {
+  margin: 0 ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    margin: 0 math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    margin: 0 2px !important;
+  }
+}
+
+.my-1 {
+  margin: ($gap*1.25) 0 !important;
+  @include for_screensize(tab-port) {
+    margin: $gap 0 !important;
+  }
+  @include for_screensize(phone) {
+    margin: $gap 0 !important;
+  }
+}
+
+.m-1 {
+  margin: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    margin: $gap !important;
+  }
+  @include for_screensize(phone) {
+    margin: $gap !important;
+  }
+}
+
+.mt-2 {
+  margin-top: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    margin-top: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    margin-top: ($gap*2) !important;
+  }
+}
+
+.mt-3 {
+  margin-top: ($gap*4) !important;
+  @include for_screensize(tab-port) {
+    margin-top: ($gap*3) !important;
+  }
+  @include for_screensize(phone) {
+    margin-top: ($gap*3) !important;
+  }
+}
+
+.mt-4 {
+  margin-top: ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    margin-top: ($gap*4) !important;
+  }
+  @include for_screensize(phone) {
+    margin-top: ($gap*4) !important;
+  }
+}
+
+.mt-6 {
+  margin-top: ($gap*7.5) !important;
+  @include for_screensize(tab-port) {
+    margin-top: ($gap*6) !important;
+  }
+  @include for_screensize(phone) {
+    margin-top: ($gap*6) !important;
+  }
+}
+
+.mt-minus-1 {
+  margin-top: -($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    margin-top: -$gap !important;
+  }
+  @include for_screensize(phone) {
+    margin-top: -$gap !important;
+  }
+}
+
+.mt-minus-2 {
+  margin-top: -($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    margin-top: -($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    margin-top: -($gap*2) !important;
+  }
+}
+
+.mb-2 {
+  margin-bottom: ($gap*2) !important;
+  @include for_screensize(tab-port) {
+    margin-bottom: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    margin-bottom: ($gap*2) !important;
+  }
+}
+
+.mb-3 {
+  margin-bottom: ($gap*4) !important;
+  @include for_screensize(tab-port) {
+    margin-bottom: ($gap*3) !important;
+  }
+  @include for_screensize(phone) {
+    margin-bottom: ($gap*3) !important;
+  }
+}
+
+.mb-4 {
+  margin-bottom: ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    margin-bottom: ($gap*2.5) !important;
+  }
+  @include for_screensize(phone) {
+    margin-bottom: ($gap*2.5) !important;
+  }
+}
+
+.ml-2 {
+  margin-left: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    margin-left: $gap !important;
+  }
+  @include for_screensize(phone) {
+    margin-left: math.div($gap, 2) !important;
+  }
+}
+
+.mr-2 {
+  margin-right: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    margin-right: $gap !important;
+  }
+  @include for_screensize(phone) {
+    margin-right: math.div($gap, 2) !important;
+  }
+}
+
+.ml-4 {
+  margin-left: ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    margin-left: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    margin-left: $gap !important;
+  }
+}
+
+.ml-5 {
+  margin-left: ($gap*6) !important;
+  @include for_screensize(tab-port) {
+    margin-left: ($gap*2.5) !important;
+  }
+  @include for_screensize(phone) {
+    margin-left: ($gap*1.25) !important;
+  }
+}
+
+.mr-4 {
+  margin-right: ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    margin-right: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    margin-right: $gap !important;
+  }
+}
+
+.mr-5 {
+  margin-right: ($gap*6) !important;
+  @include for_screensize(tab-port) {
+    margin-right: ($gap*2.5) !important;
+  }
+  @include for_screensize(phone) {
+    margin-right: ($gap*1.25) !important;
+  }
+}
+
+.mr-6 {
+  margin-right: ($gap*7.5) !important;
+  @include for_screensize(tab-port) {
+    margin-right: ($gap*4) !important;
+  }
+  @include for_screensize(phone) {
+    margin-right: ($gap*2.5) !important;
+  }
+}
+
+.mx-2 {
+  margin: 0 ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    margin: 0 $gap !important;
+  }
+  @include for_screensize(phone) {
+    margin: 0 math.div($gap, 2) !important;
+  }
+}
+
+.my-0 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.my-2 {
+  margin: ($gap*2.5) 0 !important;
+  @include for_screensize(tab-port) {
+    margin: ($gap*2) 0 !important;
+  }
+  @include for_screensize(phone) {
+    margin: ($gap*2) 0 !important;
+  }
+}
+
+.my-3 {
+  margin: ($gap*4) 0 !important;
+  @include for_screensize(tab-port) {
+    margin: ($gap*3) 0 !important;
+  }
+  @include for_screensize(phone) {
+    margin: ($gap*3) 0 !important;
+  }
+}
+
+.my-4 {
+  margin: ($gap*5) 0 !important;
+  @include for_screensize(tab-port) {
+    margin: ($gap*2.5) 0 !important;
+  }
+  @include for_screensize(phone) {
+    margin: ($gap*2.5) 0 !important;
+  }
+}
+
+.m-2 {
+  margin: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    margin: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    margin: ($gap*2) !important;
+  }
+}
+
+.pt-1 {
+  padding-top: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    padding-top: $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding-top: $gap !important;
+  }
+}
+
+.pb-0 {
+  padding-bottom: 0 !important;
+}
+
+.pb-1 {
+  padding-bottom: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    padding-bottom: $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding-bottom: $gap !important;
+  }
+}
+
+.pl-5px {
+  padding-left: 5px !important;
+  @include for_screensize(tab-port) {
+    padding-left: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-left: 3px !important;
+  }
+}
+
+.pl-1 {
+  padding-left: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    padding-left: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-left: 2px !important;
+  }
+}
+
+.pl-15px {
+  padding-left: ($gap*2) !important;
+  @include for_screensize(tab-port) {
+    padding-left: math.div($gap, 1.5) !important;
+  }
+  @include for_screensize(phone) {
+    padding-left: math.div($gap, 2) !important;
+  }
+}
+
+.pr-0 {
+  padding-right: 0 !important;
+}
+
+.pr-1 {
+  padding-right: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    padding-right: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-right: 2px !important;
+  }
+}
+
+.pr-3 {
+  padding-right: ($gap*4) !important;
+  @include for_screensize(tab-port) {
+    padding-right: ($gap*1.5) !important;
+  }
+  @include for_screensize(phone) {
+    padding-right: math.div($gap, 1.5) !important;
+  }
+}
+
+.pr-4 {
+  padding-right: ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    padding-right: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-right: $gap !important;
+  }
+}
+
+.pr-4px {
+  padding-right: math.div($gap, 2) !important;
+}
+
+.pr-6px {
+  padding-right: math.div($gap, 1.5) !important;
+}
+
+.p-0 {
+  padding: 0 !important;
+}
+
+.p-5px {
+  padding: 5px !important;
+}
+
+.pl-0 {
+  padding-left: 0 !important;
+}
+
+.px-1 {
+  padding: 0 ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    padding: 0 math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding: 0 2px !important;
+  }
+}
+
+.py-0 {
+  padding: ($gap*1.25) 0 !important;
+  @include for_screensize(tab-port) {
+    padding: $gap 0 !important;
+  }
+  @include for_screensize(phone) {
+    padding: $gap 0 !important;
+  }
+}
+
+.py-1 {
+  padding: ($gap*1.25) 0 !important;
+  @include for_screensize(tab-port) {
+    padding: $gap 0 !important;
+  }
+  @include for_screensize(phone) {
+    padding: $gap 0 !important;
+  }
+}
+
+.p-1 {
+  padding: ($gap*1.25) !important;
+  @include for_screensize(tab-port) {
+    padding: $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding: $gap !important;
+  }
+}
+
+.p-16 {
+  padding: ($gap*2) !important;
+  @include for_screensize(tab-port) {
+    padding: $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding: math.div($gap, 2) !important;
+  }
+}
+
+.pt-2 {
+  padding-top: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    padding-top: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-top: ($gap*2) !important;
+  }
+}
+
+.pt-3 {
+  padding-top: ($gap*4) !important;
+  @include for_screensize(tab-port) {
+    padding-top: ($gap*3) !important;
+  }
+  @include for_screensize(phone) {
+    padding-top: ($gap*3) !important;
+  }
+}
+
+.pb-2 {
+  padding-bottom: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    padding-bottom: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-bottom: ($gap*2) !important;
+  }
+}
+
+.pl-2 {
+  padding-left: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    padding-left: $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding-left: math.div($gap, 2) !important;
+  }
+}
+
+.pt-4 {
+  padding-top: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    padding-top: ($gap*3) !important;
+  }
+  @include for_screensize(phone) {
+    padding-top: ($gap*3) !important;
+  }
+}
+
+.pl-3 {
+  padding-left: ($gap*4) !important;
+  @include for_screensize(tab-port) {
+    padding-left: ($gap*1.5) !important;
+  }
+  @include for_screensize(phone) {
+    padding-left: math.div($gap, 1.5) !important;
+  }
+}
+
+.pl-4 {
+  padding-left: ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    padding-left: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-left: $gap !important;
+  }
+}
+
+.pr-2 {
+  padding-right: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    padding-right: $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding-right: math.div($gap, 2) !important;
+  }
+}
+
+.pr-5 {
+  padding-right: ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    padding-right: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-right: $gap !important;
+  }
+}
+
+.px-2 {
+  padding: 0 ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    padding: 0 $gap !important;
+  }
+  @include for_screensize(phone) {
+    padding: 0 math.div($gap, 2) !important;
+  }
+}
+
+.px-3 {
+  padding: 0 ($gap*4) !important;
+  @include for_screensize(tab-port) {
+    padding: 0 ($gap*1.5) !important;
+  }
+  @include for_screensize(phone) {
+    padding: 0 math.div($gap, 1.5) !important;
+  }
+}
+
+.px-4 {
+  padding: 0 ($gap*5) !important;
+  @include for_screensize(tab-port) {
+    padding: 0 ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    padding: 0 $gap !important;
+  }
+}
+
+.py-2 {
+  padding: ($gap*2.5) 0 !important;
+  @include for_screensize(tab-port) {
+    padding: ($gap*2) 0 !important;
+  }
+  @include for_screensize(phone) {
+    padding: ($gap*2) 0 !important;
+  }
+}
+
+.p-2 {
+  padding: ($gap*2.5) !important;
+  @include for_screensize(tab-port) {
+    padding: ($gap*2) !important;
+  }
+  @include for_screensize(phone) {
+    padding: ($gap*2) !important;
+  }
+}
+
+.p-24 {
+  padding: ($gap*3) !important;
+  @include for_screensize(tab-port) {
+    padding: ($gap*1.5) !important;
+  }
+  @include for_screensize(phone) {
+    padding: ($gap*1.25) !important;
+  }
+}
+
+.ps-2 {
+  padding-left: ($gap*2.5) !important;
+}
+
+.m-1px {
+  margin: 1px !important;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.overflow-y-hidden {
+  overflow-y: hidden !important;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden !important;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.mat-footer-row {
+  & .mat-footer-cell {
+    border-bottom: none !important;
+  }
+}
+
+.mat-row:last-child {
+  & .mdc-data-table__cell {
+    border-bottom: none !important;
+  }
+}
+
+.mat-mdc-form-field-infix {
+	width: 14rem !important;
+}
+
+.flex-ellipsis {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: ($gap*4);
+}
+
+.mat-list, .mat-list .mat-list-item .mat-list-item-content, .mat-nav-list, .mat-selection-list {
+  padding: 0 !important;
+}
+
+.inline-spinner {
+  display: inline-flex !important;
+  top: 5px !important;
+}
+
+.top-minus-5px {
+  position: relative;
+  top:-5px;
+}
+
+.top-minus-25px {
+  position: relative;
+  top:-($gap*3);
+  margin-bottom: -($gap*3) !important;
+}
+
+.top-minus-30px {
+  position: relative;
+  top:-($gap*4);
+}
+
+.cursor-pointer:hover {
+  cursor: pointer !important;
+}
+
+.cursor-default:hover {
+  cursor: default !important;
+}
+
+.cursor-not-allowed:hover {
+  cursor: not-allowed !important;
+}
+
+.inline-flex {
+  display: inline-flex !important;
+}
+
+.error-border {
+  border: 1px solid red;
+  box-shadow: 0 3px 1px -2px rgba(255,0,0,.2), 0 2px 2px 0 rgba(255,0,0,.14), 0 1px 5px 0 rgba(255,0,0,.12) !important;
+}
+
+.op-image{
+  box-shadow: 0 0 2px #ccc;
+  border: 2px solid;
+  border-color: transparent;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.settings-icon{
+  position: fixed;
+  top: 30%;
+  right: 0;
+  width: ($gap*.5);
+  height: ($gap*5);
+  opacity: 0.6;
+  cursor: pointer;
+  z-index: 999999;
+}
+
+.test-banner {
+	padding-top: 2px;
+  background-color: #FC7783;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+
+.currency-icon {
+  &.currency-icon-small {
+    max-width: $gap * 1.675;
+    max-height: $gap * 1.675;
+  }
+
+  &.currency-icon-medium {
+    max-width: $gap * 2;
+    max-height: $gap * 2;
+  }
+
+  &.currency-icon-large {
+    max-width: $gap * 2.25;
+    max-height: $gap * 2.25;
+  }
+
+  &.currency-icon-x-large {
+    max-width: $gap * 2.5;
+    max-height: $gap * 2.5;
+  }
+}
+
+.fa-icon-small, .top-icon-small {
+  min-width: $fa-icon-small-size;
+  svg {
+    min-width: $fa-icon-small-size;
+  }
+}
+
+.botlz-icon-sm {
+  min-width: ($gap*2);
+  width: ($gap*2);
+  max-width: ($gap*2);
+}
+
+.copy-icon {
+  position: relative;
+  top: math.div($gap, 2);
+}
+
+.copy-icon-smaller {
+  position: relative;
+  top: 2px;
+}
+
+.top-5px {
+  position: relative;
+  top: 5px;
+}
+
+.animate-settings {
+  -webkit-animation: animate-settings 10s linear infinite;
+  -moz-animation: animate-settings 10s linear infinite;
+  animation: animate-settings 10s linear infinite;
+}
+@keyframes animate-settings { 
+  100% {transform: rotate(360deg)}
+}
+@-moz-keyframes animate-settings { 
+  100% {-moz-transform: rotate(360deg)} 
+}
+@-webkit-keyframes animate-settings { 
+  100% {-webkit-transform: rotate(360deg)} 
+}
+
+.mt-minus-5 {
+  position: relative;
+  margin-top: -5px; 
+}
+
+.color-white {
+  color: white !important;
+}
+
+.custom-card {
+  padding: 0 0 $gap 0 !important;
+}
+
+.not-found-box {
+  min-width: 50%;
+}
+
+.w-100 {
+  width: 100% !important;
+}
+
+.w-96 {
+  width: 96% !important;
+}
+
+.w-84 {
+  width: 84% !important;
+}
+
+.h-100 {
+  height: 100% !important;
+}
+
+.h-93 {
+  height: 93% !important;
+}
+
+.h-40 {
+  height: 400px !important;
+}
+
+.h-46 {
+  height: 460px !important;
+}
+
+.h-50 {
+  height: 500px !important;
+}
+
+.h-10 {
+  height: 100px !important;
+}
+
+.h-4 {
+  height: ($gap*24) !important;
+}
+
+.h-35px {
+  height: 35px !important;
+}
+
+a {
+  outline: none;
+  text-decoration: none;
+  text-decoration: underline;
+}
+
+.mat-tree {
+  width: 100%;
+}
+
+.mat-tree-node, .mat-nested-tree-node-parent {
+  min-height: ($gap*6);
+  height: ($gap*6);
+  padding: 0 ($gap*1.5) 0 ($gap*1.5); 
+  cursor: pointer;
+  @include for_screensize(phone) {
+    min-height: ($gap*8);
+    height: ($gap*8);
+  }
+}
+
+.mat-tree-node:focus, .mat-tree-node:active, .mat-nested-tree-node:focus, .mat-nested-tree-node:active, .mat-nested-tree-node-parent:focus, .mat-nested-tree-node-parent:active,
+.mat-tree-node span:focus, .mat-tree-node span:active, .mat-nested-tree-node-parent span:focus, .mat-nested-tree-node-parent span:active,
+.mat-tree-node div:focus, .mat-tree-node div:active, .mat-nested-tree-node-parent div:focus, .mat-nested-tree-node-parent div:active,
+.mat-tree-node .mat-icon:focus, .mat-tree-node .mat-icon:active, .mat-nested-tree-node-parent .mat-icon:focus, .mat-nested-tree-node-parent .mat-icon:active {
+  outline: none;
+}
+
+.lnd-info {
+  height: $sidenav-info-height;
+}
+
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+
+.word-break {
+  word-break: break-all !important;
+}
+
+.font-bold-500 {
+  font-weight: 500 !important;
+}
+
+.font-bold-700 {
+  font-weight: 700 !important;
+}
+
+.pubkey-info-top {
+  flex-wrap: wrap;
+  margin-top: 1px;
+  min-height: $pubkey-info-height;
+  cursor: pointer;
+  display: flex;
+  align-content: center;
+}
+
+.logo {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.fa-icon-regular {
+  min-width: $fa-icon-regular-size;
+  width: $fa-icon-regular-size;
+  max-width: $fa-icon-regular-size;
+}
+
+.icon-large {
+  margin-left: -100%;
+}
+
+.icon-small {
+  height: ($gap*2.5) !important;
+  width: ($gap*2.5) !important;
+}
+
+.icon-smaller {
+  height: ($gap*1.25) !important;
+  width: ($gap*1.25) !important;
+}
+
+.mat-icon-36 {
+  width: $icon-size !important;
+  height: $icon-size !important;
+}
+
+.mat-mdc-select.multi-node-select {
+  width: 84%;
+}
+
+.page-title-container {
+  font-size: 110%;
+  padding: 0 $gap*1.5;
+  margin-bottom: $gap;
+  @include for_screensize(tab-port) {
+    padding: 0 $gap;
+    margin: $gap 0;
+  }
+  @include for_screensize(phone) {
+    padding: 0 $gap;
+    margin: $gap 0;
+  }
+}
+
+table {
+  width:100%;
+}
+
+th.mdc-data-table__header-cell, td.mdc-data-table__cell {
+  padding: 0 $gap*2 0 $gap*2;
+  @include for_screensize(tab-land) {
+    padding: 0 $gap 0 $gap;
+  }
+  @include for_screensize(tab-port) {
+    padding: 0 math.div($gap, 2) 0 math.div($gap, 2);
+  }
+  @include for_screensize(phone) {
+    padding: 0 math.div($gap, 4) 0 math.div($gap, 4);
+  }
+}
+
+th.mdc-data-table__header-cell:first-of-type, td.mdc-data-table__cell:first-of-type, td.mat-footer-cell:first-of-type,
+mat-cell:first-of-type, .mdc-data-table__header-cell:first-of-type, mat-footer-cell:first-of-type {
+  padding-left: $gap*2;
+  @include for_screensize(tab-land) {
+    padding-left: $gap !important;
+  }
+  @include for_screensize(tab-port) {
+    padding-left: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-left: math.div($gap, 4) !important;
+  }
+}
+
+th.mdc-data-table__header-cell:last-of-type, td.mdc-data-table__cell:last-of-type, td.mat-footer-cell:last-of-type,
+mat-cell:last-of-type, .mdc-data-table__header-cell:last-of-type, mat-footer-cell:last-of-type {
+  padding-right: $gap*2;
+  @include for_screensize(tab-land) {
+    padding-right: $gap !important;
+  }
+  @include for_screensize(tab-port) {
+    padding-right: math.div($gap, 2) !important;
+  }
+  @include for_screensize(phone) {
+    padding-right: math.div($gap, 4) !important;
+  }
+}
+
+.dot {
+  display: inline-flex;
+  width: $dot-size;
+  height: $dot-size;
+  border-radius: $dot-size;
+  margin: math.div($gap, 2) 0 0 0;
+  &.tiny-dot {
+    width: $tiny-dot-size;
+    height: $tiny-dot-size;
+    border-radius: $tiny-dot-size;
+    margin: 0 math.div($gap, 1.5) 1px 0;
+  }
+  &.green {
+    background-color: $green-color;
+  }
+  &.yellow {
+    background-color: $yellow-color;
+  }
+  &.red {
+    background-color: $red-color;
+  }
+  &.grey {
+    background-color: $grey-color;
+  }
+}
+
+.font-size-80 {
+  font-size: 80% !important;
+}
+
+.font-size-90 {
+  font-size: 90% !important;
+}
+
+.font-size-120 {
+  font-size: 120% !important;
+}
+
+.font-size-200 {
+  font-size: 200% !important;
+}
+
+.font-size-300 {
+  font-size: 300% !important;
+}
+
+.font-weight-500 {
+  font-weight: 500 !important;
+}
+
+.font-weight-900 {
+  font-weight: 900 !important;
+}
+
+.pre-wrap {
+  white-space: pre-wrap !important;
+}
+
+.display-none {
+  display: none !important;
+}
+
+.mat-divider.mat-divider-horizontal.mat-divider-inset {
+  margin-left: $gap*2;
+}
+
+.mat-vertical-stepper-header {
+  padding: ($gap*1.25)  ($gap*1.25)  ($gap*1.25) $gap !important;
+}
+
+.mat-vertical-stepper-content {
+  margin: 0 $gap;  
+}
+
+.ellipsis-child {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;  
+}
+
+.blinker {
+  animation: blink-animation 1s steps(5, start) infinite;
+  -webkit-animation: blink-animation 1s steps(5, start) infinite;
+}
+
+@keyframes blink-animation { to { visibility: hidden; }}
+
+@-webkit-keyframes blink-animation { to { visibility: hidden; }}
+
+.mat-progress-bar.dashboard-progress-bar {
+  height: 6px;
+  min-height: 6px;
+}
+
+.alert {
+  margin-bottom: ($gap*1.25);
+  padding: math.div($gap, 1.5) ($gap*1.25);
+  border-radius: 2px;
+}
+
+.dashboard-vert-menu.mat-menu-panel {
+  min-height: ($gap*6);
+}
+
+.mat-mdc-tab .mdc-tab__content {
+  overflow: hidden !important;
+}
+
+.mdc-tab__text-label {
+  opacity: 1;
+  padding: 0;
+  min-width: 11rem;
+  @include for_screensize(tab-port) {
+    min-width: auto;
+  }
+  @include for_screensize(phone) {
+    min-width: auto;
+  }
+}
+
+.dashboard-card {
+  margin-bottom: 0;
+  & .mat-mdc-card-header {
+    padding: 16px 0 0 16px
+  }
+  & .mat-mdc-card-content.dashboard-card-content {
+    margin-bottom: 0;
+  }
+}
+
+.dashboard-tabs-group.mat-mdc-tab-group {
+  max-width: 91%;
+}
+
+.dashboard-tabs-group .mat-mdc-tab-list {
+  width: 100%;  
+}
+
+.dashboard-tabs-group .mdc-tab {
+  margin: 0;
+  padding: 0 ($gap*3);
+  display: flex;
+  flex: 1 0 auto;
+  justify-content: center;
+}
+
+.dashboard-tabs-group.mat-mdc-tab-group .mat-mdc-tab .mdc-tab__content .mdc-tab__text-label {
+  min-width: 5.5rem;
+}
+
+.node-grid-tile.mat-grid-tile .mat-figure {
+  align-items: start;
+}
+
+.mat-vertical-content-container {
+  margin-left: ($gap*2.5) !important;
+}
+
+.xs-scroll-y {
+  overflow-y: scroll; 
+  max-height: 600px;
+}
+
+.h-2 {
+  min-height: ($gap*2.5) !important;
+}
+.border-valid {
+  border: 1px solid $green-color !important;
+}
+
+.border-invalid {
+  border: 1px solid $red-color !important;
+}
+
+.icon-green {
+  fill: $green-color;
+}
+
+.visible {
+  visibility: visible !important;
+}
+
+.hidden {
+  visibility: hidden !important;
+}
+
+.h-5 {
+  height: 50px;
+}
+
+.btn-sticky-container {
+  height: 0;
+  opacity: 0.5;
+  & .mat-icon {
+    animation: scrollDownAnimation 2s infinite;
+  }
+}
+
+@keyframes scrollDownAnimation {
+  0%   {transform: translateY(0)}
+  10%  {transform: translateY(-20%)}
+  20%   {transform: translateY(20%)}
+  30%  {transform: translateY(-20%)}
+  40%  {transform: translateY(20%)}
+  50%  {transform: translateY(0)}
+}
+
+.mat-form-field-appearance-legacy.mat-form-field-disabled {
+  & input, mat-select, .mat-select-trigger, .mat-select-value, .mat-select-arro-wrapper, textarea, .mat-form-field-infix {
+    cursor: not-allowed;
+  }
+}
+
+.mat-mdc-tooltip-panel {
+  max-width: 25rem !important;
+}
+
+.ngx-charts-tooltip-content {
+  &.type-tooltip {
+    background: rgba(50, 50, 50, 0.9) !important;
+  }
+  & .tooltip-caret {
+    border-top-color : rgba(50, 50, 50, 0.9) !important;
+  }
+}
+
+.mat-mdc-tooltip-panel {
+  & .mdc-tooltip__surface {
+    min-width: 10rem;
+    max-width: unset;
+    text-align: start;
+  }
+}
+
+.go-to-link {
+  text-decoration: underline;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mat-mdc-card.dashboard-card {
+  padding: 0 ($gap*1.5) !important;
+  @include for_screensize(tab-port) {
+    padding: math.div($gap, 2) ($gap*1.25) !important;
+  }
+  @include for_screensize(phone) {
+    padding: math.div($gap, 2) $gap !important;
+  }
+  &.p-0 {
+    padding: 0 !important;
+  }
+  & .mat-mdc-card-header-text {
+    width: 100%;
+  }
+}
+
+.mat-progress-bar {
+  min-height: 4px;
+}
+
+.dashboard-card-content {
+  text-align: left;
+}
+
+.ellipsis-parent {
+  display: flex;
+}
+
+.mat-column-actions {
+  min-height: ($gap*6.5);
+  @include for_screensize(phone) {
+    min-height: ($gap*8.2);
+  }
+}
+
+.mat-expansion-panel.flat-expansion-panel {
+  box-shadow: none;
+  padding: 0;
+  border-radius: 2px;
+  background: none;
+  & .mat-expansion-panel-header {
+    padding: 0 $gap*2 0 $gap*2;
+    @include for_screensize(tab-port) {
+      padding: 0 $gap 0 $gap;
+    }
+    @include for_screensize(phone) {
+      padding: 0 math.div($gap, 2) 0 math.div($gap, 2);
+    }
+    & .mat-expansion-indicator {
+      margin-top: -5px;
+    }
+  }
+  & .mat-expansion-panel-body {
+    padding: 0 $gap*3 $gap*2 $gap*3;
+    @include for_screensize(tab-port) {
+      padding: 0 $gap $gap $gap;
+    }
+    @include for_screensize(phone) {
+      padding: 0 math.div($gap, 2) math.div($gap, 4) math.div($gap, 2);
+    }
+    & .mat-expansion-panel-header-title, .mat-expansion-panel-header-description {
+      @include for_screensize(tab-port) {
+        margin-right: $gap;
+      }
+      @include for_screensize(phone) {
+        margin-right: math.div($gap, 2);
+      }
+    }
+  }
+}

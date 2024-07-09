@@ -1,0 +1,57 @@
+/* eslint-disable no-console */
+import { Injectable, isDevMode } from '@angular/core';
+
+const isDebugMode = isDevMode();
+const noop = (): any => null;
+
+export abstract class Logger {
+
+  info: any;
+  warn: any;
+  error: any;
+
+}
+
+@Injectable()
+export class LoggerService implements Logger {
+
+  info: any;
+  warn: any;
+  error: any;
+  invokeConsoleMethod(type: string, args?: any): void { }
+
+}
+
+@Injectable()
+export class ConsoleLoggerService implements Logger {
+
+  get info() {
+    if (isDebugMode) {
+      return console.log.bind(console);
+    } else {
+      return noop;
+    }
+  }
+
+  get warn() {
+    if (isDebugMode) {
+      return console.warn.bind(console);
+    } else {
+      return noop;
+    }
+  }
+
+  get error() {
+    if (isDebugMode) {
+      return console.error.bind(console);
+    } else {
+      return noop;
+    }
+  }
+
+  invokeConsoleMethod(type: string, args?: any): void {
+    const logFn: Function = (console)[type] || console.log || noop;
+    logFn.apply(console, [args]);
+  }
+
+}

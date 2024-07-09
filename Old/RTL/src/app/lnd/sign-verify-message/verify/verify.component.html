@@ -1,0 +1,31 @@
+<div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between stretch">
+  <form #form="ngForm" fxLayout="column" fxLayoutAlign="space-between stretch" fxLayout.gt-sm="row wrap">
+    <mat-form-field fxLayout="column" fxFlex="100" fxLayoutAlign="start end">
+      <mat-label>Message to verify</mat-label>
+      <textarea autoFocus matInput rows="1" required tabindex="1" name="message" [(ngModel)]="message" (keyup)="onChange()"></textarea>
+      <mat-error *ngIf="!message">Message is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field fxLayout="column" fxFlex="100" fxLayoutAlign="start end">
+      <mat-label>Signature provided</mat-label>
+      <input #sign="ngModel" matInput name="signature" tabindex="2" required [(ngModel)]="signature" (keyup)="onChange()">
+      <mat-error *ngIf="!signature">Signature is required.</mat-error>
+    </mat-form-field>
+    <p *ngIf="showVerifyStatus && !verifyRes.valid" fxFlex="100" class="color-warn" fxLayoutAlign="start center"><mat-icon class="mr-1 icon-small">close</mat-icon>Verification failed, please check message and signature</p>
+    <div fxLayout="row" class="my-1">
+      <button mat-stroked-button class="mr-1" color="primary" tabindex="3" type="reset" (click)="resetData()">Clear Fields</button>
+      <button mat-flat-button color="primary" tabindex="4" type="submit" (click)="onVerify()">Verify</button>
+    </div>
+    <div *ngIf="showVerifyStatus && verifyRes.valid" fxLayout="column" fxFlex="100" fxLayoutAlign="space-between stretch" fxLayout.gt-sm="row wrap">
+      <mat-divider class="my-2" [inset]="true" />
+      <div fxLayout="row" fxFlex="100" fxLayoutAlign="start center">
+        <p *ngIf="verifyRes.valid">Pubkey Used</p>
+      </div>
+      <div *ngIf="verifyRes.valid" fxLayout="column" fxFlex="100" fxLayoutAlign="start start" class="bordered-box read-only padding-gap">
+        <p>{{verifyRes?.pubkey}}</p> 
+      </div>
+      <div *ngIf="verifyRes.valid" fxLayout="row" class="mt-2">
+        <button mat-stroked-button color="primary" tabindex="5" rtlClipboard type="button" [payload]="verifyRes?.pubkey" (copied)="onCopyField($event)">Copy Pubkey</button>
+      </div>
+    </div>
+  </form> 
+</div>

@@ -1,0 +1,14 @@
+.mat-column-type {
+  max-width: 2.2rem;
+  width: 2.2rem;
+  text-overflow: unset;
+  & svg {
+    max-width: 2.2rem;
+    width:2.2rem;
+    text-overflow: unset;
+  }
+}
+
+.mat-column-actions {
+  min-height: 3.55rem;
+}

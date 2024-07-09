@@ -1,0 +1,69 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+# compiled output
+/dist
+/tmp
+/out-tsc
+
+# dependencies
+/node_modules
+/node_modules_old
+/node_modules_prod
+/node_modules_dev
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.angular/cache
+/.sass-cache
+/connect.lock
+/coverage
+/db
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+channels-backup
+logs
+cookies
+
+# System Files
+.DS_Store
+Thumbs.db
+/database/*
+/logs/*
+/cookies/*
+/backup/*
+cookies
+.env
+RTL-Config.json
+RTL-Config-1.json
+RTL-Multi-Node-Conf.json
+RTL.conf
+RTL-1.conf
+RTL-Multi-Node-Conf-1.json
+RTL-Config-for-BTC-Testing.json
+ECLDummyData.log
+_config.yml
+.vscode/launch.json
+RTL-Config-Docker.json
+dockerfiles/RTL-Config.json
+dockerfiles/.env
+RTL-Config-Regtest.json
+RTL-Config-Signet.json
+RTL-Config-Testnet.json
+RTL-Config-All.json

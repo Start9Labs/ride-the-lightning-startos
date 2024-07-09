@@ -1,0 +1,33 @@
+<div fxLayout="column" fxFlex="100" class="padding-gap-x-large" [perfectScrollbar]>
+  <form *ngIf="appConfig.nodes && appConfig.nodes.length && appConfig.nodes.length > 0" #form="ngForm" fxLayout="column" fxFlex="100" fxLayoutAlign="start stretch" class="settings-container page-sub-title-container mt-1">
+    <div fxLayout="row">
+      <fa-icon class="page-title-img mr-1" [icon]="faWindowRestore" />
+      <span class="page-title">Default Node</span>
+    </div>
+    <div fxLayout="column" fxFlex="100" fxLayoutAlign="start stretch" class="my-2">
+      <div fxLayout="row" fxLayoutAlign="start start">
+        <mat-form-field fxLayout="column" fxLayoutAlign="start start">
+          <mat-select autoFocus tabindex="1" name="defaultNode" [(ngModel)]="appConfig.defaultNodeIndex">
+            <mat-option *ngFor="let node of appConfig.nodes" [value]="node.index">
+              {{node.lnNode}} ({{node.lnImplementation}})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start start" class="mt-1">
+        <div fxLayout="row" fxLayoutAlign="start start">
+          <button class="mr-1" mat-stroked-button color="primary" tabindex="2" (click)="onResetSettings()">Reset</button>
+          <button mat-flat-button color="primary" tabindex="3" (click)="onUpdateApplicationSettings()">Update</button>
+        </div>
+      </div>
+    </div>
+    <!-- <mat-divider [inset]="true" class="my-2"></mat-divider> -->
+  </form>
+  <!-- <div fxLayout="row">
+    <fa-icon [icon]="faPlus" class="page-title-img mr-1"></fa-icon>
+    <span class="page-title">Add New Node</span>
+  </div>
+  <div fxLayout="row" fxFlex="100" fxLayoutAlign="start start">
+    <button mat-flat-button color="primary" (click)="onAddNewNode()" tabindex="4" class="my-2">Add Node</button>
+  </div> -->
+</div>

@@ -1,0 +1,42 @@
+<div fxLayout="row">
+  <div fxFlex="100">
+    <mat-card-header fxLayout="row" fxLayoutAlign="space-between center" class="modal-info-header">
+      <div fxFlex="95" fxLayoutAlign="start start">
+        <span class="page-title">Send Payment</span>
+      </div>
+      <button tabindex="8" fxFlex="5" fxLayoutAlign="center center" class="btn-close-x p-0" default mat-button [mat-dialog-close]="false">X</button>
+    </mat-card-header>
+    <mat-card-content class="padding-gap-x-large">
+      <form #sendPaymentForm="ngForm" fxLayoutAlign="space-between stretch" fxLayout="column">
+        <mat-form-field fxLayout="column" fxFlex="100">
+          <mat-label>Payment Request</mat-label>
+          <textarea #paymentReq="ngModel" autoFocus matInput name="paymentRequest" rows="4" tabindex="1" required [ngModel]="paymentRequest" (ngModelChange)="onPaymentRequestEntry($event)" (matTextareaAutosize)="true"></textarea>
+          <mat-hint *ngIf="paymentRequest && paymentDecodedHintPre !== ''" fxLayout="row wrap" fxFlex="100">
+            {{paymentDecodedHintPre}}
+            <span *ngIf="convertedCurrency && convertedCurrency.iconType === 'FA' && paymentDecodedHintPre !== ''" fxLayoutAlign="center center" class="mr-3px">
+              <fa-icon [icon]="convertedCurrency.symbol" />
+            </span>
+            <span *ngIf="convertedCurrency && convertedCurrency.iconType === 'SVG' && paymentDecodedHintPre !== ''" fxLayoutAlign="center center" class="mr-3px" [innerHTML]="convertedCurrency.symbol"></span>
+            {{paymentDecodedHintPost}}
+          </mat-hint>
+          <mat-error *ngIf="!paymentRequest">Payment request is required.</mat-error>
+          <mat-error *ngIf="paymentReq.errors?.decodeError">{{paymentDecodedHint}}</mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="zeroAmtInvoice" fxFlex="100">
+          <mat-label>Amount (Sats)</mat-label>
+          <input #paymentAmt="ngModel" matInput name="amount" tabindex="2" required [(ngModel)]="paymentAmount" (change)="onAmountChange($event)">
+          <mat-hint>It is a zero amount invoice, enter amount to be paid.</mat-hint>
+          <mat-error *ngIf="!paymentAmount">Payment amount is required.</mat-error>
+        </mat-form-field>
+        <div *ngIf="paymentError !== ''" fxFlex="100" class="alert alert-danger mt-1">
+          <fa-icon class="mr-1 alert-icon" [icon]="faExclamationTriangle" />
+          <span *ngIf="paymentError !== ''">{{paymentError}}</span>
+        </div>
+        <div class="mt-2" fxLayout="row" fxLayoutAlign="end center">
+          <button class="mr-1" mat-button color="primary" tabindex="2" type="reset" (click)="resetData()">Clear Fields</button>
+          <button mat-button color="primary" tabindex="3" (click)="onSendPayment();">Send Payment</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </div>
+</div>

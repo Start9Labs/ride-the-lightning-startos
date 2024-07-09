@@ -1,0 +1,44 @@
+<div *ngIf="errorMessage?.trim() === '';  else errorBlock" fxLayout="column" fxLayoutAlign="space-between stretch"fxFlex="100">
+  <div fxLayout="column" fxFlex="8" fxLayoutAlign="end start">
+    <span class="dashboard-capacity-header this-channel-capacity">Total Capacity</span>
+    <div fxLayout="row" fxLayoutAlign="space-between start" class="w-100">
+      <mat-hint fxFlex="40" fxLayoutAlign="start center" class="font-size-90"><strong class="font-weight-900 mr-5px">Local:</strong>{{channelBalances?.localBalance || 0 | number}} Sats</mat-hint>
+      <mat-hint fxFlex="20" fxLayoutAlign="center center" class="font-size-90">
+        <fa-icon class="mr-3px" matTooltip="Balance Score" [icon]="faBalanceScale" />
+        ({{channelBalances?.balancedness || 0 | number}})
+      </mat-hint>
+      <mat-hint fxFlex="40" fxLayoutAlign="end center" class="font-size-90"><strong class="font-weight-900 mr-5px">Remote:</strong>{{channelBalances?.remoteBalance || 0 | number}} Sats</mat-hint>
+    </div>
+    <mat-progress-bar class="dashboard-progress-bar this-channel-bar" mode="determinate" color="accent" value="{{channelBalances?.localBalance && channelBalances?.localBalance > 0 ? ((+channelBalances?.localBalance/((+channelBalances?.localBalance)+(+channelBalances?.remoteBalance)))*100) : 0}}" />
+  </div>
+  <div fxLayout="column" fxFlex="3" fxLayoutAlign="end stretch"><mat-divider class="dashboard-divider" /></div>
+  <div class="channels-capacity-scroll" [perfectScrollbar]>
+    <div *ngIf="allChannels && allChannels.length > 0;  else noChannelBlock" fxLayout="column"fxFlex="100">
+      <div *ngFor="let channel of allChannels" class="mt-2">
+        <a class="dashboard-capacity-header" [routerLink]="['../connections/channels/open']" [state]="{filterColumn: channel.remote_alias ? 'remote_alias' : 'remote_pubkey', filterValue: channel.remote_alias || channel.remote_pubkey}" matTooltip="{{channel.remote_alias || channel.remote_pubkey}}" matTooltipDisabled="{{(channel.remote_alias || channel.remote_pubkey).length < 26}}">
+          {{(channel.remote_alias || channel.remote_pubkey) | slice:0:24}}{{(channel.remote_alias || channel.remote_pubkey).length > 25 ? '...' : ''}}
+        </a>
+        <div fxLayout="row" fxLayoutAlign="space-between start" class="w-100">
+          <mat-hint fxFlex="40" fxLayoutAlign="start center" class="font-size-90 color-primary"><strong class="font-weight-900 mr-5px">Local:</strong>{{channel.local_balance || 0 | number}} Sats</mat-hint>
+          <mat-hint fxFlex="20" fxLayoutAlign="center center" class="font-size-90 color-primary">
+            <fa-icon class="color-primary mr-3px" matTooltip="Balance Score" [icon]="faBalanceScale" />
+            ({{channel.balancedness || 0 | number}})
+          </mat-hint>
+          <mat-hint fxFlex="40" fxLayoutAlign="end center" class="font-size-90 color-primary"><strong class="font-weight-900 mr-5px">Remote:</strong>{{channel.remote_balance || 0 | number}} Sats</mat-hint>
+        </div>
+        <mat-progress-bar class="dashboard-progress-bar" mode="determinate" value="{{channel.local_balance && channel.local_balance > 0 ? ((+channel.local_balance/((+channel.local_balance)+(+channel.remote_balance)))*100) : 0}}" />
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #noChannelBlock>
+  <div fxLayout="row" fxFlex="100" fxLayoutAlign="space-between start" class="mt-1 w-100">
+    No channels available.
+    <button mat-stroked-button color="primary" tabindex="1" (click)="goToChannels()">Open Channel</button>
+  </div>
+</ng-template>
+<ng-template #errorBlock>
+  <div fxLayout="column" fxFlex="100" fxLayoutAlign="space-between" class="p-2">
+    <p>{{errorMessage}}</p>
+  </div>
+</ng-template>

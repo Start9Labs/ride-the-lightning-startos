@@ -1,0 +1,116 @@
+<div fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-between stretch">
+  <div fxFlex="100">
+    <mat-card-header fxLayout="row" fxLayoutAlign="space-between center" class="modal-info-header">
+      <div fxFlex="95" fxLayoutAlign="start start">
+        <fa-icon class="page-title-img mr-1" [icon]="faReceipt" />
+        <span class="page-title">Channel Information</span>
+      </div>
+      <button tabindex="3" fxFlex="5" fxLayoutAlign="center center" class="btn-close-x p-0" mat-button (click)="onClose()">X</button>
+    </mat-card-header>
+    <mat-card-content class="padding-gap-x-large" [ngClass]="{'xs-scroll-y': screenSize === screenSizeEnum.XS}">
+      <div fxLayout="column">
+        <div fxLayout="row">
+          <div fxFlex="50">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Short Channel ID</h4>
+            <span tabindex="4" class="foreground-secondary-text go-to-link" matTooltip="Go To Graph Lookup" (click)="onGoToLink('1', channel.short_channel_id)" >
+              {{channel.short_channel_id}}
+            </span>
+          </div>
+          <div fxFlex="50">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Peer Alias</h4>
+            <span class="foreground-secondary-text">{{channel.alias}}</span>
+          </div>
+        </div>
+        <mat-divider class="my-1" />
+        <div fxLayout="row">
+          <div fxFlex="100">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Channel ID</h4>
+            <span class="foreground-secondary-text">{{channel.channel_id}}</span>
+          </div>
+        </div>
+        <mat-divider class="my-1" />
+        <div fxLayout="row">
+          <div fxFlex="100">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Peer Public Key</h4>
+            <span tabindex="5" class="foreground-secondary-text go-to-link" matTooltip="Go To Graph Lookup" (click)="onGoToLink('0', channel.peer_id)" >
+              {{channel.peer_id}}
+            </span>
+          </div>
+        </div>
+        <mat-divider class="my-1" />
+        <div fxLayout="row">
+          <div fxFlex="100">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Funding Transaction ID</h4>
+            <span class="foreground-secondary-text">
+              {{channel.funding_txid}}
+              <fa-icon class="ml-1 fa-icon-primary" matTooltip="{{'Link to ' + selNode.settings.blockExplorerUrl}}" [icon]="faUpRightFromSquare" (click)="onExplorerClicked()"/>
+            </span>
+          </div>
+        </div>
+        <mat-divider class="my-1" />
+        <div fxLayout="row">
+          <div fxFlex="33">
+            <h4 fxLayoutAlign="start" class="font-bold-500">State</h4>
+            <span class="overflow-wrap foreground-secondary-text">{{channel?.state | camelcaseWithReplace:'_'}}</span>
+          </div>
+          <div fxFlex="33">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Connected</h4>
+            <span class="overflow-wrap foreground-secondary-text">{{channel.peer_connected ? 'Yes' : 'No'}}</span>
+          </div>
+          <div fxFlex="34">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Private</h4>
+            <span class="overflow-wrap foreground-secondary-text">{{channel.private ? 'Yes' : 'No'}}</span>
+          </div>
+        </div>
+        <mat-divider class="my-1" />
+        <div fxLayout="row">
+          <div fxFlex="33">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Remote Balance (Sats)</h4>
+            <span class="overflow-wrap foreground-secondary-text">{{channel.to_them_msat / 1000 | number:'1.0-0'}}</span>
+          </div>
+          <div fxFlex="33">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Local Balance (Sats)</h4>
+            <span class="overflow-wrap foreground-secondary-text">{{channel.to_us_msat / 1000 | number:'1.0-0'}}</span>
+          </div>
+          <div fxFlex="34">
+            <h4 fxLayoutAlign="start" class="font-bold-500">Total (Sats)</h4>
+            <span class="overflow-wrap foreground-secondary-text">{{channel.total_msat / 1000 | number:'1.0-0'}}</span>
+          </div>
+        </div>
+        <mat-divider class="my-1" />
+        <div *ngIf="showAdvanced">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <h4 fxLayoutAlign="start" class="font-bold-500">Receivable (Sats)</h4>
+              <span class="overflow-wrap foreground-secondary-text">{{channel.receivable_msat / 1000 | number:'1.0-0'}}</span>
+            </div>
+            <div fxFlex="50">
+              <h4 fxLayoutAlign="start" class="font-bold-500">Spendable (Sats)</h4>
+              <span class="overflow-wrap foreground-secondary-text">{{channel.spendable_msat / 1000 | number:'1.0-0'}}</span>
+            </div>
+          </div>
+          <mat-divider class="my-1" />
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <h4 fxLayoutAlign="start" class="font-bold-500">Their Reserve (Sats)</h4>
+              <span class="overflow-wrap foreground-secondary-text">{{channel.their_reserve_msat / 1000 | number:'1.0-2'}}</span>
+            </div>
+            <div fxFlex="50">
+              <h4 fxLayoutAlign="start" class="font-bold-500">Our Reserve (Sats)</h4>
+              <span class="overflow-wrap foreground-secondary-text">{{channel.our_reserve_msat / 1000 | number:'1.0-2'}}</span>
+            </div>
+          </div>
+          <mat-divider class="my-1" />
+        </div>
+        <div fxLayout="row" fxLayoutAlign="end center" fxFlex="100" [ngClass]="{'mt-2': !showAdvanced, 'mt-1': showAdvanced}">
+          <button mat-button color="primary" type="reset" tabindex="6" class="mr-1" (click)="onShowAdvanced()">
+            <p *ngIf="!showAdvanced; else hideAdvancedText">Show Advanced</p>
+            <ng-template #hideAdvancedText><p>Hide Advanced</p></ng-template>
+          </button>
+          <button *ngIf="showCopy" autoFocus mat-button color="primary" tabindex="7" type="submit" rtlClipboard [payload]="channel.short_channel_id" (copied)="onCopyChanID($event)">Copy Short Channel ID</button>
+          <button *ngIf="!showCopy" autoFocus mat-button color="primary" tabindex="8" type="button" (click)="onClose()">OK</button>
+        </div>
+      </div>
+    </mat-card-content>
+  </div>
+</div>

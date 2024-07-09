@@ -1,0 +1,60 @@
+<div *ngIf="lookupResult" fxLayout="column" class="mt-1">
+  <mat-divider class="mb-1" />
+  <div fxLayout="row">
+    <div fxFlex="30">
+      <h4 fxLayoutAlign="start" class="font-bold-500">Alias</h4>
+      <span class="foreground-secondary-text">{{lookupResult?.alias}}<span class="ml-2" [ngStyle]="{'background-color': '#' + lookupResult?.color}">{{lookupResult?.color ? '#' + lookupResult?.color : ''}}</span></span>
+    </div>
+    <div fxFlex="70">
+      <h4 fxLayoutAlign="start" class="font-bold-500">Pub Key</h4>
+      <span class="foreground-secondary-text w-100">{{lookupResult?.nodeid}}</span>
+    </div>
+  </div>
+  <mat-divider class="my-1" />
+  <div fxLayout="row">
+    <div fxFlex="30">
+      <h4 fxLayoutAlign="start" class="font-bold-500">Last Update</h4>
+      <span class="foreground-secondary-text">{{(lookupResult?.last_timestamp * 1000) | date:'dd/MMM/y HH:mm'}}</span>
+    </div>
+    <div fxFlex="70">
+      <h4 fxLayoutAlign="start" class="font-bold-500">Features</h4>
+      <span *ngFor="let featureDescription of featureDescriptions" class="foreground-secondary-text">{{featureDescription}}</span>
+    </div>
+  </div>
+  <mat-divider class="my-1" />
+  <div fxLayout="column">
+    <h4 fxFlex="100" fxLayoutAlign="start" class="font-bold-500 mb-1">Addresses</h4>
+    <div fxLayout="row" fxFlex="100" class="table-container" [perfectScrollbar]>
+      <table #table mat-table matSort [dataSource]="addresses">
+        <ng-container matColumnDef="type">
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Type</th>
+          <td *matCellDef="let address" mat-cell>{{address?.type}}</td>
+        </ng-container>
+        <ng-container matColumnDef="address">
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Address</th>
+          <td *matCellDef="let address" mat-cell>{{address?.address}}</td>
+        </ng-container>
+        <ng-container matColumnDef="port">
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Port</th>
+          <td *matCellDef="let address" mat-cell>{{address?.port}}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th *matHeaderCellDef mat-header-cell>
+            <div class="bordered-box table-actions-select btn-action" fxLayoutAlign="center center">Actions</div>
+         </th>
+         <td *matCellDef="let address" mat-cell fxLayoutAlign="end center">
+          <div class="bordered-box table-actions-select" fxLayoutAlign="center center">
+            <mat-select placeholder="Actions" tabindex="1" class="mr-0">
+              <mat-select-trigger />
+              <mat-option (click)="onConnectNode(address)">Connect</mat-option>
+              <mat-option rtlClipboard [payload]="lookupResult?.nodeid + '@' + address.address + ':' + address.port" (copied)="onCopyNodeURI($event)">Copy URI</mat-option>
+            </mat-select>
+          </div>
+        </td>
+        </ng-container>
+        <tr *matHeaderRowDef="displayedColumns;" mat-header-row></tr>
+        <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+      </table>
+    </div>
+  </div>
+</div>

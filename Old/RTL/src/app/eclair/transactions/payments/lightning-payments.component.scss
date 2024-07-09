@@ -1,0 +1,33 @@
+@import "../../../shared/theme/styles/constants.scss";
+
+.mat-column-group_actions {
+  & .part-group-head, .part-group-details {
+    min-height: 3rem;
+  }
+
+  & .btn-part-expand {
+    min-width: $table-actions-min-width;
+    width: $table-actions-min-width;
+    margin: 0;
+  }
+
+  & .btn-part-info {
+    min-width: $table-actions-min-width - 1rem;
+    min-width: $table-actions-min-width - 1rem;
+    margin: 0;
+  }
+}
+
+.mat-column-group_firstPartTimestamp {
+  .part-row-span:not(:first-of-type) {
+    padding-left: 2rem;
+  }
+}
+
+.part-row-span {
+  min-height: 3rem;
+}
+
+.mat-column-group_firstPartTimestamp {
+  min-width: 11rem;
+}
