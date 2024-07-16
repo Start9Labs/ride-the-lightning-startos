@@ -1,5 +1,5 @@
 {
-  "name": "hello-moon",
+  "name": "ride-the-lightning",
   "scripts": {
     "build": "ncc build startos/index.ts -o ./",
     "prettier": "prettier --write startos",
