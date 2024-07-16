@@ -1,8 +1,4 @@
 import { sdk } from '../sdk'
+import { v0_15_2_1 } from './v0_15_2_1'
 
-/**
- * Here we list every migration in sequential order.
- *
- * See Hello World for an example.
- */
-export const migrations = sdk.setupMigrations()
+export const migrations = sdk.setupMigrations(v0_15_2_1)

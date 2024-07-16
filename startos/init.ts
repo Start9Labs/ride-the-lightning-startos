@@ -6,11 +6,6 @@ import { utils } from '@start9labs/start-sdk'
 import { migrations } from './migrations'
 import { randomPassword } from './utils'
 
-/**
- * Here you define arbitrary code that runs *once*, on fresh install only.
- *
- * See Hello World for an example.
- */
 const install = sdk.setupInstall(async ({ effects }) => {
   // generate random password
   const password = utils.getDefaultString(randomPassword)
@@ -18,9 +13,6 @@ const install = sdk.setupInstall(async ({ effects }) => {
   await sdk.store.setOwn(effects, sdk.StorePath.password, password)
 })
 
-/**
- * Here we define arbitrary code that runs once, on uninstall only.
- */
 const uninstall = sdk.setupUninstall(async ({ effects }) => {})
 
 /**

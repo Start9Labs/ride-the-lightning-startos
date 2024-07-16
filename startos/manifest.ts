@@ -6,7 +6,8 @@ import { setupManifest } from '@start9labs/start-sdk'
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
   title: 'Ride The Lightning',
-  version: '4.0.0',
+  version: '0.15.2-beta:0',
+  satisfies: null,
   releaseNotes: 'Updated for 0.3.6',
   license: 'mit',
   replaces: [], // A list of SaaS services/products this service is intended to replace
@@ -26,8 +27,6 @@ export const manifest = setupManifest({
       source: {
         dockerTag: "shahanafarooqui/rtl:v0.15.2"
       },
-      arch: ['x86_64', 'aarch64'],
-      emulateMissingAs: 'aarch64',
     },
   }, // IDs of images, used when other actions need to run in this image
   hardwareRequirements: null,

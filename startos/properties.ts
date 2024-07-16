@@ -9,7 +9,7 @@ export const properties = sdk.setupProperties(async ({ effects }) => {
   const store = await sdk.store.getOwn(effects, sdk.StorePath).once()
 
   return {
-    'Secret Phrase': {
+    'UI Password': {
       type: 'string',
       value: store.password,
       description: 'Use this password to access the RTL web UI',
