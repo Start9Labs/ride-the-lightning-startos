@@ -1,7 +1,7 @@
 # ---------------
 # Install Dependencies
 # ---------------
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 
 RUN apk add --no-cache \
   python3 \
@@ -34,7 +34,7 @@ RUN npm prune --production --legacy-peer-deps
 # ---------------
 # Release App
 # ---------------
-FROM node:18-alpine as runner
+FROM node:20-alpine as runner
 
 ARG ARCH
 

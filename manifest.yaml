@@ -1,9 +1,9 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.15.1
+version: 0.15.4
 release-notes: |
-  * Update RTL to 0.15.1 [Release Notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.1)
-  * Bump max LND dependency version
+  * Update RTL to 0.15.4 [Release Notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.4)
+  * Fix CLN dependency auto-configure
 license: MIT
 wrapper-repo: https://github.com/Start9Labs/ride-the-lightning-wrapper
 upstream-repo: https://github.com/Ride-The-Lightning/RTL
