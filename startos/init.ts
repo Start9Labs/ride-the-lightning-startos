@@ -1,28 +1,45 @@
 import { sdk } from './sdk'
-import { exposedStore } from './store'
-import { setDependencies } from './dependencies/dependencies'
+import { exposedStore, initStore } from './store'
+import { setDependencies } from './dependencies'
 import { setInterfaces } from './interfaces'
-import { utils } from '@start9labs/start-sdk'
-import { migrations } from './migrations'
-import { randomPassword } from './utils'
+import { versions } from './versions'
+import { actions } from './actions'
+import { rtlConfig } from './file-models/RTL-Config.json'
+import { configDefaults } from './utils'
+import { resetPassword } from './actions/resetPassword'
+import { setNodes } from './actions/setNodes'
 
-const install = sdk.setupInstall(async ({ effects }) => {
-  // generate random password
-  const password = utils.getDefaultString(randomPassword)
-  // Save password to store
-  await sdk.store.setOwn(effects, sdk.StorePath.password, password)
+// **** PreInstall ****
+const preInstall = sdk.setupPreInstall(async ({ effects }) => {
+  await rtlConfig.write(effects, configDefaults)
 })
 
+// **** PostInstall ****
+const postInstall = sdk.setupPostInstall(async ({ effects }) => {
+  await Promise.all([
+    sdk.action.requestOwn(effects, resetPassword, 'critical', {
+      reason: 'Set your RTL password',
+    }),
+    sdk.action.requestOwn(effects, setNodes, 'critical', {
+      reason: 'Choose which nodes RTL will manage',
+    }),
+  ])
+})
+
+// **** Uninstall ****
 const uninstall = sdk.setupUninstall(async ({ effects }) => {})
 
 /**
  * Plumbing. DO NOT EDIT.
  */
-export const { init, uninit } = sdk.setupInit(
-  migrations,
-  install,
+export const { packageInit, packageUninit, containerInit } = sdk.setupInit(
+  versions,
+  preInstall,
+  postInstall,
   uninstall,
   setInterfaces,
   setDependencies,
+  actions,
+  initStore,
   exposedStore,
 )

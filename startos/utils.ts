@@ -1,13 +1,39 @@
-import { RtlConfig } from './file-models/RTL-Config.json'
+export const uiPort = 80
 
-export const randomPassword = {
-  charset: 'a-z,A-Z,1-9,!,@,$,%,&,*',
-  len: 22,
+export type Config = {
+  host: '0.0.0.0'
+  port: typeof uiPort
+  multiPass: string
+  multiPassHashed: string // set by RTL
+  secret2fa: string // set by RTL
+  nodes: {
+    index: number
+    lnImplementation: 'LND' | 'CLN'
+    lnNode: string // human readable name of the node
+    Authentication: {
+      macaroonPath: string
+    }
+    Settings: {
+      themeMode: 'DAY' | 'NIGHT'
+      themeColor: 'PURPLE' | 'TEAL' | 'INDIGO' | 'PINK' | 'YELLOW'
+      channelBackupPath: string
+      lnServerUrl: string
+    }
+  }[]
+}
+
+export const configDefaults: Config = {
+  host: '0.0.0.0',
+  port: uiPort,
+  multiPass: '',
+  multiPassHashed: '',
+  secret2fa: '',
+  nodes: [],
 }
 
 export function hasInternal(
-  nodes: RtlConfig['nodes'],
+  nodes: Config['nodes'],
   imp: 'lnd' | 'c-lightning',
 ): boolean {
-  return nodes.some((n) => n.Settings.lnServerUrl.includes(`${imp}.embassy`))
+  return nodes.some((n) => n.Settings.lnServerUrl.includes(`${imp}.startos`))
 }

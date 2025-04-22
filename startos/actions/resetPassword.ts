@@ -1,47 +1,45 @@
+import { utils } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-import { randomPassword } from '../utils'
 import { rtlConfig } from '../file-models/RTL-Config.json'
 
-const { Config, Value } = sdk
+export const resetPassword = sdk.Action.withoutInput(
+  // id
+  'reset-password',
 
-const input = Config.of({
-  password: Value.text({
-    name: 'New Password',
-    required: {
-      default: randomPassword,
-    },
-    generate: randomPassword,
-    masked: true,
-  }),
-})
-
-export const resetPassword = sdk.createAction(
-  'resetPassword',
-  {
-    name: 'Reset Password',
-    description: 'Resets your password to the one provided',
-    warning: null,
-    disabled: false,
-    input,
-    allowedStatuses: 'onlyStopped',
-    group: null,
-  },
-  async ({ effects, input }) => {
-    const password = input.password
-
-    // Save password in RTL-config.json
-    const config = (await rtlConfig.read(effects))!
-    config.multiPass = password
-    config.multiPassHashed = ''
-    await rtlConfig.write(config, effects)
-
-    // Save password to Store
-    await sdk.store.setOwn(effects, sdk.StorePath.password, password)
+  // metadata
+  async ({ effects }) => {
+    const hasPass = await sdk.store
+      .getOwn(effects, sdk.StorePath.hasPassword)
+      .const()
+    const desc = 'your user interface password'
 
     return {
-      message: 'Password changed successfully.',
-      value: {
+      name: hasPass ? 'Reset Password' : 'Create Password',
+      description: hasPass ? `Reset ${desc}` : `Create ${desc}`,
+      warning: null,
+      allowedStatuses: 'any',
+      group: null,
+      visibility: 'enabled',
+    }
+  },
+
+  // the execution function
+  async ({ effects }) => {
+    const password = utils.getDefaultString({
+      charset: 'a-z,A-Z,1-9,!,@,$,%,&,*',
+      len: 22,
+    })
+
+    await rtlConfig.merge(effects, { multiPass: password, multiPassHashed: '' })
+
+    return {
+      version: '1',
+      title: 'Success',
+      message: 'Your new password is below. Save it to a password manager.',
+      result: {
+        type: 'single',
         value: password,
+        masked: true,
         copyable: true,
         qr: false,
       },

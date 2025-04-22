@@ -3,30 +3,25 @@ import { setupManifest } from '@start9labs/start-sdk'
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
   title: 'Ride The Lightning',
-  version: '0.15.2-beta:0',
-  satisfies: null,
-  releaseNotes: 'Updated for 0.3.6',
   license: 'mit',
-  replaces: [],
   wrapperRepo: 'https://github.com/Start9Labs/ride-the-lightning-wrapper',
   upstreamRepo: 'https://github.com/Ride-The-Lightning/RTL',
   supportSite: 'https://github.com/Ride-The-Lightning/RTL/issues',
-  marketingSite: 'https://twitter.com/RTL_App',
-  donationUrl: 'https://www.ridethelightning.info/donate/',
+  marketingSite: 'https://ridethelightning.info/',
+  donationUrl: 'https://ridethelightning.info/donate/',
   description: {
-    short: 'A full function, device agnostic, web user interface for managing lightning node operations',
-    long: 'A full function, device agnostic, web user interface for managing lightning node operations. It talks directly to the LND or CLN node running on your StartOS server and is accessible from any Tor-enabled Browser!',
+    short: 'A web user interface for managing lightning nodes',
+    long: 'A full function, device agnostic, web user interface for managing lightning nodes. RTL connects directly to your StartOS LND and/or CLN node and is accessible from any browser.',
   },
-  assets: [],
   volumes: ['main'],
   images: {
-    main: {
+    rtl: {
       source: {
-        dockerTag: "shahanafarooqui/rtl:v0.15.2"
+        dockerTag: 'shahanafarooqui/rtl:v0.15.2',
       },
     },
   },
-  hardwareRequirements: null,
+  hardwareRequirements: {},
   alerts: {
     install: null,
     update: null,
@@ -36,13 +31,15 @@ export const manifest = setupManifest({
     stop: null,
   },
   dependencies: {
-    'lnd': {
-      description: 'Needed to communicate with the Lightning Network.',
-      optional: true,
-    },
     'c-lightning': {
-      description: 'Needed to communicate with the Lightning Network.',
+      description: 'Optionally connect RTL to your CLN node.',
       optional: true,
+      s9pk: '../hello-world-startos/hello-world.s9pk',
+    },
+    lnd: {
+      description: 'Optionally connect RTL to your LND node.',
+      optional: true,
+      s9pk: '../hello-world-startos/hello-world.s9pk',
     },
   },
 })
