@@ -5,7 +5,7 @@ import { hasInternal } from './utils'
 import { manifest } from './manifest'
 
 export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
-  const { nodes } = (await rtlConfig.read.const(effects))!
+  const nodes = (await rtlConfig.read((c) => c.nodes).const(effects))!
 
   const deps = {} as T.CurrentDependenciesResult<typeof manifest>
 

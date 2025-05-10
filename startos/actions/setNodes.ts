@@ -99,7 +99,7 @@ export const setNodes = sdk.Action.withInput(
 
   // optionally pre-fill the input form
   async ({ effects }) => {
-    const { nodes } = (await rtlConfig.read.const(effects))!
+    const nodes = (await rtlConfig.read((c) => c.nodes).const(effects))!
 
     return {
       internalLnd: hasInternal(nodes, 'lnd'),
@@ -161,7 +161,7 @@ export const setNodes = sdk.Action.withInput(
       )
     }
 
-    const config = (await rtlConfig.read.const(effects))!
+    const config = (await rtlConfig.read().once())!
 
     await Promise.all(
       input.remoteNodes.map(async (node, index) => {

@@ -7,7 +7,7 @@ export const v_0_15_4_2 = VersionInfo.of({
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
     up: async ({ effects }) => {
-      const config = (await rtlConfig.read.once())!
+      const config = (await rtlConfig.read().once())!
 
       // update nodes to accommodate new config approach
       await rtlConfig.merge(effects, {

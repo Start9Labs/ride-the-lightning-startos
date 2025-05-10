@@ -16,28 +16,33 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
   const depResult = await sdk.checkDependencies(effects)
   depResult.throwIfNotSatisfied()
 
-  let mounts = sdk.Mounts.of().addVolume('main', null, '/data', false)
+  let mounts = sdk.Mounts.of().mountVolume({
+    volumeId: 'main',
+    subpath: null,
+    mountpoint: '/data',
+    readonly: false,
+  })
 
-  const { nodes } = (await rtlConfig.read.const(effects))!
+  const nodes = (await rtlConfig.read((c) => c.nodes).const(effects))!
 
   if (hasInternal(nodes, 'lnd')) {
-    mounts = mounts.addDependency<typeof lndManifest>(
-      'lnd',
-      'main',
-      null,
-      '/lnd',
-      true,
-    )
+    mounts = mounts.mountDependency<typeof lndManifest>({
+      dependencyId: 'lnd',
+      volumeId: 'main',
+      subpath: null,
+      mountpoint: '/lnd',
+      readonly: true,
+    })
   }
 
   if (hasInternal(nodes, 'c-lightning')) {
-    mounts = mounts.addDependency<typeof clnManifest>(
-      'c-lightning',
-      'main',
-      null,
-      '/c-lightning',
-      true,
-    )
+    mounts = mounts.mountDependency<typeof clnManifest>({
+      dependencyId: 'c-lightning',
+      volumeId: 'main',
+      subpath: null,
+      mountpoint: '/c-lightning',
+      readonly: true,
+    })
   }
 
   /**
@@ -60,7 +65,12 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
       subcontainer: await sdk.SubContainer.of(
         effects,
         { imageId: 'rtl' },
-        sdk.Mounts.of().addVolume('main', null, '/data', false),
+        sdk.Mounts.of().mountVolume({
+          volumeId: 'main',
+          subpath: null,
+          mountpoint: '/data',
+          readonly: false,
+        }),
         'rtl-sub',
       ),
       command: ['node', 'rtl'],
