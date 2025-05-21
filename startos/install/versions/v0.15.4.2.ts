@@ -1,6 +1,6 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
 import { rmdir } from 'fs/promises'
-import { rtlConfig } from '../file-models/RTL-Config.json'
+import { rtlConfig } from '../../file-models/RTL-Config.json'
 
 export const v_0_15_4_2 = VersionInfo.of({
   version: '0.15.4:2',
