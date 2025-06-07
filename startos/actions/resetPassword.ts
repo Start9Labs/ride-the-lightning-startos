@@ -1,7 +1,6 @@
 import { utils } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 import { rtlConfig } from '../file-models/RTL-Config.json'
-import { store } from '../file-models/store.json'
 
 export const resetPassword = sdk.Action.withoutInput(
   // id
@@ -9,7 +8,9 @@ export const resetPassword = sdk.Action.withoutInput(
 
   // metadata
   async ({ effects }) => {
-    const hasPass = await store.read((s) => s.hassPassword).const(effects)
+    const hasPass = await rtlConfig
+      .read((s) => s.multiPassHashed)
+      .const(effects)
     const desc = 'your user interface password'
 
     return {

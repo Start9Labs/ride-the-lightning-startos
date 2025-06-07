@@ -12,8 +12,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   if (hasInternal(nodes, 'lnd')) {
     deps.lnd = {
       kind: 'exists',
-      // @TODO
-      versionRange: '',
+      versionRange: '>0.18.5',
     }
   }
 

@@ -1,5 +1,5 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
-import { rmdir } from 'fs/promises'
+import { rm } from 'fs/promises'
 import { rtlConfig } from '../../file-models/RTL-Config.json'
 
 export const v_0_15_4_2 = VersionInfo.of({
@@ -28,8 +28,10 @@ export const v_0_15_4_2 = VersionInfo.of({
         }),
       })
 
-      await rmdir('/root/lnd-external') // TODO Check if dir still exists
-      await rmdir('/root/start9')
+      await Promise.all([
+        rm('/media/startos/volumes/main/lnd-external'), // TODO Check if dir still exists
+        rm('media/startos/volumes/main/start9', { recursive: true }),
+      ]).catch(console.error)
     },
     down: IMPOSSIBLE,
   },

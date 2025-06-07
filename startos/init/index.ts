@@ -4,7 +4,7 @@ import { setInterfaces } from '../interfaces'
 import { versionGraph } from '../install/versionGraph'
 import { actions } from '../actions'
 import { restoreInit } from '../backups'
-import { setupRtl } from './setupRtl'
+import { monitorConfig } from './monitorConfig'
 
 export const init = sdk.setupInit(
   restoreInit,
@@ -12,7 +12,7 @@ export const init = sdk.setupInit(
   setInterfaces,
   setDependencies,
   actions,
-  setupRtl,
+  monitorConfig,
 )
 
 export const uninit = sdk.setupUninit(versionGraph)

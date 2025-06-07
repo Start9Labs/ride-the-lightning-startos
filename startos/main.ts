@@ -3,7 +3,7 @@ import { rtlConfig } from './file-models/RTL-Config.json'
 import { T } from '@start9labs/start-sdk'
 import { hasInternal, uiPort } from './utils'
 import { manifest as lndManifest } from 'lnd-startos/startos/manifest'
-import { manifest as clnManifest } from 'cln-startos/startos/manifest'
+// import { manifest as clnManifest } from 'cln-startos/startos/manifest'
 
 export const main = sdk.setupMain(async ({ effects, started }) => {
   /**
@@ -35,8 +35,9 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
     })
   }
 
+  // @TODO import clnManifest for type safety
   if (hasInternal(nodes, 'c-lightning')) {
-    mounts = mounts.mountDependency<typeof clnManifest>({
+    mounts = mounts.mountDependency({
       dependencyId: 'c-lightning',
       volumeId: 'main',
       subpath: null,
@@ -73,9 +74,11 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
         }),
         'rtl-sub',
       ),
-      command: ['node', 'rtl'],
-      env: {
-        RTL_CONFIG_PATH: '/data', // TODO confirm package path
+      exec: {
+        command: ['node', 'rtl'],
+        env: {
+          RTL_CONFIG_PATH: '/data', // @TODO confirm package path
+        },
       },
       ready: {
         display: 'Web Interface',
