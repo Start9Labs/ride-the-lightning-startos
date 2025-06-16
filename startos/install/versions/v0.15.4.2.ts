@@ -13,12 +13,12 @@ export const v_0_15_4_2 = VersionInfo.of({
       // update nodes to accommodate new config approach
       await rtlConfig.merge(effects, {
         nodes: config?.nodes.map((n, index) => {
-          if (n.settings.lnServerUrl === 'https://lnd.embassy:8080') {
+          if (n.settings.lnServerUrl.includes('lnd.embassy')) {
             n.settings.lnServerUrl = 'https://lnd.startos:8080'
             n.lnNode = 'Internal-LND'
             n.index = 1
             n.authentication.macaroonPath = lndMountpoint
-          } else if (n.settings.lnServerUrl === 'https://c-lightning.embassy:3001') {
+          } else if (n.settings.lnServerUrl.includes('c-lightning.embassy')) {
             n.settings.lnServerUrl = 'https://c-lightning.startos:8080'
             n.lnNode = 'Internal-CLN'
             n.index = 2
