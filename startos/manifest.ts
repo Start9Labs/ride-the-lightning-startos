@@ -17,7 +17,7 @@ export const manifest = setupManifest({
   images: {
     rtl: {
       source: {
-        dockerTag: 'shahanafarooqui/rtl:v0.15.2',
+        dockerTag: 'shahanafarooqui/rtl:v0.15.4-beta',
       },
     },
   },
