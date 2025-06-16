@@ -1,7 +1,6 @@
 import { sdk } from './sdk'
 import { rtlConfig } from './file-models/RTL-Config.json'
-import { T } from '@start9labs/start-sdk'
-import { hasInternal, uiPort } from './utils'
+import { clnMountpoint, hasInternal, lndMountpoint, uiPort } from './utils'
 import { manifest as lndManifest } from 'lnd-startos/startos/manifest'
 // import { manifest as clnManifest } from 'cln-startos/startos/manifest'
 
@@ -19,7 +18,7 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
   let mounts = sdk.Mounts.of().mountVolume({
     volumeId: 'main',
     subpath: null,
-    mountpoint: '/data',
+    mountpoint: '/root',
     readonly: false,
   })
 
@@ -30,7 +29,7 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
       dependencyId: 'lnd',
       volumeId: 'main',
       subpath: null,
-      mountpoint: '/lnd',
+      mountpoint: lndMountpoint,
       readonly: true,
     })
   }
@@ -41,17 +40,10 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
       dependencyId: 'c-lightning',
       volumeId: 'main',
       subpath: null,
-      mountpoint: '/c-lightning',
+      mountpoint: clnMountpoint,
       readonly: true,
     })
   }
-
-  /**
-   * ======================== Additional Health Checks (optional) ========================
-   *
-   * In this section, we define *additional* health checks beyond those included with each daemon (below).
-   */
-  const additionalChecks: T.HealthCheck[] = []
 
   /**
    * ======================== Daemons ========================
@@ -60,35 +52,27 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    *
    * Each daemon defines its own health check, which can optionally be exposed to the user.
    */
-  return sdk.Daemons.of(effects, started, additionalChecks).addDaemon(
-    'primary',
-    {
-      subcontainer: await sdk.SubContainer.of(
-        effects,
-        { imageId: 'rtl' },
-        sdk.Mounts.of().mountVolume({
-          volumeId: 'main',
-          subpath: null,
-          mountpoint: '/data',
-          readonly: false,
-        }),
-        'rtl-sub',
-      ),
-      exec: {
-        command: ['node', 'rtl'],
-        env: {
-          RTL_CONFIG_PATH: '/data', // @TODO confirm package path
-        },
+  return sdk.Daemons.of(effects, started).addDaemon('primary', {
+    subcontainer: await sdk.SubContainer.of(
+      effects,
+      { imageId: 'rtl' },
+      mounts,
+      'rtl-sub',
+    ),
+    exec: {
+      command: ['node', 'rtl'],
+      env: {
+        RTL_CONFIG_PATH: '/root',
       },
-      ready: {
-        display: 'Web Interface',
-        fn: () =>
-          sdk.healthCheck.checkPortListening(effects, uiPort, {
-            successMessage: 'The web interface is ready',
-            errorMessage: 'The web interface is not ready',
-          }),
-      },
-      requires: [],
     },
-  )
+    ready: {
+      display: 'Web Interface',
+      fn: () =>
+        sdk.healthCheck.checkPortListening(effects, uiPort, {
+          successMessage: 'The web interface is ready',
+          errorMessage: 'The web interface is not ready',
+        }),
+    },
+    requires: [],
+  })
 })

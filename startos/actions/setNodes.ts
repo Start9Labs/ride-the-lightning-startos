@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import { rtlConfig } from '../file-models/RTL-Config.json'
 import { sdk } from '../sdk'
-import { Config, hasInternal } from '../utils'
+import { clnMountpoint, Config, hasInternal, lndMountpoint } from '../utils'
 const { InputSpec, Value, List } = sdk
 
 export const remoteNodes = Value.list(
@@ -99,7 +99,8 @@ export const setNodes = sdk.Action.withInput(
 
   // optionally pre-fill the input form
   async ({ effects }) => {
-    const nodes = (await rtlConfig.read((c) => c.nodes).const(effects))!
+    const nodes = await rtlConfig.read((c) => c.nodes).const(effects)
+    if (!nodes) throw new Error('nodes not found in config file')
 
     return {
       internalLnd: hasInternal(nodes, 'lnd'),
@@ -108,14 +109,14 @@ export const setNodes = sdk.Action.withInput(
         nodes
           .filter(
             (n) =>
-              !n.Settings.lnServerUrl.includes('lnd.embassy') &&
-              !n.Settings.lnServerUrl.includes('c-lightning.embassy'),
+              !n.settings.lnServerUrl.includes('lnd.startos') &&
+              !n.settings.lnServerUrl.includes('c-lightning.startos'),
           )
           .map(async (n) => ({
             lnImplementation: n.lnImplementation,
             lnNode: n.lnNode,
-            lnServerUrl: n.Settings.lnServerUrl,
-            macaroon: await readFile(n.Authentication.macaroonPath, {
+            lnServerUrl: n.settings.lnServerUrl,
+            macaroon: await readFile(n.authentication.macaroonPath || n.authentication.runePath || '', {
               encoding: 'base64',
             }),
           })),
@@ -138,9 +139,11 @@ export const setNodes = sdk.Action.withInput(
           index: 1,
           lnImplementation: 'LND',
           lnNode: 'Internal LND',
-          macaroonPath: '/lnd',
+          authentication: {
+            macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet/`,
+          },
           channelBackupPath,
-          lnServerUrl: `lnd.startos:8080`,
+          lnServerUrl: `https://lnd.startos:8080`,
         }),
       )
     }
@@ -154,14 +157,17 @@ export const setNodes = sdk.Action.withInput(
           index: 2,
           lnImplementation: 'CLN',
           lnNode: 'Internal CLN',
-          macaroonPath: '/c-lightning',
+          authentication: {
+            runePath: clnMountpoint, 
+          },
           channelBackupPath,
-          lnServerUrl: 'c-lightning.startos:3001',
+          lnServerUrl: 'https://c-lightning.startos:3001',
         }),
       )
     }
 
-    const config = (await rtlConfig.read().once())!
+    const config = await rtlConfig.read().once()
+    if (!config) throw new Error('Config file not found')
 
     await Promise.all(
       input.remoteNodes.map(async (node, index) => {
@@ -169,10 +175,10 @@ export const setNodes = sdk.Action.withInput(
         const hyphenatedName = lnNode.replace(/\s+/g, '-')
 
         // macaroon
-        const macaroonPath = `/root/remote-macaroons/${hyphenatedName}`
-        await mkdir(macaroonPath, { recursive: true })
+        const credentialPath = `/root/remote-macaroons/${hyphenatedName}`
+        await mkdir(credentialPath, { recursive: true })
         await writeFile(
-          `${macaroonPath}/${
+          `${credentialPath}/${
             lnImplementation === 'LND' ? 'admin' : 'access'
           }.macaroon`,
           macaroon,
@@ -184,15 +190,20 @@ export const setNodes = sdk.Action.withInput(
 
         const savedNode = config.nodes.find((n) => n.lnNode === lnNode)
 
+        const authentication =
+          lnImplementation === 'LND'
+            ? { macaroonPath: credentialPath }
+            : { runePath: credentialPath }
+
         nodes.push(
           await toRtlNode({
             index: index + 3, // start with 2 to account for internal LND and CLN
             lnImplementation,
             lnNode,
-            macaroonPath,
+            authentication,
             channelBackupPath,
             lnServerUrl,
-            settings: savedNode?.Settings,
+            settings: savedNode?.settings,
           }),
         )
       }),
@@ -208,7 +219,7 @@ async function toRtlNode({
   index,
   lnImplementation,
   lnNode,
-  macaroonPath,
+  authentication,
   channelBackupPath,
   lnServerUrl,
   settings,
@@ -216,19 +227,17 @@ async function toRtlNode({
   index: number
   lnImplementation: 'LND' | 'CLN'
   lnNode: string
-  macaroonPath: string
+  authentication: Config['nodes'][0]['authentication']
   channelBackupPath: string
   lnServerUrl: string
-  settings?: Config['nodes'][0]['Settings']
+  settings?: Config['nodes'][0]['settings']
 }): Promise<Config['nodes'][0]> {
   return {
     index,
     lnImplementation,
     lnNode,
-    Authentication: {
-      macaroonPath,
-    },
-    Settings: settings || {
+    authentication,
+    settings: settings || {
       themeMode: 'NIGHT',
       themeColor: 'PINK',
       channelBackupPath,

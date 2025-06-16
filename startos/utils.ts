@@ -1,4 +1,6 @@
 export const uiPort = 80
+export const lndMountpoint = '/mnt/lnd'
+export const clnMountpoint = '/mnt/cln'
 
 export type Config = {
   host: '0.0.0.0'
@@ -6,14 +8,20 @@ export type Config = {
   multiPass: string
   multiPassHashed: string // set by RTL
   secret2fa: string // set by RTL
+  SSO: {
+    logoutRedirectLink: string
+    rtlCookiePath: string
+    rtlSSO: number
+  }
   nodes: {
     index: number
     lnImplementation: 'LND' | 'CLN'
     lnNode: string // human readable name of the node
-    Authentication: {
-      macaroonPath: string
+    authentication: {
+      macaroonPath?: string
+      runePath?: string
     }
-    Settings: {
+    settings: {
       themeMode: 'DAY' | 'NIGHT'
       themeColor: 'PURPLE' | 'TEAL' | 'INDIGO' | 'PINK' | 'YELLOW'
       channelBackupPath: string
@@ -28,6 +36,11 @@ export const configDefaults: Config = {
   multiPass: '',
   multiPassHashed: '',
   secret2fa: '',
+  SSO: {
+    logoutRedirectLink: '',
+    rtlCookiePath: '',
+    rtlSSO: 0,
+  },
   nodes: [],
 }
 
@@ -35,5 +48,5 @@ export function hasInternal(
   nodes: Config['nodes'],
   imp: 'lnd' | 'c-lightning',
 ): boolean {
-  return nodes.some((n) => n.Settings.lnServerUrl.includes(`${imp}.startos`))
+  return nodes.some((n) => n.settings.lnServerUrl.includes(`${imp}.startos`))
 }

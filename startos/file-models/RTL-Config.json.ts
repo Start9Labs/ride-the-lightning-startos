@@ -1,9 +1,13 @@
 import { matches, FileHelper } from '@start9labs/start-sdk'
 import { configDefaults } from '../utils'
 
-const { object, array, string, natural, oneOf, literal } = matches
+const { object, array, string, natural, oneOf, literal, literals } = matches
 
-const { host, port, multiPass, multiPassHashed, secret2fa } = configDefaults
+const { host, port, multiPass, multiPassHashed, secret2fa, SSO } = configDefaults
+
+const { logoutRedirectLink, rtlCookiePath, rtlSSO } = SSO
+
+// @TODO account for macaroon & rune path depending on ln implementation
 
 const shape = object({
   host: literal(host).onMismatch(host),
@@ -11,22 +15,28 @@ const shape = object({
   multiPass: string.onMismatch(multiPass),
   multiPassHashed: string.onMismatch(multiPassHashed), // set by RTL
   secret2fa: string.onMismatch(secret2fa), // set by RTL
+  SSO: object({
+    logoutRedirectLink: literal(logoutRedirectLink),
+    rtlCookiePath: literal(rtlCookiePath),
+    rtlSSO: literal(rtlSSO),
+  }).onMismatch(SSO),
   nodes: array(
     object({
       index: natural,
-      lnImplementation: oneOf(literal('LND'), literal('CLN')),
+      lnImplementation: literals('LND', 'CLN'),
       lnNode: string, // human readable name of the node
-      Authentication: object({
-        macaroonPath: string,
+      authentication: object({
+        macaroonPath: string.optional(),
+        runePath: string.optional()
       }),
-      Settings: object({
-        themeMode: oneOf(literal('DAY'), literal('NIGHT')),
-        themeColor: oneOf(
-          literal('PURPLE'),
-          literal('TEAL'),
-          literal('INDIGO'),
-          literal('PINK'),
-          literal('YELLOW'),
+      settings: object({
+        themeMode: literals('DAY', 'NIGHT'),
+        themeColor: literals(
+          'PURPLE',
+          'TEAL',
+          'INDIGO',
+          'PINK',
+          'YELLOW',
         ),
         channelBackupPath: string,
         lnServerUrl: string,
@@ -35,7 +45,9 @@ const shape = object({
   ),
 })
 
-export const rtlConfig = FileHelper.json(
-  '/media/startos/volumes/main/RTL-Config.json',
+export const rtlConfig = FileHelper.json({
+  volumeId: 'main',
+  subpath: '/RTL-Config.json'
+},
   shape,
 )
