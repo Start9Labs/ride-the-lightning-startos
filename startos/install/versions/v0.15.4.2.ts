@@ -8,21 +8,21 @@ export const v_0_15_4_2 = VersionInfo.of({
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
     up: async ({ effects }) => {
-      const config = (await rtlConfig.read().once())! // @TODO throw
-
-      // @TODO actually migrate previous config
+      const config = await rtlConfig.read().once()
 
       // update nodes to accommodate new config approach
       await rtlConfig.merge(effects, {
-        nodes: config.nodes.map((n, index) => {
-          if (n.settings.lnServerUrl === 'https://lnd.startos:8080') {
+        nodes: config?.nodes.map((n, index) => {
+          if (n.settings.lnServerUrl === 'https://lnd.embassy:8080') {
+            n.settings.lnServerUrl = 'https://lnd.startos:8080'
             n.lnNode = 'Internal-LND'
             n.index = 1
             n.authentication.macaroonPath = lndMountpoint
-          } else if (n.settings.lnServerUrl === 'https://c-lightning.startos:3001') {
+          } else if (n.settings.lnServerUrl === 'https://c-lightning.embassy:3001') {
+            n.settings.lnServerUrl = 'https://c-lightning.startos:8080'
             n.lnNode = 'Internal-CLN'
             n.index = 2
-            n.authentication.macaroonPath = clnMountpoint
+            n.authentication.runePath = clnMountpoint
           } else {
             n.index = index + 2
           }
@@ -32,9 +32,15 @@ export const v_0_15_4_2 = VersionInfo.of({
       })
 
       await Promise.all([
-        rm('/media/startos/volumes/main/lnd-external'), // @TODO Check if dir still exists
-        rm('media/startos/volumes/main/start9', { recursive: true }),
-      ]).catch(console.error)
+        rm('/media/startos/volumes/main/lnd-external', {
+          recursive: true,
+          force: true,
+        }),
+        rm('media/startos/volumes/main/start9', {
+          recursive: true,
+          force: true,
+        }),
+      ])
     },
     down: IMPOSSIBLE,
   },
