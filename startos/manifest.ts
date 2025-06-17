@@ -4,7 +4,7 @@ export const manifest = setupManifest({
   id: 'ride-the-lightning',
   title: 'Ride The Lightning',
   license: 'mit',
-  wrapperRepo: 'https://github.com/Start9Labs/ride-the-lightning-wrapper',
+  wrapperRepo: 'https://github.com/Start9Labs/ride-the-lightning-startos',
   upstreamRepo: 'https://github.com/Ride-The-Lightning/RTL',
   supportSite: 'https://github.com/Ride-The-Lightning/RTL/issues',
   marketingSite: 'https://ridethelightning.info/',

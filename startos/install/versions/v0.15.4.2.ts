@@ -10,7 +10,6 @@ export const v_0_15_4_2 = VersionInfo.of({
     up: async ({ effects }) => {
       const config = await rtlConfig.read().once()
 
-      // update nodes to accommodate new config approach
       await rtlConfig.merge(effects, {
         nodes: config?.nodes.map((n, index) => {
           if (n.settings.lnServerUrl.includes('lnd.embassy')) {
