@@ -17,7 +17,7 @@ export const resetPassword = sdk.Action.withoutInput(
       name: hasPass ? 'Reset Password' : 'Create Password',
       description: hasPass ? `Reset ${desc}` : `Create ${desc}`,
       warning: null,
-      allowedStatuses: 'any',
+      allowedStatuses: 'only-stopped',
       group: null,
       visibility: 'enabled',
     }

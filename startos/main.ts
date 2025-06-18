@@ -20,7 +20,8 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
     readonly: false,
   })
 
-  const nodes = (await rtlConfig.read((c) => c.nodes).const(effects))!
+  const nodes = await rtlConfig.read((c) => c.nodes).const(effects)
+  if (!nodes) throw new Error('nodes not found in config file')
 
   if (hasInternal(nodes, 'lnd')) {
     mounts = mounts.mountDependency<typeof lndManifest>({
