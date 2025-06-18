@@ -4,17 +4,21 @@ import { rtlConfig } from '../file-models/RTL-Config.json'
 import { sdk } from '../sdk'
 
 export const monitorConfig = sdk.setupOnInit(async (effects) => {
-  const config = await rtlConfig
-    .read((c) => ({ multiPassHashed: c.multiPassHashed, nodes: c.nodes }))
+  const nodes = await rtlConfig
+    .read((c) => c.nodes)
     .const(effects)
 
-  if (!config?.multiPassHashed) {
+  const hash = await rtlConfig
+    .read((c) => c.multiPassHashed)
+    .once()
+
+  if (!hash) {
     await sdk.action.createOwnTask(effects, resetPassword, 'critical', {
       reason: 'Set your RTL password',
     })
   }
 
-  if (!config?.nodes.length) {
+  if (!nodes?.length) {
     await sdk.action.createOwnTask(effects, setNodes, 'critical', {
       reason: 'Choose which nodes RTL will manage',
     })
