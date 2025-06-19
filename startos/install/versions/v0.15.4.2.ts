@@ -11,7 +11,7 @@ export const v_0_15_4_2 = VersionInfo.of({
       const config = await rtlConfig.read().once()
 
       await rtlConfig.merge(effects, {
-        nodes: config?.nodes.map((n, index) => {
+        nodes: config?.nodes?.map((n, index) => {
           if (n.settings.lnServerUrl.includes('lnd.embassy')) {
             n.settings.lnServerUrl = 'https://lnd.startos:8080'
             n.lnNode = 'Internal-LND'
@@ -27,7 +27,7 @@ export const v_0_15_4_2 = VersionInfo.of({
           }
 
           return n
-        }),
+        }) || [],
       })
 
       await Promise.all([

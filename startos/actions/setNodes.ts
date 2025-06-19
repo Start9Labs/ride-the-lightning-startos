@@ -21,14 +21,14 @@ export const remoteNodes = Value.list(
             CLN: 'CLN',
           },
           default: 'LND',
-          immutable: true,
+          immutable: false,
         }),
         lnNode: Value.text({
           name: 'Node Name',
           description: 'Name of this node in the list',
           required: true,
           default: null,
-          immutable: true,
+          immutable: false,
           placeholder: 'Remote Node 1',
           patterns: [
             {
