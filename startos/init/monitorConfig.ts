@@ -5,7 +5,7 @@ import { sdk } from '../sdk'
 
 export const monitorConfig = sdk.setupOnInit(async (effects) => {
   const nodes = await rtlConfig
-    .read((c) => c.nodes)
+    .read((c) => c.nodes.length)
     .const(effects)
 
   const hash = await rtlConfig
@@ -18,7 +18,7 @@ export const monitorConfig = sdk.setupOnInit(async (effects) => {
     })
   }
 
-  if (!nodes?.length) {
+  if (!nodes) {
     await sdk.action.createOwnTask(effects, setNodes, 'critical', {
       reason: 'Choose which nodes RTL will manage',
     })
