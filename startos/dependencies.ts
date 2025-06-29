@@ -13,7 +13,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   if (hasInternal(nodes, 'lnd')) {
     deps.lnd = {
       kind: 'exists',
-      versionRange: '>=0.19.1-beta:1-alpha.0',
+      versionRange: '0.19.1-beta:1-alpha.2',
     }
   }
 
