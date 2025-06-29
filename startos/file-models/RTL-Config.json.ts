@@ -47,7 +47,7 @@ const shape = object({
 
 export const rtlConfig = FileHelper.json({
   volumeId: 'main',
-  subpath: '/RTL-Config.json'
+  subpath: 'RTL-Config.json'
 },
   shape,
 )
