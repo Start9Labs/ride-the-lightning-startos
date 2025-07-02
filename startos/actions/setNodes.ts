@@ -140,7 +140,7 @@ export const setNodes = sdk.Action.withInput(
           lnImplementation: 'LND',
           lnNode: 'Internal LND',
           authentication: {
-            macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet/`,
+            macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet`,
           },
           channelBackupPath,
           lnServerUrl: `https://lnd.startos:8080`,
