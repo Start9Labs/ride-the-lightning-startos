@@ -4,7 +4,7 @@ import { rtlConfig } from '../../file-models/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../../utils'
 
 export const v_0_15_4_2 = VersionInfo.of({
-  version: '0.15.4-beta:2-alpha.0',
+  version: '0.15.4-beta:2-alpha.1',
   releaseNotes: 'Updated for StartOS v0.4.0',
   migrations: {
     up: async ({ effects }) => {
