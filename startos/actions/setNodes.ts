@@ -67,15 +67,15 @@ export const remoteNodes = Value.list(
 )
 
 export const inputSpec = InputSpec.of({
-  internalLnd: Value.toggle({
-    name: 'LND (on StartOS)',
-    description: 'Connect RTL with you local LND node.',
-    default: false,
-  }),
-  internalCln: Value.toggle({
-    name: 'CLN (on StartOS)',
-    description: 'Connect RTL with your local CLN node.',
-    default: false,
+  internalNodes: Value.multiselect({
+    name: 'Internal Nodes',
+    description:
+      '- LND: Lightning Network Daemon from Lightning Labs\n- CLN: Core Lightning from Blockstream\n',
+    values: {
+      lnd: 'Lightning Network Daemon (LND)',
+      cln: 'Core Lightning (CLN)',
+    },
+    default: ['lnd'],
   }),
   remoteNodes,
 })
@@ -102,9 +102,12 @@ export const setNodes = sdk.Action.withInput(
     const nodes = await rtlConfig.read((c) => c.nodes).const(effects)
     if (!nodes) throw new Error('nodes not found in config file')
 
+    const configuredNodes: ('lnd' | 'cln')[] = []
+    if (hasInternal(nodes, 'lnd')) configuredNodes.push('lnd')
+    if (hasInternal(nodes, 'c-lightning')) configuredNodes.push('cln')
+
     return {
-      internalLnd: hasInternal(nodes, 'lnd'),
-      internalCln: hasInternal(nodes, 'c-lightning'),
+      internalNodes: configuredNodes,
       remoteNodes: await Promise.all(
         nodes
           .filter(
@@ -116,9 +119,12 @@ export const setNodes = sdk.Action.withInput(
             lnImplementation: n.lnImplementation,
             lnNode: n.lnNode,
             lnServerUrl: n.settings.lnServerUrl,
-            macaroon: await readFile(n.authentication.macaroonPath || n.authentication.runePath || '', {
-              encoding: 'base64',
-            }),
+            macaroon: await readFile(
+              n.authentication.macaroonPath || n.authentication.runePath || '',
+              {
+                encoding: 'base64',
+              },
+            ),
           })),
       ),
     }
@@ -130,7 +136,7 @@ export const setNodes = sdk.Action.withInput(
 
     const internalBackupPath = '/root/backup/Internal-'
 
-    if (input.internalLnd) {
+    if (input.internalNodes.includes('lnd')) {
       const channelBackupPath = `${internalBackupPath}LND`
       await mkdir(channelBackupPath, { recursive: true })
 
@@ -148,7 +154,7 @@ export const setNodes = sdk.Action.withInput(
       )
     }
 
-    if (input.internalCln) {
+    if (input.internalNodes.includes('cln')) {
       const channelBackupPath = `${internalBackupPath}CLN`
       await mkdir(channelBackupPath, { recursive: true })
 
@@ -158,10 +164,10 @@ export const setNodes = sdk.Action.withInput(
           lnImplementation: 'CLN',
           lnNode: 'Internal CLN',
           authentication: {
-            runePath: clnMountpoint, 
+            runePath: clnMountpoint,
           },
           channelBackupPath,
-          lnServerUrl: 'https://c-lightning.startos:3001',
+          lnServerUrl: 'https://c-lightning.startos:3010',
         }),
       )
     }
