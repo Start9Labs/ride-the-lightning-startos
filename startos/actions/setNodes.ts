@@ -164,7 +164,7 @@ export const setNodes = sdk.Action.withInput(
           lnImplementation: 'CLN',
           lnNode: 'Internal CLN',
           authentication: {
-            runePath: clnMountpoint,
+            runePath: `${clnMountpoint}/.commando-env`,
           },
           channelBackupPath,
           lnServerUrl: 'https://c-lightning.startos:3010',
