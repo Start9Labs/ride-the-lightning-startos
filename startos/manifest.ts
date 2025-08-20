@@ -1,4 +1,10 @@
 import { setupManifest } from '@start9labs/start-sdk'
+import { SDKImageInputSpec } from '@start9labs/start-sdk/base/lib/types/ManifestTypes'
+
+const BUILD = process.env.BUILD || ''
+
+const architectures =
+  BUILD === 'x86_64' || BUILD === 'aarch64' ? [BUILD] : ['x86_64', 'aarch64']
 
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
@@ -21,9 +27,12 @@ export const manifest = setupManifest({
       source: {
         dockerTag: 'shahanafarooqui/rtl:v0.15.5',
       },
-    },
+      arch: architectures,
+    } as SDKImageInputSpec,
   },
-  hardwareRequirements: {},
+  hardwareRequirements: {
+    arch: architectures,
+  },
   alerts: {
     install: null,
     update: null,
