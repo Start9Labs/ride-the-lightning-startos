@@ -4,9 +4,7 @@ import { rtlConfig } from '../file-models/RTL-Config.json'
 import { sdk } from '../sdk'
 
 export const monitorConfig = sdk.setupOnInit(async (effects) => {
-  const nodes = await rtlConfig
-    .read((c) => c.nodes.length)
-    .const(effects)
+  const nodes = await rtlConfig.read((c) => c.nodes.length).once()
 
   const hash = await rtlConfig.read((c) => c.multiPass).once()
 
