@@ -23,6 +23,7 @@ export const v_0_15_5_1 = VersionInfo.of({
               n.lnNode = 'Internal-CLN'
               n.index = 2
               n.authentication.runePath = clnMountpoint
+              n.lnImplementation = 'CLN'
             } else {
               n.index = index + 2
             }
