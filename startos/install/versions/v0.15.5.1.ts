@@ -15,14 +15,16 @@ export const v_0_15_5_1 = VersionInfo.of({
           config?.nodes?.map((n, index) => {
             if (n.settings.lnServerUrl.includes('lnd.embassy')) {
               n.settings.lnServerUrl = 'https://lnd.startos:8080'
-              n.lnNode = 'Internal-LND'
+              n.settings.channelBackupPath = '/root/backup/Internal-LND'
+              n.lnNode = 'Internal LND'
               n.index = 1
-              n.authentication.macaroonPath = lndMountpoint
+              n.authentication.macaroonPath = `${lndMountpoint}/data/chain/bitcoin/mainnet`
             } else if (n.settings.lnServerUrl.includes('c-lightning.embassy')) {
-              n.settings.lnServerUrl = 'https://c-lightning.startos:8080'
-              n.lnNode = 'Internal-CLN'
+              n.settings.lnServerUrl = 'https://c-lightning.startos:3010'
+              n.settings.channelBackupPath = '/root/backup/Internal-CLN'
+              n.lnNode = 'Internal CLN'
               n.index = 2
-              n.authentication.runePath = clnMountpoint
+              n.authentication.runePath = `${clnMountpoint}/.commando-env`
               n.lnImplementation = 'CLN'
             } else {
               n.index = index + 2
