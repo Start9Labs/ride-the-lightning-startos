@@ -8,9 +8,7 @@ export const monitorConfig = sdk.setupOnInit(async (effects) => {
     .read((c) => c.nodes.length)
     .const(effects)
 
-  const hash = await rtlConfig
-    .read((c) => c.multiPassHashed)
-    .once()
+  const hash = await rtlConfig.read((c) => c.multiPass).once()
 
   if (!hash) {
     await sdk.action.createOwnTask(effects, resetPassword, 'critical', {
