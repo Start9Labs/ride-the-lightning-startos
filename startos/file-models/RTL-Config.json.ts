@@ -23,7 +23,7 @@ const shape = object({
   nodes: array(
     object({
       index: natural,
-      lnImplementation: literals('LND', 'CLN'),
+      lnImplementation: literals('LND', 'CLN').onMismatch('CLN'),
       lnNode: string, // human readable name of the node
       authentication: object({
         macaroonPath: string.optional(),
