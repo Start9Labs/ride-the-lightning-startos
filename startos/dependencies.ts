@@ -13,14 +13,14 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   if (hasInternal(nodes, 'lnd')) {
     deps.lnd = {
       kind: 'exists',
-      versionRange: '>=0.19.1-beta:1-beta.1',
+      versionRange: '>=0.19.3-beta:1-beta.0',
     }
   }
 
   if (hasInternal(nodes, 'c-lightning')) {
     deps['c-lightning'] = {
       kind: 'exists',
-      versionRange: '>=25.5:1-alpha.1',
+      versionRange: '>=25.09:1-beta.0',
     }
   }
 
