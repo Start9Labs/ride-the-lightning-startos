@@ -20,7 +20,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   if (hasInternal(nodes, 'c-lightning')) {
     deps['c-lightning'] = {
       kind: 'exists',
-      versionRange: '>=25.09:1-beta.0',
+      versionRange: '>=25.9:1-beta.0',
     }
   }
 
