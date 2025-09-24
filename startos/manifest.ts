@@ -25,7 +25,7 @@ export const manifest = setupManifest({
   images: {
     rtl: {
       source: {
-        dockerTag: 'shahanafarooqui/rtl:v0.15.6',
+        dockerTag: 'shahanafarooqui/rtl:v0.15.5',
       },
       arch: architectures,
     } as SDKImageInputSpec,
