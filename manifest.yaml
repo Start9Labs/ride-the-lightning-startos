@@ -1,6 +1,6 @@
 id: ride-the-lightning
 title: Ride the Lightning
-version: 0.15.4.2
+version: 0.15.4.3
 release-notes: |
   * Bump LND max version
 license: MIT
@@ -76,7 +76,7 @@ interfaces:
       - http
 dependencies:
   lnd:
-    version: ">=0.13.4 <0.20.0"
+    version: ">=0.13.4 <0.21.0"
     description: Used to communicate with the Lightning Network.
     requirement:
       type: opt-in
