@@ -21,7 +21,8 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
     readonly: false,
   })
 
-  const nodes = await rtlConfig.read((c) => c.nodes).const(effects)
+  const config = await rtlConfig.read().const(effects)
+  const nodes = config?.nodes
   if (!nodes) {
     await sdk.action.createOwnTask(effects, setNodes, 'critical', {
       reason: 'Choose which nodes RTL will manage',

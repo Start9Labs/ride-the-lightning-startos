@@ -8,9 +8,8 @@ export const resetPassword = sdk.Action.withoutInput(
 
   // metadata
   async ({ effects }) => {
-    const hasPass = await rtlConfig
-      .read((s) => s.multiPassHashed)
-      .const(effects)
+    const config = await rtlConfig.read().const(effects)
+    const hasPass = config?.multiPassHashed
     const desc = 'your user interface password'
 
     return {
