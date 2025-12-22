@@ -1,10 +1,4 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { SDKImageInputSpec } from '@start9labs/start-sdk/base/lib/types/ManifestTypes'
-
-const BUILD = process.env.BUILD || ''
-
-const architectures =
-  BUILD === 'x86_64' || BUILD === 'aarch64' ? [BUILD] : ['x86_64', 'aarch64']
 
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
@@ -27,30 +21,24 @@ export const manifest = setupManifest({
       source: {
         dockerTag: 'shahanafarooqui/rtl:v0.15.5',
       },
-      arch: architectures,
-    } as SDKImageInputSpec,
-  },
-  hardwareRequirements: {
-    arch: architectures,
-  },
-  alerts: {
-    install: null,
-    update: null,
-    uninstall: null,
-    restore: null,
-    start: null,
-    stop: null,
+    },
   },
   dependencies: {
     'c-lightning': {
       description: 'Optionally connect RTL to your CLN node.',
       optional: true,
-      s9pk: 'https://github.com/Start9Labs/cln-startos/releases/download/v25.09.3.1-beta.0/c-lightning.s9pk',
+      metadata: {
+        title: 'Core Lightning',
+        icon: 'https://github.com/Start9Labs/cln-startos/blob/master/icon.png',
+      },
     },
     lnd: {
       description: 'Optionally connect RTL to your LND node.',
       optional: true,
-      s9pk: 'https://github.com/Start9Labs/lnd-startos/releases/download/v0.20.0-beta.1-beta.0/lnd.s9pk',
+      metadata: {
+        title: 'LND',
+        icon: 'https://github.com/Start9Labs/lnd-startos/blob/master/icon.png',
+      },
     },
   },
 })

@@ -1,10 +1,10 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
 import { rm } from 'fs/promises'
-import { rtlConfig } from '../../file-models/RTL-Config.json'
+import { rtlConfig } from '../../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../../utils'
 
-export const v_0_15_5_1 = VersionInfo.of({
-  version: '0.15.5-beta:1-alpha.0',
+export const v_0_15_6_0_a0 = VersionInfo.of({
+  version: '0.15.6:0-alpha.0',
   releaseNotes: 'Updated for StartOS v0.4.0',
   migrations: {
     up: async ({ effects }) => {
@@ -34,16 +34,15 @@ export const v_0_15_5_1 = VersionInfo.of({
           }) || [],
       })
 
-      await Promise.all([
-        rm('/media/startos/volumes/main/lnd-external', {
-          recursive: true,
-          force: true,
-        }),
-        rm('media/startos/volumes/main/start9', {
-          recursive: true,
-          force: true,
-        }),
-      ])
+      rm('/media/startos/volumes/main/lnd-external', {
+        recursive: true,
+        force: true,
+      }).catch(console.log)
+
+      rm('media/startos/volumes/main/start9', {
+        recursive: true,
+        force: true,
+      }).catch(console.log)
     },
     down: IMPOSSIBLE,
   },

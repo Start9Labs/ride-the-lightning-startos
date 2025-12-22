@@ -1,6 +1,6 @@
 import { utils } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-import { rtlConfig } from '../file-models/RTL-Config.json'
+import { rtlConfig } from '../fileModels/RTL-Config.json'
 
 export const resetPassword = sdk.Action.withoutInput(
   // id

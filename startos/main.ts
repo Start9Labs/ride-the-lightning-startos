@@ -1,18 +1,15 @@
 import { sdk } from './sdk'
-import { rtlConfig } from './file-models/RTL-Config.json'
+import { rtlConfig } from './fileModels/RTL-Config.json'
 import { clnMountpoint, hasInternal, lndMountpoint, uiPort } from './utils'
 import { manifest as lndManifest } from 'lnd-startos/startos/manifest'
 import { manifest as clnManifest } from 'cln-startos/startos/manifest'
 import { setNodes } from './actions/setNodes'
 
-export const main = sdk.setupMain(async ({ effects, started }) => {
+export const main = sdk.setupMain(async ({ effects }) => {
   /**
    * ======================== Setup ========================
    */
   console.info('Starting Ride The Lightning...')
-
-  const depResult = await sdk.checkDependencies(effects)
-  depResult.throwIfNotSatisfied()
 
   let mounts = sdk.Mounts.of().mountVolume({
     volumeId: 'main',
@@ -53,7 +50,7 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
   /**
    * ======================== Daemons ========================
    */
-  return sdk.Daemons.of(effects, started).addDaemon('primary', {
+  return sdk.Daemons.of(effects).addDaemon('primary', {
     subcontainer: await sdk.SubContainer.of(
       effects,
       { imageId: 'rtl' },

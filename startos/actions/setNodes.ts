@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'fs/promises'
-import { rtlConfig } from '../file-models/RTL-Config.json'
+import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { sdk } from '../sdk'
 import { clnMountpoint, Config, hasInternal, lndMountpoint } from '../utils'
 const { InputSpec, Value, List } = sdk

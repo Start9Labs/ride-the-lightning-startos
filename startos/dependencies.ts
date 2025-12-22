@@ -1,5 +1,5 @@
 import { T } from '@start9labs/start-sdk'
-import { rtlConfig } from './file-models/RTL-Config.json'
+import { rtlConfig } from './fileModels/RTL-Config.json'
 import { sdk } from './sdk'
 import { hasInternal } from './utils'
 import { manifest } from './manifest'
