@@ -4,6 +4,7 @@ import { clnMountpoint, hasInternal, lndMountpoint, uiPort } from './utils'
 import { manifest as lndManifest } from 'lnd-startos/startos/manifest'
 import { manifest as clnManifest } from 'cln-startos/startos/manifest'
 import { setNodes } from './actions/setNodes'
+import { i18n } from './i18n'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   /**
@@ -22,9 +23,9 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const nodes = config?.nodes
   if (!nodes) {
     await sdk.action.createOwnTask(effects, setNodes, 'critical', {
-      reason: 'Choose which nodes RTL will manage',
+      reason: i18n('Choose which nodes RTL will manage'),
     })
-    throw new Error('nodes not found in config file')
+    throw new Error(i18n('nodes not found in config file'))
   }
 
   if (hasInternal(nodes, 'lnd')) {
@@ -58,17 +59,18 @@ export const main = sdk.setupMain(async ({ effects }) => {
       'rtl-sub',
     ),
     exec: {
-      command: ['node', 'rtl'],
+      command: sdk.useEntrypoint(),
+      runAsInit: true,
       env: {
         RTL_CONFIG_PATH: '/root',
       },
     },
     ready: {
-      display: 'Web Interface',
+      display: i18n('Web Interface'),
       fn: () =>
         sdk.healthCheck.checkPortListening(effects, uiPort, {
-          successMessage: 'The web interface is ready',
-          errorMessage: 'The web interface is not ready',
+          successMessage: i18n('The web interface is ready'),
+          errorMessage: i18n('The web interface is not ready'),
         }),
     },
     requires: [],

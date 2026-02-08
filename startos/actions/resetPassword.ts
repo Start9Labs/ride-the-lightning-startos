@@ -10,12 +10,11 @@ export const resetPassword = sdk.Action.withoutInput(
   async ({ effects }) => {
     const config = await rtlConfig.read().const(effects)
     const hasPass = config?.multiPassHashed
-    const desc = 'your user interface password'
 
     return {
       name: hasPass ? 'Reset Password' : 'Create Password',
-      description: hasPass ? `Reset ${desc}` : `Create ${desc}`,
-      warning: null,
+      description: hasPass ? 'Reset your user interface password' : 'Create your user interface password',
+      warning: 'Create new password?',
       allowedStatuses: 'any',
       group: null,
       visibility: 'enabled',

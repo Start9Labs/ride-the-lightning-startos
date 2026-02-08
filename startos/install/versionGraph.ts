@@ -7,6 +7,6 @@ export const versionGraph = VersionGraph.of({
   current,
   other,
   preInstall: async (effects) => {
-    await rtlConfig.write(effects, configDefaults)
+    await rtlConfig.merge(effects, configDefaults)
   },
 })

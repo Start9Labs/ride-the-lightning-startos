@@ -1,5 +1,6 @@
 import { matches, FileHelper } from '@start9labs/start-sdk'
 import { configDefaults } from '../utils'
+import { sdk } from '../sdk'
 
 const { object, array, string, natural, oneOf, literal, literals } = matches
 
@@ -46,7 +47,7 @@ const shape = object({
 })
 
 export const rtlConfig = FileHelper.json({
-  volumeId: 'main',
+  base: sdk.volumes.main,
   subpath: 'RTL-Config.json'
 },
   shape,

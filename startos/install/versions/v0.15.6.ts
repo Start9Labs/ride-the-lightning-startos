@@ -3,7 +3,7 @@ import { rm } from 'fs/promises'
 import { rtlConfig } from '../../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../../utils'
 
-export const v_0_15_6_0_a0 = VersionInfo.of({
+export const v_0_15_6 = VersionInfo.of({
   version: '0.15.6:0-alpha.0',
   releaseNotes: 'Updated for StartOS v0.4.0',
   migrations: {
