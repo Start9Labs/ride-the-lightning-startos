@@ -1,4 +1,5 @@
 import { setupManifest } from '@start9labs/start-sdk'
+import { short, long } from './i18n'
 
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
@@ -9,17 +10,13 @@ export const manifest = setupManifest({
   supportSite: 'https://github.com/Ride-The-Lightning/RTL/issues',
   marketingSite: 'https://ridethelightning.info/',
   donationUrl: 'https://ridethelightning.info/donate/',
-  docsUrl:
-    'https://github.com/Start9Labs/ride-the-lightning-startos/instructions.md',
-  description: {
-    short: 'A web user interface for managing lightning nodes',
-    long: 'A full function, device agnostic, web user interface for managing lightning nodes. RTL connects directly to your StartOS LND and/or CLN node and is accessible from any browser.',
-  },
+  docsUrl: 'https://github.com/Ride-The-Lightning/RTL/wiki',
+  description: { short, long },
   volumes: ['main'],
   images: {
     rtl: {
       source: {
-        dockerTag: 'shahanafarooqui/rtl:v0.15.5',
+        dockerTag: 'shahanafarooqui/rtl:v0.15.8',
       },
     },
   },

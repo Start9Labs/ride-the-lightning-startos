@@ -1,9 +1,11 @@
 import { matches, FileHelper } from '@start9labs/start-sdk'
 import { configDefaults } from '../utils'
+import { sdk } from '../sdk'
 
 const { object, array, string, natural, oneOf, literal, literals } = matches
 
-const { host, port, multiPass, multiPassHashed, secret2fa, SSO } = configDefaults
+const { host, port, multiPass, multiPassHashed, secret2fa, SSO } =
+  configDefaults
 
 const { logoutRedirectLink, rtlCookiePath, rtlSSO } = SSO
 
@@ -27,17 +29,11 @@ const shape = object({
       lnNode: string, // human readable name of the node
       authentication: object({
         macaroonPath: string.optional(),
-        runePath: string.optional()
+        runePath: string.optional(),
       }),
       settings: object({
         themeMode: literals('DAY', 'NIGHT'),
-        themeColor: literals(
-          'PURPLE',
-          'TEAL',
-          'INDIGO',
-          'PINK',
-          'YELLOW',
-        ),
+        themeColor: literals('PURPLE', 'TEAL', 'INDIGO', 'PINK', 'YELLOW'),
         channelBackupPath: string,
         lnServerUrl: string,
       }),
@@ -45,9 +41,10 @@ const shape = object({
   ),
 })
 
-export const rtlConfig = FileHelper.json({
-  volumeId: 'main',
-  subpath: 'RTL-Config.json'
-},
+export const rtlConfig = FileHelper.json(
+  {
+    base: sdk.volumes.main,
+    subpath: 'RTL-Config.json',
+  },
   shape,
 )
