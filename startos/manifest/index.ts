@@ -26,7 +26,7 @@ export const manifest = setupManifest({
       optional: true,
       metadata: {
         title: 'Core Lightning',
-        icon: 'https://github.com/Start9Labs/cln-startos/blob/master/icon.png',
+        icon: 'https://github.com/Start9Labs/cln-startos/blob/master/icon.png?raw=true',
       },
     },
     lnd: {
@@ -34,7 +34,7 @@ export const manifest = setupManifest({
       optional: true,
       metadata: {
         title: 'LND',
-        icon: 'https://github.com/Start9Labs/lnd-startos/blob/master/icon.png',
+        icon: 'https://github.com/Start9Labs/lnd-startos/blob/master/icon.png?raw=true',
       },
     },
   },
