@@ -1,7 +1,8 @@
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { sdk } from '../sdk'
-import { clnMountpoint, Config, hasInternal, lndMountpoint } from '../utils'
+import { RtlConfig } from '../fileModels/RTL-Config.json'
+import { clnMountpoint, hasInternal, lndMountpoint } from '../utils'
 const { InputSpec, Value, List } = sdk
 
 export const remoteNodes = Value.list(
@@ -132,7 +133,7 @@ export const setNodes = sdk.Action.withInput(
 
   // the execution function
   async ({ effects, input }) => {
-    let nodes: Config['nodes'] = []
+    let nodes: RtlConfig['nodes'] = []
 
     const internalBackupPath = '/root/backup/Internal-'
 
@@ -233,11 +234,11 @@ async function toRtlNode({
   index: number
   lnImplementation: 'LND' | 'CLN'
   lnNode: string
-  authentication: Config['nodes'][0]['authentication']
+  authentication: RtlConfig['nodes'][0]['authentication']
   channelBackupPath: string
   lnServerUrl: string
-  settings?: Config['nodes'][0]['settings']
-}): Promise<Config['nodes'][0]> {
+  settings?: RtlConfig['nodes'][0]['settings']
+}): Promise<RtlConfig['nodes'][0]> {
   return {
     index,
     lnImplementation,

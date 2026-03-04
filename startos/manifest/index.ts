@@ -1,16 +1,15 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { short, long } from './i18n'
+import { short, long, depClnDescription, depLndDescription } from './i18n'
 
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
   title: 'Ride The Lightning',
   license: 'mit',
-  wrapperRepo: 'https://github.com/Start9Labs/ride-the-lightning-startos',
+  packageRepo: 'https://github.com/Start9Labs/ride-the-lightning-startos/tree/update/040',
   upstreamRepo: 'https://github.com/Ride-The-Lightning/RTL',
-  supportSite: 'https://github.com/Ride-The-Lightning/RTL/issues',
-  marketingSite: 'https://ridethelightning.info/',
+  marketingUrl: 'https://ridethelightning.info/',
   donationUrl: 'https://ridethelightning.info/donate/',
-  docsUrl: 'https://github.com/Ride-The-Lightning/RTL/wiki',
+  docsUrls: ['https://github.com/Ride-The-Lightning/RTL/wiki'],
   description: { short, long },
   volumes: ['main'],
   images: {
@@ -22,19 +21,19 @@ export const manifest = setupManifest({
   },
   dependencies: {
     'c-lightning': {
-      description: 'Optionally connect RTL to your CLN node.',
+      description: depClnDescription,
       optional: true,
       metadata: {
         title: 'Core Lightning',
-        icon: 'https://github.com/Start9Labs/cln-startos/blob/master/icon.png?raw=true',
+        icon: 'https://raw.githubusercontent.com/Start9Labs/cln-startos/71b2d1eb78e2d31cc4d62a410512422d39e856e9/icon.svg',
       },
     },
     lnd: {
-      description: 'Optionally connect RTL to your LND node.',
+      description: depLndDescription,
       optional: true,
       metadata: {
         title: 'LND',
-        icon: 'https://github.com/Start9Labs/lnd-startos/blob/master/icon.png?raw=true',
+        icon: 'https://raw.githubusercontent.com/Start9Labs/lnd-startos/6a24e93761aa9046d427d0e62021defcaf9b47f3/icon.svg',
       },
     },
   },

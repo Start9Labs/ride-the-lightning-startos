@@ -3,12 +3,8 @@ import { rtlConfig } from './fileModels/RTL-Config.json'
 import { clnMountpoint, hasInternal, lndMountpoint, uiPort } from './utils'
 import { manifest as lndManifest } from 'lnd-startos/startos/manifest'
 import { manifest as clnManifest } from 'cln-startos/startos/manifest'
-import { setNodes } from './actions/setNodes'
 
 export const main = sdk.setupMain(async ({ effects }) => {
-  /**
-   * ======================== Setup ========================
-   */
   console.info('Starting Ride The Lightning...')
 
   let mounts = sdk.Mounts.of().mountVolume({
@@ -20,11 +16,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
   const config = await rtlConfig.read().const(effects)
   const nodes = config?.nodes
-  if (!nodes) {
-    await sdk.action.createOwnTask(effects, setNodes, 'critical', {
-      reason: 'Choose which nodes RTL will manage',
-    })
-    throw new Error('nodes not found in config file')
+  if (!nodes?.length) {
+    throw new Error('No nodes configured. Run the "Set Nodes" action first.')
   }
 
   if (hasInternal(nodes, 'lnd')) {

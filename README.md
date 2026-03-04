@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.png" alt="Ride The Lightning Logo" width="21%">
+  <img src="icon.svg" alt="Ride The Lightning Logo" width="21%">
 </p>
 
 # Ride The Lightning on StartOS
@@ -7,7 +7,7 @@
 > **Upstream docs:** <https://github.com/Ride-The-Lightning/RTL/wiki>
 >
 > Everything not listed in this document should behave the same as upstream
-> RTL v0.15.5. If a feature, setting, or behavior is not mentioned
+> RTL. If a feature, setting, or behavior is not mentioned
 > here, the upstream documentation is accurate and fully applicable.
 
 [Ride The Lightning](https://github.com/Ride-The-Lightning/RTL) is a full-function, device-agnostic web user interface for managing Lightning nodes. RTL connects directly to your StartOS LND and/or CLN node and is accessible from any browser.
@@ -36,7 +36,7 @@
 
 | Property | Value |
 |----------|-------|
-| Image | `shahanafarooqui/rtl:v0.15.5` (upstream unmodified) |
+| Image | `shahanafarooqui/rtl:v0.15.8` (upstream unmodified) |
 | Architectures | x86_64, aarch64 |
 | Command | `node rtl` |
 
@@ -221,8 +221,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 
 ```yaml
 package_id: ride-the-lightning
-upstream_version: 0.15.5
-image: shahanafarooqui/rtl:v0.15.5
+upstream_version: 0.15.8
+image: shahanafarooqui/rtl:v0.15.8
 architectures: [x86_64, aarch64]
 volumes:
   main: /root

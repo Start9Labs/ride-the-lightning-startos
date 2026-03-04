@@ -6,6 +6,22 @@ export const short = {
   fr_FR: 'Une interface web pour gérer les nœuds Lightning',
 }
 
+export const depClnDescription = {
+  en_US: 'Optionally connect RTL to your CLN node.',
+  es_ES: 'Conectar opcionalmente RTL a su nodo CLN.',
+  de_DE: 'Verbinden Sie RTL optional mit Ihrem CLN-Knoten.',
+  pl_PL: 'Opcjonalnie połącz RTL z węzłem CLN.',
+  fr_FR: 'Connectez optionnellement RTL à votre nœud CLN.',
+}
+
+export const depLndDescription = {
+  en_US: 'Optionally connect RTL to your LND node.',
+  es_ES: 'Conectar opcionalmente RTL a su nodo LND.',
+  de_DE: 'Verbinden Sie RTL optional mit Ihrem LND-Knoten.',
+  pl_PL: 'Opcjonalnie połącz RTL z węzłem LND.',
+  fr_FR: 'Connectez optionnellement RTL à votre nœud LND.',
+}
+
 export const long = {
   en_US:
     'A full function, device agnostic, web user interface for managing lightning nodes. RTL connects directly to your StartOS LND and/or CLN node and is accessible from any browser.',
