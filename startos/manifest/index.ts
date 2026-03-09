@@ -1,15 +1,16 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { short, long, depClnDescription, depLndDescription } from './i18n'
+import { depClnDescription, depLndDescription, long, short } from './i18n'
 
 export const manifest = setupManifest({
   id: 'ride-the-lightning',
   title: 'Ride The Lightning',
   license: 'mit',
-  packageRepo: 'https://github.com/Start9Labs/ride-the-lightning-startos/tree/update/040',
+  packageRepo:
+    'https://github.com/Start9Labs/ride-the-lightning-startos/tree/update/040',
   upstreamRepo: 'https://github.com/Ride-The-Lightning/RTL',
   marketingUrl: 'https://ridethelightning.info/',
   donationUrl: 'https://ridethelightning.info/donate/',
-  docsUrls: ['https://github.com/Ride-The-Lightning/RTL/wiki'],
+  docsUrls: ['https://github.com/Ride-The-Lightning/RTL'],
   description: { short, long },
   volumes: ['main'],
   images: {
