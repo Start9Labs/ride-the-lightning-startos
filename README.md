@@ -4,7 +4,7 @@
 
 # Ride The Lightning on StartOS
 
-> **Upstream docs:** <https://github.com/Ride-The-Lightning/RTL/wiki>
+> **Upstream docs:** <https://github.com/Ride-The-Lightning/RTL>
 >
 > Everything not listed in this document should behave the same as upstream
 > RTL. If a feature, setting, or behavior is not mentioned

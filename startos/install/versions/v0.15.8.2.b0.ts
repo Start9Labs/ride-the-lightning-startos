@@ -3,8 +3,8 @@ import { readFile, rm } from 'fs/promises'
 import { rtlConfig } from '../../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../../utils'
 
-export const v_0_15_8_1_b0 = VersionInfo.of({
-  version: '0.15.8:1-beta.0',
+export const v_0_15_8_2_b0 = VersionInfo.of({
+  version: '0.15.8:2-beta.0',
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
     up: async ({ effects }) => {
