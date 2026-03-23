@@ -36,7 +36,7 @@
 
 | Property | Value |
 |----------|-------|
-| Image | `shahanafarooqui/rtl:v0.15.8` (upstream unmodified) |
+| Image | `shahanafarooqui/rtl` (upstream unmodified) |
 | Architectures | x86_64, aarch64 |
 | Command | `node rtl` |
 
@@ -156,10 +156,10 @@ Generates a random 22-character password. The result is displayed once (masked, 
 
 ## Dependencies
 
-| Dependency | Required | Version | Purpose |
-|------------|----------|---------|---------|
-| LND | Optional | >=0.19.3-beta | Lightning node management |
-| Core Lightning | Optional | >=25.9 | Lightning node management |
+| Dependency | Required | Purpose |
+|------------|----------|---------|
+| LND | Optional | Lightning node management |
+| Core Lightning | Optional | Lightning node management |
 
 Dependencies are dynamically resolved based on which internal nodes are configured. At least one Lightning node (internal or remote) is needed for RTL to be useful.
 
@@ -221,8 +221,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 
 ```yaml
 package_id: ride-the-lightning
-upstream_version: 0.15.8
-image: shahanafarooqui/rtl:v0.15.8
+image: shahanafarooqui/rtl
 architectures: [x86_64, aarch64]
 volumes:
   main: /root
@@ -231,10 +230,8 @@ ports:
 dependencies:
   lnd:
     required: false
-    min_version: ">=0.19.3-beta"
   c-lightning:
     required: false
-    min_version: ">=25.9"
 actions:
   - set-nodes (enabled, any)
   - reset-password (enabled, any)

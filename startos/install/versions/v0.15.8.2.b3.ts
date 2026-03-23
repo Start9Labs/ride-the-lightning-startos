@@ -3,9 +3,15 @@ import { readFile, rm } from 'fs/promises'
 import { rtlConfig } from '../../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../../utils'
 
-export const v_0_15_8_2_b2 = VersionInfo.of({
-  version: '0.15.8:2-beta.2',
-  releaseNotes: 'Revamped for StartOS 0.4.0',
+export const v_0_15_8_2_b3 = VersionInfo.of({
+  version: '0.15.8:2-beta.3',
+  releaseNotes: {
+    en_US: 'Update to StartOS SDK beta.65',
+    es_ES: 'Actualización a StartOS SDK beta.65',
+    de_DE: 'Update auf StartOS SDK beta.65',
+    pl_PL: 'Aktualizacja do StartOS SDK beta.65',
+    fr_FR: 'Mise à jour vers StartOS SDK beta.65',
+  },
   migrations: {
     up: async ({ effects }) => {
       // 0.3.5.1 migration: migrate .embassy URLs to .startos
