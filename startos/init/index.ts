@@ -8,9 +8,9 @@ import { actions } from '../actions'
 import { restoreInit } from '../backups'
 
 export const init = sdk.setupInit(
-  seedFiles,
   restoreInit,
   versionGraph,
+  seedFiles,
   setInterfaces,
   setDependencies,
   actions,
