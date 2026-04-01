@@ -156,12 +156,27 @@ Generates a random 22-character password. The result is displayed once (masked, 
 
 ## Dependencies
 
-| Dependency | Required | Purpose |
-|------------|----------|---------|
-| LND | Optional | Lightning node management |
-| Core Lightning | Optional | Lightning node management |
+Dependencies are dynamically resolved based on which internal nodes are selected in the "Set Nodes" action. At least one Lightning node (internal or remote) is needed for RTL to be useful.
 
-Dependencies are dynamically resolved based on which internal nodes are configured. At least one Lightning node (internal or remote) is needed for RTL to be useful.
+### LND (`lnd`)
+
+| Property | Value |
+|----------|-------|
+| **Required** | Optional |
+| **Version constraint** | `>=0.20.1-beta` |
+| **Health checks** | `lnd` must pass |
+| **Mounted volumes** | `lnd:main` at `/mnt/lnd` (read-only) — for macaroon and TLS credentials |
+| **Purpose** | Lightning node management via LND REST API |
+
+### Core Lightning (`c-lightning`)
+
+| Property | Value |
+|----------|-------|
+| **Required** | Optional |
+| **Version constraint** | `>=25.12.1` |
+| **Health checks** | `lightningd` must pass |
+| **Mounted volumes** | `c-lightning:main` at `/mnt/cln` (read-only) — for credentials |
+| **Purpose** | Lightning node management via CLN REST API |
 
 ---
 
@@ -183,7 +198,7 @@ Dependencies are dynamically resolved based on which internal nodes are configur
 
 | Check | Display Name | Method | Messages |
 |-------|--------------|--------|----------|
-| Web UI | Web Interface | Port 80 listening | Ready / Not ready |
+| Web UI | "Web Interface" | Port 80 listening | "The web interface is ready" / "The web interface is not ready" |
 
 ---
 
@@ -222,29 +237,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 ```yaml
 package_id: ride-the-lightning
 image: shahanafarooqui/rtl
-architectures: [x86_64, aarch64]
+architectures:
+  - x86_64
+  - aarch64
 volumes:
   main: /root
 ports:
   ui: 80
 dependencies:
-  lnd:
-    required: false
-  c-lightning:
-    required: false
+  - lnd (optional)
+  - c-lightning (optional)
+startos_managed_env_vars:
+  - RTL_CONFIG_PATH
 actions:
-  - set-nodes (enabled, any)
-  - reset-password (enabled, any)
-health_checks:
-  - webui: port_listening 80
-backup_volumes:
-  - main
-startos_managed_config:
-  host: 0.0.0.0
-  port: 80
-  RTL_CONFIG_PATH: /root
-  SSO.rtlSSO: 0
-not_available:
-  - Single sign-on (SSO)
-  - Config file editing (managed via actions)
+  - set-nodes
+  - reset-password
 ```
