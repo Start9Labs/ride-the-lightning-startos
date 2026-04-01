@@ -13,7 +13,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   if (hasInternal(nodes, 'lnd')) {
     deps.lnd = {
       kind: 'running',
-      versionRange: '>=0.20.1-beta:1-beta.3',
+      versionRange: '>=0.20.1-beta:1',
       healthChecks: ['lnd'],
     }
   }
@@ -21,7 +21,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   if (hasInternal(nodes, 'c-lightning')) {
     deps['c-lightning'] = {
       kind: 'running',
-      versionRange: '>=25.12.1:4-beta.5',
+      versionRange: '>=25.12.1:4',
       healthChecks: ['lightningd'],
     }
   }
