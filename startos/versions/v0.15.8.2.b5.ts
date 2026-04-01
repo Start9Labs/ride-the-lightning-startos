@@ -1,10 +1,10 @@
-import { VersionInfo, IMPOSSIBLE, YAML } from '@start9labs/start-sdk'
+import { IMPOSSIBLE, VersionInfo, YAML } from '@start9labs/start-sdk'
 import { readFile, rm } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../utils'
 
-export const v_0_15_8_2_b4 = VersionInfo.of({
-  version: '0.15.8:2-beta.4',
+export const v_0_15_8_2_b5 = VersionInfo.of({
+  version: '0.15.8:2-beta.5',
   releaseNotes: {
     en_US: 'Update to StartOS SDK beta.65',
     es_ES: 'Actualización a StartOS SDK beta.65',

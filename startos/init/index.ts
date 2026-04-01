@@ -1,6 +1,6 @@
 import { sdk } from '../sdk'
 import { seedFiles } from './seedFiles'
-import { taskSetNodes } from './taskSetNodes'
+import { taskInit } from './taskSetNodes'
 import { setDependencies } from '../dependencies'
 import { setInterfaces } from '../interfaces'
 import { versionGraph } from '../versions'
@@ -14,7 +14,7 @@ export const init = sdk.setupInit(
   setInterfaces,
   setDependencies,
   actions,
-  taskSetNodes,
+  taskInit,
 )
 
 export const uninit = sdk.setupUninit(versionGraph)
