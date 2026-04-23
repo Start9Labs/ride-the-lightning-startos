@@ -5,6 +5,21 @@ import { RtlConfig } from '../fileModels/RTL-Config.json'
 import { clnMountpoint, hasInternal, lndMountpoint } from '../utils'
 const { InputSpec, Value, List } = sdk
 
+// Persistent package data volume. RTL's subcontainer bind-mounts it at /root
+// (see main.ts), so paths stored in RTL-Config.json use that form. The action
+// runtime (where this code executes) is a *different* filesystem context where
+// the same volume is reachable at /media/startos/volumes/main. Any disk
+// operation from inside this action must translate /root/... to the action-
+// runtime-visible path; otherwise writes land in an overlay filesystem that
+// RTL never sees, leaving the node entry in the config but no macaroon file
+// where RTL can read it.
+const VOLUME_ROOT_RTL = '/root'
+const VOLUME_ROOT_DISK = '/media/startos/volumes/main'
+const toDisk = (rtlPath: string): string =>
+  rtlPath.startsWith(`${VOLUME_ROOT_RTL}/`)
+    ? `${VOLUME_ROOT_DISK}${rtlPath.slice(VOLUME_ROOT_RTL.length)}`
+    : rtlPath
+
 export const remoteNodes = Value.list(
   List.obj(
     {
@@ -121,7 +136,7 @@ export const setNodes = sdk.Action.withInput(
               n.authentication.macaroonPath || n.authentication.runePath || ''
             const credFile =
               n.lnImplementation === 'LND' ? 'admin.macaroon' : 'access.macaroon'
-            const raw = await readFile(`${credDir}/${credFile}`)
+            const raw = await readFile(`${toDisk(credDir)}/${credFile}`)
             const macaroon = raw
               .toString('base64')
               .replace(/\+/g, '-')
@@ -145,7 +160,7 @@ export const setNodes = sdk.Action.withInput(
 
     if (input.internalNodes.includes('lnd')) {
       const channelBackupPath = `${internalBackupPath}LND`
-      await mkdir(channelBackupPath, { recursive: true })
+      await mkdir(toDisk(channelBackupPath), { recursive: true })
 
       nodes.push(
         await toRtlNode({
@@ -163,7 +178,7 @@ export const setNodes = sdk.Action.withInput(
 
     if (input.internalNodes.includes('cln')) {
       const channelBackupPath = `${internalBackupPath}CLN`
-      await mkdir(channelBackupPath, { recursive: true })
+      await mkdir(toDisk(channelBackupPath), { recursive: true })
 
       nodes.push(
         await toRtlNode({
@@ -189,15 +204,17 @@ export const setNodes = sdk.Action.withInput(
 
         // macaroon: decode base64url string from the form back to raw binary
         // bytes before persisting. Upstream RTL expects the on-disk file to be
-        // raw macaroon bytes; writing the ASCII base64url text would fail auth.
+        // raw macaroon bytes; writing the ASCII base64url text would fail
+        // auth. Write to the action-runtime-visible path so the bytes land in
+        // the persistent data volume that RTL's subcontainer sees at /root.
         const credentialPath = `/root/remote-macaroons/${hyphenatedName}`
-        await mkdir(credentialPath, { recursive: true })
+        await mkdir(toDisk(credentialPath), { recursive: true })
         const macaroonBytes = Buffer.from(
           macaroon.replace(/-/g, '+').replace(/_/g, '/'),
           'base64',
         )
         await writeFile(
-          `${credentialPath}/${
+          `${toDisk(credentialPath)}/${
             lnImplementation === 'LND' ? 'admin' : 'access'
           }.macaroon`,
           macaroonBytes,
@@ -205,7 +222,7 @@ export const setNodes = sdk.Action.withInput(
 
         // backup
         const channelBackupPath = `/root/backup/${hyphenatedName}`
-        await mkdir(channelBackupPath, { recursive: true })
+        await mkdir(toDisk(channelBackupPath), { recursive: true })
 
         const savedNode = config.nodes.find((n) => n.lnNode === lnNode)
 
