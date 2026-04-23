@@ -116,17 +116,23 @@ export const setNodes = sdk.Action.withInput(
               !n.settings.lnServerUrl.includes('lnd.startos') &&
               !n.settings.lnServerUrl.includes('c-lightning.startos'),
           )
-          .map(async (n) => ({
-            lnImplementation: n.lnImplementation,
-            lnNode: n.lnNode,
-            lnServerUrl: n.settings.lnServerUrl,
-            macaroon: await readFile(
-              n.authentication.macaroonPath || n.authentication.runePath || '',
-              {
-                encoding: 'base64',
-              },
-            ),
-          })),
+          .map(async (n) => {
+            const credDir =
+              n.authentication.macaroonPath || n.authentication.runePath || ''
+            const credFile =
+              n.lnImplementation === 'LND' ? 'admin.macaroon' : 'access.macaroon'
+            const raw = await readFile(`${credDir}/${credFile}`)
+            const macaroon = raw
+              .toString('base64')
+              .replace(/\+/g, '-')
+              .replace(/\//g, '_')
+            return {
+              lnImplementation: n.lnImplementation,
+              lnNode: n.lnNode,
+              lnServerUrl: n.settings.lnServerUrl,
+              macaroon,
+            }
+          }),
       ),
     }
   },
@@ -181,14 +187,20 @@ export const setNodes = sdk.Action.withInput(
         const { lnImplementation, lnNode, lnServerUrl, macaroon } = node
         const hyphenatedName = lnNode.replace(/\s+/g, '-')
 
-        // macaroon
+        // macaroon: decode base64url string from the form back to raw binary
+        // bytes before persisting. Upstream RTL expects the on-disk file to be
+        // raw macaroon bytes; writing the ASCII base64url text would fail auth.
         const credentialPath = `/root/remote-macaroons/${hyphenatedName}`
         await mkdir(credentialPath, { recursive: true })
+        const macaroonBytes = Buffer.from(
+          macaroon.replace(/-/g, '+').replace(/_/g, '/'),
+          'base64',
+        )
         await writeFile(
           `${credentialPath}/${
             lnImplementation === 'LND' ? 'admin' : 'access'
           }.macaroon`,
-          macaroon,
+          macaroonBytes,
         )
 
         // backup
