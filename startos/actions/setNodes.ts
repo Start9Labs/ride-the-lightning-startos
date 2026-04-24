@@ -136,11 +136,9 @@ export const setNodes = sdk.Action.withInput(
               n.authentication.macaroonPath || n.authentication.runePath || ''
             const credFile =
               n.lnImplementation === 'LND' ? 'admin.macaroon' : 'access.macaroon'
-            const raw = await readFile(`${toDisk(credDir)}/${credFile}`)
-            const macaroon = raw
-              .toString('base64')
-              .replace(/\+/g, '-')
-              .replace(/\//g, '_')
+            const macaroon = (
+              await readFile(`${toDisk(credDir)}/${credFile}`)
+            ).toString('base64url')
             return {
               lnImplementation: n.lnImplementation,
               lnNode: n.lnNode,
@@ -209,15 +207,11 @@ export const setNodes = sdk.Action.withInput(
         // the persistent data volume that RTL's subcontainer sees at /root.
         const credentialPath = `/root/remote-macaroons/${hyphenatedName}`
         await mkdir(toDisk(credentialPath), { recursive: true })
-        const macaroonBytes = Buffer.from(
-          macaroon.replace(/-/g, '+').replace(/_/g, '/'),
-          'base64',
-        )
         await writeFile(
           `${toDisk(credentialPath)}/${
             lnImplementation === 'LND' ? 'admin' : 'access'
           }.macaroon`,
-          macaroonBytes,
+          Buffer.from(macaroon, 'base64url'),
         )
 
         // backup
