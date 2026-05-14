@@ -10,7 +10,6 @@ export const manifest = setupManifest({
   upstreamRepo: 'https://github.com/Ride-The-Lightning/RTL',
   marketingUrl: 'https://ridethelightning.info/',
   donationUrl: 'https://ridethelightning.info/donate/',
-  docsUrls: ['https://github.com/Ride-The-Lightning/RTL'],
   description: { short, long },
   volumes: ['main'],
   images: {
