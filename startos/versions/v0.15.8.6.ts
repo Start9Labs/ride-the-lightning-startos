@@ -3,14 +3,14 @@ import { readFile, rm } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../utils'
 
-export const v_0_15_8_5 = VersionInfo.of({
-  version: '0.15.8:5',
+export const v_0_15_8_6 = VersionInfo.of({
+  version: '0.15.8:6',
   releaseNotes: {
-    en_US: 'Internal updates (start-sdk 1.5.0)',
-    es_ES: 'Actualizaciones internas (start-sdk 1.5.0)',
-    de_DE: 'Interne Aktualisierungen (start-sdk 1.5.0)',
-    pl_PL: 'Aktualizacje wewnętrzne (start-sdk 1.5.0)',
-    fr_FR: 'Mises à jour internes (start-sdk 1.5.0)',
+    en_US: 'Internal updates (start-sdk 1.5.2)',
+    es_ES: 'Actualizaciones internas (start-sdk 1.5.2)',
+    de_DE: 'Interne Aktualisierungen (start-sdk 1.5.2)',
+    pl_PL: 'Aktualizacje wewnętrzne (start-sdk 1.5.2)',
+    fr_FR: 'Mises à jour internes (start-sdk 1.5.2)',
   },
   migrations: {
     up: async ({ effects }) => {
