@@ -3,14 +3,44 @@ import { readFile, rm } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../utils'
 
-export const v_0_15_8_5 = VersionInfo.of({
-  version: '0.15.8:5',
+export const v_0_15_8_6 = VersionInfo.of({
+  version: '0.15.8:6',
   releaseNotes: {
-    en_US: 'Internal updates (start-sdk 1.5.0)',
-    es_ES: 'Actualizaciones internas (start-sdk 1.5.0)',
-    de_DE: 'Interne Aktualisierungen (start-sdk 1.5.0)',
-    pl_PL: 'Aktualizacje wewnętrzne (start-sdk 1.5.0)',
-    fr_FR: 'Mises à jour internes (start-sdk 1.5.0)',
+    en_US: `**Bumps**
+
+- start-sdk → 1.5.2
+
+**Fixes**
+
+- "Missing Rune" error when starting alongside Core Lightning.`,
+    es_ES: `**Actualizaciones**
+
+- start-sdk → 1.5.2
+
+**Correcciones**
+
+- Error "Missing Rune" al iniciar junto a Core Lightning.`,
+    de_DE: `**Aktualisierungen**
+
+- start-sdk → 1.5.2
+
+**Korrekturen**
+
+- Fehler „Missing Rune" beim Start zusammen mit Core Lightning.`,
+    pl_PL: `**Aktualizacje**
+
+- start-sdk → 1.5.2
+
+**Poprawki**
+
+- Błąd „Missing Rune" przy uruchamianiu razem z Core Lightning.`,
+    fr_FR: `**Mises à jour**
+
+- start-sdk → 1.5.2
+
+**Corrections**
+
+- Erreur « Missing Rune » au démarrage avec Core Lightning.`,
   },
   migrations: {
     up: async ({ effects }) => {
