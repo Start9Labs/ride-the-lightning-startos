@@ -40,6 +40,10 @@ const shape = z.object({
       }),
     )
     .catch([]),
+  // Index of the node RTL selects by default. Must match one of nodes[].index
+  // or RTL crashes in its logger constructor on startup. Owned here so the
+  // package keeps it consistent whenever it rewrites the nodes array.
+  defaultNodeIndex: z.number().int().nonnegative().catch(1),
 })
 
 export type RtlConfig = z.infer<typeof shape>

@@ -152,7 +152,7 @@ export const setNodes = sdk.Action.withInput(
 
   // the execution function
   async ({ effects, input }) => {
-    let nodes: RtlConfig['nodes'] = []
+    const built: Omit<RtlConfig['nodes'][number], 'index'>[] = []
 
     const internalBackupPath = '/root/backup/Internal-'
 
@@ -160,9 +160,8 @@ export const setNodes = sdk.Action.withInput(
       const channelBackupPath = `${internalBackupPath}LND`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
 
-      nodes.push(
+      built.push(
         await toRtlNode({
-          index: 1,
           lnImplementation: 'LND',
           lnNode: 'Internal LND',
           authentication: {
@@ -178,9 +177,8 @@ export const setNodes = sdk.Action.withInput(
       const channelBackupPath = `${internalBackupPath}CLN`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
 
-      nodes.push(
+      built.push(
         await toRtlNode({
-          index: 2,
           lnImplementation: 'CLN',
           lnNode: 'Internal CLN',
           authentication: {
@@ -196,7 +194,7 @@ export const setNodes = sdk.Action.withInput(
     if (!config) throw new Error('Config file not found')
 
     await Promise.all(
-      input.remoteNodes.map(async (node, index) => {
+      input.remoteNodes.map(async (node) => {
         const { lnImplementation, lnNode, lnServerUrl, macaroon } = node
         const hyphenatedName = lnNode.replace(/\s+/g, '-')
 
@@ -225,9 +223,8 @@ export const setNodes = sdk.Action.withInput(
             ? { macaroonPath: credentialPath }
             : { runePath: credentialPath }
 
-        nodes.push(
+        built.push(
           await toRtlNode({
-            index: index + 3, // start with 2 to account for internal LND and CLN
             lnImplementation,
             lnNode,
             authentication,
@@ -239,14 +236,25 @@ export const setNodes = sdk.Action.withInput(
       }),
     )
 
+    // RTL keys nodes by a 1-based `index`; the values are just identifiers, so
+    // number them positionally. `defaultNodeIndex` must point at one of those
+    // indices or RTL crashes in its logger constructor on startup — keep it on
+    // the previously-default node when that node survives, else the first.
+    const previousDefaultName = config.nodes.find(
+      (n) => n.index === config.defaultNodeIndex,
+    )?.lnNode
+    const nodes = built.map((n, i) => ({ ...n, index: i + 1 }))
+    const defaultNodeIndex =
+      nodes.find((n) => n.lnNode === previousDefaultName)?.index ?? 1
+
     await rtlConfig.merge(effects, {
       nodes,
+      defaultNodeIndex,
     })
   },
 )
 
 async function toRtlNode({
-  index,
   lnImplementation,
   lnNode,
   authentication,
@@ -254,16 +262,14 @@ async function toRtlNode({
   lnServerUrl,
   settings,
 }: {
-  index: number
   lnImplementation: 'LND' | 'CLN'
   lnNode: string
   authentication: RtlConfig['nodes'][0]['authentication']
   channelBackupPath: string
   lnServerUrl: string
   settings?: RtlConfig['nodes'][0]['settings']
-}): Promise<RtlConfig['nodes'][0]> {
+}): Promise<Omit<RtlConfig['nodes'][0], 'index'>> {
   return {
-    index,
     lnImplementation,
     lnNode,
     authentication,
