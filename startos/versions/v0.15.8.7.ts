@@ -12,35 +12,40 @@ export const v_0_15_8_7 = VersionInfo.of({
 
 **Fixes**
 
-- Fixed a startup crash-loop when the default node didn't match a configured node (notably single Core Lightning setups).`,
+- Fixed a startup crash-loop when the default node didn't match a configured node (notably single Core Lightning setups).
+- Stopped re-prompting to create a password when changing nodes if one was already set.`,
     es_ES: `**Actualizaciones**
 
 - start-sdk → 1.5.3
 
 **Correcciones**
 
-- Se corrigió un bucle de fallos al iniciar cuando el nodo predeterminado no coincidía con ningún nodo configurado (especialmente configuraciones con un solo Core Lightning).`,
+- Se corrigió un bucle de fallos al iniciar cuando el nodo predeterminado no coincidía con ningún nodo configurado (especialmente configuraciones con un solo Core Lightning).
+- Se dejó de solicitar de nuevo la creación de una contraseña al cambiar los nodos si ya había una configurada.`,
     de_DE: `**Aktualisierungen**
 
 - start-sdk → 1.5.3
 
 **Korrekturen**
 
-- Start-Absturzschleife behoben, wenn der Standard-Node zu keinem konfigurierten Node passte (insbesondere Setups mit nur Core Lightning).`,
+- Start-Absturzschleife behoben, wenn der Standard-Node zu keinem konfigurierten Node passte (insbesondere Setups mit nur Core Lightning).
+- Keine erneute Aufforderung zur Passworterstellung mehr beim Ändern von Nodes, wenn bereits eines gesetzt ist.`,
     pl_PL: `**Aktualizacje**
 
 - start-sdk → 1.5.3
 
 **Poprawki**
 
-- Naprawiono pętlę awarii przy starcie, gdy domyślny węzeł nie pasował do skonfigurowanego węzła (zwłaszcza konfiguracje z jednym Core Lightning).`,
+- Naprawiono pętlę awarii przy starcie, gdy domyślny węzeł nie pasował do skonfigurowanego węzła (zwłaszcza konfiguracje z jednym Core Lightning).
+- Zaprzestano ponownego proszenia o utworzenie hasła przy zmianie węzłów, jeśli zostało już ustawione.`,
     fr_FR: `**Mises à jour**
 
 - start-sdk → 1.5.3
 
 **Corrections**
 
-- Correction d'une boucle de plantage au démarrage lorsque le nœud par défaut ne correspondait à aucun nœud configuré (notamment les configurations avec un seul Core Lightning).`,
+- Correction d'une boucle de plantage au démarrage lorsque le nœud par défaut ne correspondait à aucun nœud configuré (notamment les configurations avec un seul Core Lightning).
+- L'invite de création de mot de passe ne réapparaît plus lors du changement de nœuds si un mot de passe est déjà défini.`,
   },
   migrations: {
     up: async ({ effects }) => {
