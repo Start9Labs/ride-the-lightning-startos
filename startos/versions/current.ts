@@ -3,7 +3,7 @@ import { readFile, rm } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../utils'
 
-export const v_0_15_8_7 = VersionInfo.of({
+export const current = VersionInfo.of({
   version: '0.15.8:7',
   releaseNotes: {
     en_US: `**Bumps**
