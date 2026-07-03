@@ -128,8 +128,8 @@ export const setNodes = sdk.Action.withInput(
         nodes
           .filter(
             (n) =>
-              !n.settings.lnServerUrl.includes('lnd.startos') &&
-              !n.settings.lnServerUrl.includes('c-lightning.startos'),
+              !n.authentication.macaroonPath?.startsWith(lndMountpoint) &&
+              !n.authentication.runePath?.startsWith(clnMountpoint),
           )
           .map(async (n) => {
             const credDir =
@@ -154,6 +154,10 @@ export const setNodes = sdk.Action.withInput(
   async ({ effects, input }) => {
     const built: Omit<RtlConfig['nodes'][number], 'index'>[] = []
 
+    // The internal-node `lnServerUrl`s below are placeholders: main resolves the
+    // dependency's live LXC-bridge address and rewrites them on every start
+    // (`.startos` DNS is retired in StartOS 0.4.x). The credential mountpoint is
+    // what marks a node internal.
     const internalBackupPath = '/root/backup/Internal-'
 
     if (input.internalNodes.includes('lnd')) {
@@ -185,9 +189,7 @@ export const setNodes = sdk.Action.withInput(
             runePath: `${clnMountpoint}/.commando-env`,
           },
           channelBackupPath,
-          // clnrest serves plaintext HTTP; an https URL fails the TLS
-          // handshake with OpenSSL's "packet length too long" on every request.
-          lnServerUrl: 'http://c-lightning.startos:3010',
+          lnServerUrl: 'https://c-lightning.startos:3010',
         }),
       )
     }
