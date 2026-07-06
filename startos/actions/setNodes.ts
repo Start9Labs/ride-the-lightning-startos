@@ -146,7 +146,9 @@ export const setNodes = sdk.Action.withInput(
             const credDir =
               n.authentication.macaroonPath || n.authentication.runePath || ''
             const credFile =
-              n.lnImplementation === 'LND' ? 'admin.macaroon' : 'access.macaroon'
+              n.lnImplementation === 'LND'
+                ? 'admin.macaroon'
+                : 'access.macaroon'
             const macaroon = (
               await readFile(`${toDisk(credDir)}/${credFile}`)
             ).toString('base64url')
@@ -167,12 +169,14 @@ export const setNodes = sdk.Action.withInput(
 
     // The internal-node `lnServerUrl`s below are resolved to the dependency's
     // live LXC-bridge address via the helper's `.once()` (`.startos` DNS is
-    // retired in StartOS 0.4.x), with a loopback placeholder when the dependency
-    // isn't installed yet. main re-resolves and heals them via `.const()` on
-    // every start, so writing the resolved value here keeps main's first merge a
-    // no-op instead of forcing an extra restart. The credential mountpoint is
-    // what marks a node internal. LND terminates its own TLS over the bridge
-    // (https); clnrest serves plaintext (http).
+    // retired in StartOS 0.4.x), or left absent when the dependency isn't
+    // installed yet — never a fabricated placeholder that pretends to be the
+    // dependency. main re-resolves and heals them via `.const()` on every start,
+    // so writing the resolved value here keeps main's first merge a no-op
+    // instead of forcing an extra restart; while the dependency is absent main
+    // throws until it appears. The credential mountpoint is what marks a node
+    // internal. LND terminates its own TLS over the bridge (https); clnrest
+    // serves plaintext (http).
     const internalBackupPath = '/root/backup/Internal-'
 
     if (input.internalNodes.includes('lnd')) {
@@ -193,7 +197,7 @@ export const setNodes = sdk.Action.withInput(
             macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet`,
           },
           channelBackupPath,
-          lnServerUrl: `https://${lndAddr ?? `127.0.0.1:${restPort}`}`,
+          lnServerUrl: lndAddr ? `https://${lndAddr}` : undefined,
         }),
       )
     }
@@ -216,7 +220,7 @@ export const setNodes = sdk.Action.withInput(
             runePath: `${clnMountpoint}/.commando-env`,
           },
           channelBackupPath,
-          lnServerUrl: `http://${clnAddr ?? `127.0.0.1:${clnrestPort}`}`,
+          lnServerUrl: clnAddr ? `http://${clnAddr}` : undefined,
         }),
       )
     }
@@ -297,7 +301,7 @@ async function toRtlNode({
   lnNode: string
   authentication: RtlConfig['nodes'][0]['authentication']
   channelBackupPath: string
-  lnServerUrl: string
+  lnServerUrl?: string
   settings?: RtlConfig['nodes'][0]['settings']
 }): Promise<Omit<RtlConfig['nodes'][0], 'index'>> {
   return {

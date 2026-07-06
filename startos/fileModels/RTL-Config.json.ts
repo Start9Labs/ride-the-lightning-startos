@@ -35,7 +35,12 @@ const shape = z.object({
           themeMode: z.enum(['DAY', 'NIGHT']),
           themeColor: z.enum(['PURPLE', 'TEAL', 'INDIGO', 'PINK', 'YELLOW']),
           channelBackupPath: z.string(),
-          lnServerUrl: z.string(),
+          // Absent for an internal node until its dependency (LND/CLN) is
+          // installed: main resolves the live bridge address and writes it (or
+          // throws) before the daemon starts, so the daemon never runs without
+          // it. A fabricated loopback placeholder would just pretend to be the
+          // dependency address and could not work.
+          lnServerUrl: z.string().optional(),
         }),
       }),
     )

@@ -51,7 +51,8 @@ export function bridgeAddress(
         const port =
           host?.bindings[opts.internalPort]?.net.assignedPort ??
           opts.fallbackPort
-        return port != null ? `${osIp}:${port}` : null
+        if (port == null) return null
+        return `${osIp}:${port}`
       },
     )
   }
@@ -69,6 +70,8 @@ export function hasInternal(
   imp: 'lnd' | 'c-lightning',
 ): boolean {
   return imp === 'lnd'
-    ? nodes.some((n) => n.authentication.macaroonPath?.startsWith(lndMountpoint))
+    ? nodes.some((n) =>
+        n.authentication.macaroonPath?.startsWith(lndMountpoint),
+      )
     : nodes.some((n) => n.authentication.runePath?.startsWith(clnMountpoint))
 }

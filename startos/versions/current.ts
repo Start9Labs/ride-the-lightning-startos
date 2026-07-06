@@ -14,9 +14,10 @@ export const current = VersionInfo.of({
   },
   migrations: {
     up: async ({ effects }) => {
-      // 0.3.5.1 migration: replace legacy .embassy URLs with loopback
-      // placeholders; main rewrites these to the dependency's live LXC-bridge
-      // address on every start (`.startos` DNS is retired in StartOS 0.4.x).
+      // 0.3.5.1 migration: drop legacy .embassy URLs on internal nodes; main
+      // resolves the dependency's live LXC-bridge address and writes it (or
+      // throws) on every start (`.startos` DNS is retired in StartOS 0.4.x), so
+      // the address is left absent here rather than fabricated.
       const configYaml = await readFile(
         '/media/startos/volumes/main/start9/config.yaml',
         'utf-8',
@@ -32,13 +33,13 @@ export const current = VersionInfo.of({
         )?.lnNode
 
         const nodes = (config?.nodes ?? []).map((n) => {
-          if (n.settings.lnServerUrl.includes('lnd.embassy')) {
-            n.settings.lnServerUrl = 'https://127.0.0.1:8080'
+          if (n.settings.lnServerUrl?.includes('lnd.embassy')) {
+            n.settings.lnServerUrl = undefined
             n.settings.channelBackupPath = '/root/backup/Internal-LND'
             n.lnNode = 'Internal LND'
             n.authentication.macaroonPath = `${lndMountpoint}/data/chain/bitcoin/mainnet`
-          } else if (n.settings.lnServerUrl.includes('c-lightning.embassy')) {
-            n.settings.lnServerUrl = 'http://127.0.0.1:3010'
+          } else if (n.settings.lnServerUrl?.includes('c-lightning.embassy')) {
+            n.settings.lnServerUrl = undefined
             n.settings.channelBackupPath = '/root/backup/Internal-CLN'
             n.lnNode = 'Internal CLN'
             n.authentication.runePath = `${clnMountpoint}/.commando-env`
