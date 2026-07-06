@@ -14,7 +14,9 @@ export const current = VersionInfo.of({
   },
   migrations: {
     up: async ({ effects }) => {
-      // 0.3.5.1 migration: migrate .embassy URLs to .startos
+      // 0.3.5.1 migration: replace legacy .embassy URLs with loopback
+      // placeholders; main rewrites these to the dependency's live LXC-bridge
+      // address on every start (`.startos` DNS is retired in StartOS 0.4.x).
       const configYaml = await readFile(
         '/media/startos/volumes/main/start9/config.yaml',
         'utf-8',
@@ -31,12 +33,12 @@ export const current = VersionInfo.of({
 
         const nodes = (config?.nodes ?? []).map((n) => {
           if (n.settings.lnServerUrl.includes('lnd.embassy')) {
-            n.settings.lnServerUrl = 'https://lnd.startos:8080'
+            n.settings.lnServerUrl = 'https://127.0.0.1:8080'
             n.settings.channelBackupPath = '/root/backup/Internal-LND'
             n.lnNode = 'Internal LND'
             n.authentication.macaroonPath = `${lndMountpoint}/data/chain/bitcoin/mainnet`
           } else if (n.settings.lnServerUrl.includes('c-lightning.embassy')) {
-            n.settings.lnServerUrl = 'https://c-lightning.startos:3010'
+            n.settings.lnServerUrl = 'http://127.0.0.1:3010'
             n.settings.channelBackupPath = '/root/backup/Internal-CLN'
             n.lnNode = 'Internal CLN'
             n.authentication.runePath = `${clnMountpoint}/.commando-env`

@@ -2,7 +2,18 @@ import { mkdir, readFile, writeFile } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { sdk } from '../sdk'
 import { RtlConfig } from '../fileModels/RTL-Config.json'
-import { clnMountpoint, hasInternal, lndMountpoint } from '../utils'
+import {
+  bridgeAddress,
+  clnMountpoint,
+  clnRestHostId,
+  hasInternal,
+  lndMountpoint,
+} from '../utils'
+import {
+  controlHostId as lndControlHostId,
+  restPort,
+} from 'lnd-startos/startos/interfaces'
+import { clnrestPort } from 'cln-startos/startos/utils'
 const { InputSpec, Value, List } = sdk
 
 // Persistent package data volume. RTL's subcontainer bind-mounts it at /root
@@ -154,15 +165,25 @@ export const setNodes = sdk.Action.withInput(
   async ({ effects, input }) => {
     const built: Omit<RtlConfig['nodes'][number], 'index'>[] = []
 
-    // The internal-node `lnServerUrl`s below are placeholders: main resolves the
-    // dependency's live LXC-bridge address and rewrites them on every start
-    // (`.startos` DNS is retired in StartOS 0.4.x). The credential mountpoint is
-    // what marks a node internal.
+    // The internal-node `lnServerUrl`s below are resolved to the dependency's
+    // live LXC-bridge address via the helper's `.once()` (`.startos` DNS is
+    // retired in StartOS 0.4.x), with a loopback placeholder when the dependency
+    // isn't installed yet. main re-resolves and heals them via `.const()` on
+    // every start, so writing the resolved value here keeps main's first merge a
+    // no-op instead of forcing an extra restart. The credential mountpoint is
+    // what marks a node internal. LND terminates its own TLS over the bridge
+    // (https); clnrest serves plaintext (http).
     const internalBackupPath = '/root/backup/Internal-'
 
     if (input.internalNodes.includes('lnd')) {
       const channelBackupPath = `${internalBackupPath}LND`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
+
+      const lndAddr = await bridgeAddress(effects, {
+        packageId: 'lnd',
+        hostId: lndControlHostId,
+        internalPort: restPort,
+      }).once()
 
       built.push(
         await toRtlNode({
@@ -172,7 +193,7 @@ export const setNodes = sdk.Action.withInput(
             macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet`,
           },
           channelBackupPath,
-          lnServerUrl: `https://lnd.startos:8080`,
+          lnServerUrl: `https://${lndAddr ?? `127.0.0.1:${restPort}`}`,
         }),
       )
     }
@@ -180,6 +201,12 @@ export const setNodes = sdk.Action.withInput(
     if (input.internalNodes.includes('cln')) {
       const channelBackupPath = `${internalBackupPath}CLN`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
+
+      const clnAddr = await bridgeAddress(effects, {
+        packageId: 'c-lightning',
+        hostId: clnRestHostId,
+        internalPort: clnrestPort,
+      }).once()
 
       built.push(
         await toRtlNode({
@@ -189,7 +216,7 @@ export const setNodes = sdk.Action.withInput(
             runePath: `${clnMountpoint}/.commando-env`,
           },
           channelBackupPath,
-          lnServerUrl: 'https://c-lightning.startos:3010',
+          lnServerUrl: `http://${clnAddr ?? `127.0.0.1:${clnrestPort}`}`,
         }),
       )
     }

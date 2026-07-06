@@ -1,66 +1,21 @@
-import { T, utils } from '@start9labs/start-sdk'
 import { sdk } from './sdk'
 import { rtlConfig } from './fileModels/RTL-Config.json'
-import { clnMountpoint, hasInternal, lndMountpoint, uiPort } from './utils'
+import {
+  bridgeAddress,
+  clnMountpoint,
+  clnRestHostId,
+  hasInternal,
+  lndMountpoint,
+  uiPort,
+} from './utils'
 import { manifest as lndManifest } from 'lnd-startos/startos/manifest'
 import { manifest as clnManifest } from 'cln-startos/startos/manifest'
 import {
   controlHostId as lndControlHostId,
-  lndconnectRestId,
+  restPort,
 } from 'lnd-startos/startos/interfaces'
+import { clnrestPort } from 'cln-startos/startos/utils'
 import { readFile } from 'fs/promises'
-
-// clnrest host + interface ids. cln exports only its peer/watchtower ids, so
-// these are referenced by literal (see cln-startos/startos/interfaces.ts).
-const clnRestHostId = 'clnrest'
-const clnRestInterfaceId = 'clnrest'
-
-// The IPv4 LXC-bridge hostname for an interface on an already-resolved host.
-// `.startos` DNS is retired in StartOS 0.4.x; containers reach each other over
-// the bridge. Pure — called inside a `sdk.host` map fn so `.const()` narrows
-// its reactivity to just this address. lxcbr0 is dual-stack, so pin ipv4.
-const bridgeHostname = (
-  host: utils.FilledHost | null,
-  interfaceId: string,
-  ssl: boolean,
-) => {
-  const iface =
-    host &&
-    Object.values(host.bindings)
-      .flatMap((b) => Object.values(b.interfaces))
-      .find((i) => i.id === interfaceId)
-  return iface?.addressInfo
-    .filter({
-      kind: 'bridge',
-      predicate: (h) => h.ssl === ssl && h.metadata.kind === 'ipv4',
-    })
-    .hostnames[0]
-}
-
-// LND's REST endpoint over the bridge (replaces `https://lnd.startos:8080`).
-// LND terminates its own TLS with a cert that covers the bridge address.
-const lndRestBridgeUrl = (effects: T.Effects) =>
-  sdk.host
-    .get(effects, { hostId: lndControlHostId, packageId: 'lnd' }, (host) => {
-      const h = bridgeHostname(host, lndconnectRestId, true)
-      return h ? `https://${h.hostname}:${h.port}` : undefined
-    })
-    .const()
-
-// CLN's clnrest endpoint over the bridge (replaces
-// `https://c-lightning.startos:3010`). clnrest serves plaintext HTTP, so target
-// the non-TLS bridge address directly rather than the StartOS SSL edge.
-const clnRestBridgeUrl = (effects: T.Effects) =>
-  sdk.host
-    .get(
-      effects,
-      { hostId: clnRestHostId, packageId: 'c-lightning' },
-      (host) => {
-        const h = bridgeHostname(host, clnRestInterfaceId, false)
-        return h ? `http://${h.hostname}:${h.port}` : undefined
-      },
-    )
-    .const()
 
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info('Starting Ride The Lightning...')
@@ -102,13 +57,30 @@ export const main = sdk.setupMain(async ({ effects }) => {
   }
 
   // Internal nodes reach LND/CLN over the LXC bridge (`.startos` DNS is retired
-  // in StartOS 0.4.x). Resolve the live bridge addresses and rewrite the
-  // internal nodes' server URLs before starting the daemon; the addresses can
-  // change across restarts, so this runs on every start. Internal nodes are
-  // identified by their credential mountpoints, which are stable.
+  // in StartOS 0.4.x). Resolve the live bridge addresses via `.const()` and
+  // rewrite the internal nodes' server URLs before starting the daemon: the
+  // mapped address only changes on dependency install/uninstall/port-change, so
+  // RTL restarts to heal exactly then and never on dependency updates. LND
+  // terminates its own TLS over the bridge (https); clnrest serves plaintext
+  // (http). Internal nodes are identified by their credential mountpoints, which
+  // are stable.
   if (hasLnd || hasCln) {
-    const lndUrl = hasLnd ? await lndRestBridgeUrl(effects) : undefined
-    const clnUrl = hasCln ? await clnRestBridgeUrl(effects) : undefined
+    const lndAddr = hasLnd
+      ? await bridgeAddress(effects, {
+          packageId: 'lnd',
+          hostId: lndControlHostId,
+          internalPort: restPort,
+        }).const()
+      : null
+    const clnAddr = hasCln
+      ? await bridgeAddress(effects, {
+          packageId: 'c-lightning',
+          hostId: clnRestHostId,
+          internalPort: clnrestPort,
+        }).const()
+      : null
+    const lndUrl = lndAddr ? `https://${lndAddr}` : undefined
+    const clnUrl = clnAddr ? `http://${clnAddr}` : undefined
     if (hasLnd && !lndUrl) {
       throw new Error(
         'LND is not yet reachable on the internal network. Ensure LND is installed and running.',
