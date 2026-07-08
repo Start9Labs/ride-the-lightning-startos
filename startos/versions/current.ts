@@ -4,51 +4,46 @@ import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../utils'
 
 export const current = VersionInfo.of({
-  version: '0.15.8:7',
+  version: '0.15.8:8',
   releaseNotes: {
-    en_US: `**Bumps**
+    en_US: `**Fixes**
 
-- start-sdk → 1.5.3
+- Fixed connecting to an internal Core Lightning (CLN) node. RTL now reaches CLN's REST API over HTTP (clnrest serves plaintext), resolving the "packet length too long" SSL error on startup. Existing CLN nodes are corrected automatically on upgrade.`,
+    es_ES: `**Correcciones**
 
-**Fixes**
+- Se corrigió la conexión a un nodo interno de Core Lightning (CLN). RTL ahora accede a la API REST de CLN por HTTP (clnrest sirve texto plano), resolviendo el error SSL "packet length too long" al iniciar. Los nodos CLN existentes se corrigen automáticamente al actualizar.`,
+    de_DE: `**Korrekturen**
 
-- Fixed a startup crash-loop when the default node didn't match a configured node (notably single Core Lightning setups).
-- Stopped re-prompting to create a password when changing nodes if one was already set.`,
-    es_ES: `**Actualizaciones**
+- Verbindung zu einem internen Core-Lightning-(CLN-)Node behoben. RTL erreicht die REST-API von CLN jetzt über HTTP (clnrest liefert Klartext) und behebt so den SSL-Fehler "packet length too long" beim Start. Bestehende CLN-Nodes werden beim Upgrade automatisch korrigiert.`,
+    pl_PL: `**Poprawki**
 
-- start-sdk → 1.5.3
+- Naprawiono łączenie z wewnętrznym węzłem Core Lightning (CLN). RTL łączy się teraz z API REST węzła CLN przez HTTP (clnrest udostępnia zwykły tekst), co rozwiązuje błąd SSL "packet length too long" przy starcie. Istniejące węzły CLN są poprawiane automatycznie podczas aktualizacji.`,
+    fr_FR: `**Corrections**
 
-**Correcciones**
-
-- Se corrigió un bucle de fallos al iniciar cuando el nodo predeterminado no coincidía con ningún nodo configurado (especialmente configuraciones con un solo Core Lightning).
-- Se dejó de solicitar de nuevo la creación de una contraseña al cambiar los nodos si ya había una configurada.`,
-    de_DE: `**Aktualisierungen**
-
-- start-sdk → 1.5.3
-
-**Korrekturen**
-
-- Start-Absturzschleife behoben, wenn der Standard-Node zu keinem konfigurierten Node passte (insbesondere Setups mit nur Core Lightning).
-- Keine erneute Aufforderung zur Passworterstellung mehr beim Ändern von Nodes, wenn bereits eines gesetzt ist.`,
-    pl_PL: `**Aktualizacje**
-
-- start-sdk → 1.5.3
-
-**Poprawki**
-
-- Naprawiono pętlę awarii przy starcie, gdy domyślny węzeł nie pasował do skonfigurowanego węzła (zwłaszcza konfiguracje z jednym Core Lightning).
-- Zaprzestano ponownego proszenia o utworzenie hasła przy zmianie węzłów, jeśli zostało już ustawione.`,
-    fr_FR: `**Mises à jour**
-
-- start-sdk → 1.5.3
-
-**Corrections**
-
-- Correction d'une boucle de plantage au démarrage lorsque le nœud par défaut ne correspondait à aucun nœud configuré (notamment les configurations avec un seul Core Lightning).
-- L'invite de création de mot de passe ne réapparaît plus lors du changement de nœuds si un mot de passe est déjà défini.`,
+- Correction de la connexion à un nœud Core Lightning (CLN) interne. RTL accède désormais à l'API REST de CLN en HTTP (clnrest fournit du texte en clair), ce qui résout l'erreur SSL « packet length too long » au démarrage. Les nœuds CLN existants sont corrigés automatiquement lors de la mise à jour.`,
   },
   migrations: {
     up: async ({ effects }) => {
+      // Heal internal CLN nodes still pointed at https. clnrest serves plaintext
+      // HTTP, so an https URL fails the TLS handshake with OpenSSL's "packet
+      // length too long" (EPROTO) on every request. Flip the saved URL to http.
+      const clnCfg = await rtlConfig.read().once()
+      if (clnCfg) {
+        await rtlConfig.merge(effects, {
+          nodes: clnCfg.nodes.map((n) =>
+            n.settings.lnServerUrl === 'https://c-lightning.startos:3010'
+              ? {
+                  ...n,
+                  settings: {
+                    ...n.settings,
+                    lnServerUrl: 'http://c-lightning.startos:3010',
+                  },
+                }
+              : n,
+          ),
+        })
+      }
+
       // 0.3.5.1 migration: migrate .embassy URLs to .startos
       const configYaml = await readFile(
         '/media/startos/volumes/main/start9/config.yaml',
@@ -71,7 +66,7 @@ export const current = VersionInfo.of({
             n.lnNode = 'Internal LND'
             n.authentication.macaroonPath = `${lndMountpoint}/data/chain/bitcoin/mainnet`
           } else if (n.settings.lnServerUrl.includes('c-lightning.embassy')) {
-            n.settings.lnServerUrl = 'https://c-lightning.startos:3010'
+            n.settings.lnServerUrl = 'http://c-lightning.startos:3010'
             n.settings.channelBackupPath = '/root/backup/Internal-CLN'
             n.lnNode = 'Internal CLN'
             n.authentication.runePath = `${clnMountpoint}/.commando-env`

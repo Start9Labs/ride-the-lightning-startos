@@ -185,7 +185,9 @@ export const setNodes = sdk.Action.withInput(
             runePath: `${clnMountpoint}/.commando-env`,
           },
           channelBackupPath,
-          lnServerUrl: 'https://c-lightning.startos:3010',
+          // clnrest serves plaintext HTTP; an https URL fails the TLS
+          // handshake with OpenSSL's "packet length too long" on every request.
+          lnServerUrl: 'http://c-lightning.startos:3010',
         }),
       )
     }
