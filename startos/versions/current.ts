@@ -4,7 +4,7 @@ import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { clnMountpoint, lndMountpoint } from '../utils'
 
 export const current = VersionInfo.of({
-  version: '0.15.8:8',
+  version: '0.15.8:9',
   releaseNotes: {
     en_US: 'Internal updates (start-sdk 2.0.x)',
     es_ES: 'Actualizaciones internas (start-sdk 2.0.x)',
