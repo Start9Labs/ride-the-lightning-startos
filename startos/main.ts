@@ -15,7 +15,6 @@ import {
   restPort,
 } from 'lnd-startos/startos/interfaces'
 import { clnrestPort } from 'cln-startos/startos/utils'
-import { readFile } from 'fs/promises'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info('Starting Ride The Lightning...')
@@ -108,29 +107,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
     mounts,
     'rtl-sub',
   )
-
-  if (hasCln) {
-    // Upstream RTL's setOptions caches per-node auth on first request and never
-    // re-reads runePath if the first read fails or yields no LIGHTNING_RUNE
-    // line. CLN writes .commando-env from a oneshot that races RTL startup, so
-    // wait here until the file has the rune line before letting the daemon run.
-    const rootfs = await rtlSub.rootfs
-    const runePath = `${rootfs}${clnMountpoint}/.commando-env`
-    const deadline = Date.now() + 120_000
-    while (true) {
-      try {
-        const contents = await readFile(runePath, 'utf-8')
-        if (/LIGHTNING_RUNE="[^"]+"/.test(contents)) break
-      } catch {}
-      if (Date.now() > deadline) {
-        throw new Error(
-          `Timed out waiting for CLN rune at ${clnMountpoint}/.commando-env`,
-        )
-      }
-      console.info(`Waiting for CLN rune at ${clnMountpoint}/.commando-env...`)
-      await new Promise((r) => setTimeout(r, 1000))
-    }
-  }
 
   /**
    * ======================== Daemons ========================
