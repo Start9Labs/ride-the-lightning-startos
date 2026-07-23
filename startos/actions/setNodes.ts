@@ -2,7 +2,18 @@ import { mkdir, readFile, writeFile } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { sdk } from '../sdk'
 import { RtlConfig } from '../fileModels/RTL-Config.json'
-import { clnMountpoint, hasInternal, lndMountpoint } from '../utils'
+import {
+  bridgeAddress,
+  clnMountpoint,
+  clnRestHostId,
+  hasInternal,
+  lndMountpoint,
+} from '../utils'
+import {
+  controlHostId as lndControlHostId,
+  restPort,
+} from 'lnd-startos/startos/interfaces'
+import { clnrestPort } from 'cln-startos/startos/utils'
 const { InputSpec, Value, List } = sdk
 
 // Persistent package data volume. RTL's subcontainer bind-mounts it at /root
@@ -128,14 +139,16 @@ export const setNodes = sdk.Action.withInput(
         nodes
           .filter(
             (n) =>
-              !n.settings.lnServerUrl.includes('lnd.startos') &&
-              !n.settings.lnServerUrl.includes('c-lightning.startos'),
+              !n.authentication.macaroonPath?.startsWith(lndMountpoint) &&
+              !n.authentication.runePath?.startsWith(clnMountpoint),
           )
           .map(async (n) => {
             const credDir =
               n.authentication.macaroonPath || n.authentication.runePath || ''
             const credFile =
-              n.lnImplementation === 'LND' ? 'admin.macaroon' : 'access.macaroon'
+              n.lnImplementation === 'LND'
+                ? 'admin.macaroon'
+                : 'access.macaroon'
             const macaroon = (
               await readFile(`${toDisk(credDir)}/${credFile}`)
             ).toString('base64url')
@@ -154,11 +167,27 @@ export const setNodes = sdk.Action.withInput(
   async ({ effects, input }) => {
     const built: Omit<RtlConfig['nodes'][number], 'index'>[] = []
 
+    // The internal-node `lnServerUrl`s below are resolved to the dependency's
+    // live LXC-bridge address via the helper's `.once()` (`.startos` DNS is
+    // retired in StartOS 0.4.x), or left absent when the dependency isn't
+    // installed yet — never a fabricated placeholder that pretends to be the
+    // dependency. main re-resolves and heals them via `.const()` on every start,
+    // so writing the resolved value here keeps main's first merge a no-op
+    // instead of forcing an extra restart; while the dependency is absent main
+    // throws until it appears. The credential mountpoint is what marks a node
+    // internal. LND terminates its own TLS over the bridge (https); clnrest
+    // serves plaintext (http).
     const internalBackupPath = '/root/backup/Internal-'
 
     if (input.internalNodes.includes('lnd')) {
       const channelBackupPath = `${internalBackupPath}LND`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
+
+      const lndAddr = await bridgeAddress(effects, {
+        packageId: 'lnd',
+        hostId: lndControlHostId,
+        internalPort: restPort,
+      }).once()
 
       built.push(
         await toRtlNode({
@@ -168,7 +197,7 @@ export const setNodes = sdk.Action.withInput(
             macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet`,
           },
           channelBackupPath,
-          lnServerUrl: `https://lnd.startos:8080`,
+          lnServerUrl: lndAddr ? `https://${lndAddr}` : undefined,
         }),
       )
     }
@@ -176,6 +205,12 @@ export const setNodes = sdk.Action.withInput(
     if (input.internalNodes.includes('cln')) {
       const channelBackupPath = `${internalBackupPath}CLN`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
+
+      const clnAddr = await bridgeAddress(effects, {
+        packageId: 'c-lightning',
+        hostId: clnRestHostId,
+        internalPort: clnrestPort,
+      }).once()
 
       built.push(
         await toRtlNode({
@@ -185,9 +220,7 @@ export const setNodes = sdk.Action.withInput(
             runePath: `${clnMountpoint}/.commando-env`,
           },
           channelBackupPath,
-          // clnrest serves plaintext HTTP; an https URL fails the TLS
-          // handshake with OpenSSL's "packet length too long" on every request.
-          lnServerUrl: 'http://c-lightning.startos:3010',
+          lnServerUrl: clnAddr ? `http://${clnAddr}` : undefined,
         }),
       )
     }
@@ -268,7 +301,7 @@ async function toRtlNode({
   lnNode: string
   authentication: RtlConfig['nodes'][0]['authentication']
   channelBackupPath: string
-  lnServerUrl: string
+  lnServerUrl?: string
   settings?: RtlConfig['nodes'][0]['settings']
 }): Promise<Omit<RtlConfig['nodes'][0], 'index'>> {
   return {
