@@ -1,7 +1,6 @@
 import { sdk } from './sdk'
 import { rtlConfig } from './fileModels/RTL-Config.json'
 import {
-  bridgeAddress,
   clnMountpoint,
   clnRestHostId,
   hasInternal,
@@ -65,18 +64,23 @@ export const main = sdk.setupMain(async ({ effects }) => {
   // are stable.
   if (hasLnd || hasCln) {
     const lndAddr = hasLnd
-      ? await bridgeAddress(effects, {
-          packageId: 'lnd',
-          hostId: lndControlHostId,
-          internalPort: restPort,
-        }).const()
+      ? await sdk.host
+          .getBridgeAddress(effects, {
+            packageId: 'lnd',
+            hostId: lndControlHostId,
+            internalPort: restPort,
+          })
+          .const()
       : null
     const clnAddr = hasCln
-      ? await bridgeAddress(effects, {
-          packageId: 'c-lightning',
-          hostId: clnRestHostId,
-          internalPort: clnrestPort,
-        }).const()
+      ? await sdk.host
+          .getBridgeAddress(effects, {
+            packageId: 'c-lightning',
+            hostId: clnRestHostId,
+            internalPort: clnrestPort,
+            ssl: false,
+          })
+          .const()
       : null
     const lndUrl = lndAddr ? `https://${lndAddr}` : undefined
     const clnUrl = clnAddr ? `http://${clnAddr}` : undefined
