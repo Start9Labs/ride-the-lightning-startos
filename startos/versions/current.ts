@@ -1,7 +1,7 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.15.9:0',
+  version: '0.15.9:1',
   releaseNotes: {
     en_US:
       'Updated Ride The Lightning to 0.15.9: security and dependency hardening (zero production vulnerabilities), multi-node authentication fixes, and Core Lightning channel-status corrections.',
