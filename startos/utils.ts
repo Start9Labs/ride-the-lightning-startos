@@ -1,4 +1,3 @@
-import { sdk } from './sdk'
 import { RtlConfig } from './fileModels/RTL-Config.json'
 
 export const uiPort = 80

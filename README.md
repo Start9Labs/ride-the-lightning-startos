@@ -34,19 +34,19 @@
 
 ## Image and Container Runtime
 
-| Property | Value |
-|----------|-------|
-| Image | `shahanafarooqui/rtl` (upstream unmodified) |
-| Architectures | x86_64, aarch64 |
-| Command | `node rtl` |
+| Property      | Value                                       |
+| ------------- | ------------------------------------------- |
+| Image         | `shahanafarooqui/rtl` (upstream unmodified) |
+| Architectures | x86_64, aarch64                             |
+| Command       | `node rtl`                                  |
 
 ---
 
 ## Volume and Data Layout
 
-| Volume | Mount Point | Purpose |
-|--------|-------------|---------|
-| `main` | `/root` | RTL configuration and data |
+| Volume | Mount Point | Purpose                    |
+| ------ | ----------- | -------------------------- |
+| `main` | `/root`     | RTL configuration and data |
 
 **Key paths on the `main` volume:**
 
@@ -65,12 +65,12 @@
 
 ## Installation and First-Run Flow
 
-| Step | Upstream | StartOS |
-|------|----------|---------|
-| Installation | npm install / Docker | Install from marketplace |
-| Configuration | Edit RTL-Config.json manually | Managed via actions |
+| Step            | Upstream                      | StartOS                            |
+| --------------- | ----------------------------- | ---------------------------------- |
+| Installation    | npm install / Docker          | Install from marketplace           |
+| Configuration   | Edit RTL-Config.json manually | Managed via actions                |
 | Node connection | Manual URL and macaroon setup | Auto-configured for internal nodes |
-| Password | Set in config file | Create via action |
+| Password        | Set in config file            | Create via action                  |
 
 **First-run steps:**
 
@@ -86,29 +86,29 @@
 
 ### Auto-Configured by StartOS
 
-| Setting | Value | Purpose |
-|---------|-------|---------|
-| `host` | `0.0.0.0` | Bind address |
-| `port` | `80` | Web UI port |
-| `RTL_CONFIG_PATH` | `/root` | Config file location |
-| `SSO.rtlSSO` | `0` | SSO disabled |
+| Setting           | Value     | Purpose              |
+| ----------------- | --------- | -------------------- |
+| `host`            | `0.0.0.0` | Bind address         |
+| `port`            | `80`      | Web UI port          |
+| `RTL_CONFIG_PATH` | `/root`   | Config file location |
+| `SSO.rtlSSO`      | `0`       | SSO disabled         |
 
 ### Managed via Actions
 
-| Setting | Action | Purpose |
-|---------|--------|---------|
-| Node list | Set Nodes | Configure internal and remote Lightning nodes |
-| Password | Reset Password | Set or reset the login password |
-| Lightning URLs | Set Nodes | Auto-configured for internal LND/CLN |
-| Macaroon paths | Set Nodes | Auto-configured for internal nodes |
+| Setting        | Action         | Purpose                                       |
+| -------------- | -------------- | --------------------------------------------- |
+| Node list      | Set Nodes      | Configure internal and remote Lightning nodes |
+| Password       | Reset Password | Set or reset the login password               |
+| Lightning URLs | Set Nodes      | Auto-configured for internal LND/CLN          |
+| Macaroon paths | Set Nodes      | Auto-configured for internal nodes            |
 
 ---
 
 ## Network Access and Interfaces
 
-| Interface | Port | Protocol | Purpose |
-|-----------|------|----------|---------|
-| Web UI | 80 | HTTP | RTL web interface |
+| Interface | Port | Protocol | Purpose           |
+| --------- | ---- | -------- | ----------------- |
+| Web UI    | 80   | HTTP     | RTL web interface |
 
 **Access methods (StartOS 0.4.0):**
 
@@ -123,12 +123,12 @@
 
 ### Set Nodes
 
-| Property | Value |
-|----------|-------|
-| ID | `set-nodes` |
-| Visibility | Enabled |
-| Availability | Any status |
-| Purpose | Configure which Lightning nodes RTL manages |
+| Property     | Value                                       |
+| ------------ | ------------------------------------------- |
+| ID           | `set-nodes`                                 |
+| Visibility   | Enabled                                     |
+| Availability | Any status                                  |
+| Purpose      | Configure which Lightning nodes RTL manages |
 
 **Inputs:**
 
@@ -143,12 +143,12 @@ Internal nodes are auto-configured with correct URLs and credential paths. Remot
 
 ### Reset Password
 
-| Property | Value |
-|----------|-------|
-| ID | `reset-password` |
-| Visibility | Enabled |
-| Availability | Any status |
-| Purpose | Create or reset the login password |
+| Property     | Value                              |
+| ------------ | ---------------------------------- |
+| ID           | `reset-password`                   |
+| Visibility   | Enabled                            |
+| Availability | Any status                         |
+| Purpose      | Create or reset the login password |
 
 Generates a random 22-character password. The result is displayed once (masked, copyable). RTL will hash it on next startup.
 
@@ -160,23 +160,23 @@ Dependencies are dynamically resolved based on which internal nodes are selected
 
 ### LND (`lnd`)
 
-| Property | Value |
-|----------|-------|
-| **Required** | Optional |
-| **Version constraint** | `>=0.20.1-beta` |
-| **Health checks** | `lnd` must pass |
-| **Mounted volumes** | `lnd:main` at `/mnt/lnd` (read-only) — for macaroon and TLS credentials |
-| **Purpose** | Lightning node management via LND REST API |
+| Property               | Value                                                                   |
+| ---------------------- | ----------------------------------------------------------------------- |
+| **Required**           | Optional                                                                |
+| **Version constraint** | `>=0.20.1-beta`                                                         |
+| **Health checks**      | `lnd` must pass                                                         |
+| **Mounted volumes**    | `lnd:main` at `/mnt/lnd` (read-only) — for macaroon and TLS credentials |
+| **Purpose**            | Lightning node management via LND REST API                              |
 
 ### Core Lightning (`c-lightning`)
 
-| Property | Value |
-|----------|-------|
-| **Required** | Optional |
-| **Version constraint** | `>=25.12.1` |
-| **Health checks** | `lightningd` must pass |
-| **Mounted volumes** | `c-lightning:main` at `/mnt/cln` (read-only) — for credentials |
-| **Purpose** | Lightning node management via CLN REST API |
+| Property               | Value                                                          |
+| ---------------------- | -------------------------------------------------------------- |
+| **Required**           | Optional                                                       |
+| **Version constraint** | `>=25.12.1`                                                    |
+| **Health checks**      | `lightningd` must pass                                         |
+| **Mounted volumes**    | `c-lightning:main` at `/mnt/cln` (read-only) — for credentials |
+| **Purpose**            | Lightning node management via CLN REST API                     |
 
 ---
 
@@ -196,8 +196,8 @@ Dependencies are dynamically resolved based on which internal nodes are selected
 
 ## Health Checks
 
-| Check | Display Name | Method | Messages |
-|-------|--------------|--------|----------|
+| Check  | Display Name    | Method            | Messages                                                        |
+| ------ | --------------- | ----------------- | --------------------------------------------------------------- |
 | Web UI | "Web Interface" | Port 80 listening | "The web interface is ready" / "The web interface is not ready" |
 
 ---
