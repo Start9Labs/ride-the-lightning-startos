@@ -57,7 +57,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   // Internal nodes reach LND/CLN over the LXC bridge (`.startos` DNS is retired
   // in StartOS 0.4.x). Resolve the live bridge addresses via `.const()` and
   // rewrite the internal nodes' server URLs before starting the daemon: the
-  // mapped address only changes on dependency install/uninstall/port-change, so
+  // bridge address only changes on dependency install/uninstall/port-change, so
   // RTL restarts to heal exactly then and never on dependency updates. LND
   // terminates its own TLS over the bridge (https); clnrest serves plaintext
   // (http). Internal nodes are identified by their credential mountpoints, which
