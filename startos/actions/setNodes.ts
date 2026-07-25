@@ -3,7 +3,6 @@ import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { sdk } from '../sdk'
 import { RtlConfig } from '../fileModels/RTL-Config.json'
 import {
-  bridgeAddress,
   clnMountpoint,
   clnRestHostId,
   hasInternal,
@@ -183,11 +182,13 @@ export const setNodes = sdk.Action.withInput(
       const channelBackupPath = `${internalBackupPath}LND`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
 
-      const lndAddr = await bridgeAddress(effects, {
-        packageId: 'lnd',
-        hostId: lndControlHostId,
-        internalPort: restPort,
-      }).once()
+      const lndAddr = await sdk.host
+        .getBridgeAddress(effects, {
+          packageId: 'lnd',
+          hostId: lndControlHostId,
+          internalPort: restPort,
+        })
+        .once()
 
       built.push(
         await toRtlNode({
@@ -206,11 +207,14 @@ export const setNodes = sdk.Action.withInput(
       const channelBackupPath = `${internalBackupPath}CLN`
       await mkdir(toDisk(channelBackupPath), { recursive: true })
 
-      const clnAddr = await bridgeAddress(effects, {
-        packageId: 'c-lightning',
-        hostId: clnRestHostId,
-        internalPort: clnrestPort,
-      }).once()
+      const clnAddr = await sdk.host
+        .getBridgeAddress(effects, {
+          packageId: 'c-lightning',
+          hostId: clnRestHostId,
+          internalPort: clnrestPort,
+          ssl: false,
+        })
+        .once()
 
       built.push(
         await toRtlNode({
