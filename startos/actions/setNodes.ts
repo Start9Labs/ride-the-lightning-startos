@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'fs/promises'
+import { chmod, mkdir, readFile, writeFile } from 'fs/promises'
 import { rtlConfig } from '../fileModels/RTL-Config.json'
 import { sdk } from '../sdk'
 import { RtlConfig } from '../fileModels/RTL-Config.json'
@@ -58,7 +58,11 @@ export const remoteNodes = Value.list(
           placeholder: 'Remote Node 1',
           patterns: [
             {
-              regex: '[A-Za-z0-9]+',
+              // Anchored, matching the SDK's own convention for supplied
+              // patterns. This name becomes a directory under
+              // remote-macaroons/ and backup/, so an unanchored pattern would
+              // accept a value carrying path separators anywhere but the start.
+              regex: '^[A-Za-z0-9]+$',
               description: 'Name can only contain A-Z, a-z, and 0-9',
             },
           ],
@@ -242,18 +246,30 @@ export const setNodes = sdk.Action.withInput(
         // raw macaroon bytes; writing the ASCII base64url text would fail
         // auth. Write to the action-runtime-visible path so the bytes land in
         // the persistent data volume that RTL's subcontainer sees at /root.
+        // An LND admin macaroon and a CLN rune are full-control credentials for
+        // the node, so neither the file nor the directory holding it is left at
+        // the default 0644/0755. The chmod is not redundant with the create
+        // mode: both only apply when the entry is created, so an install that
+        // already wrote these at the old modes would otherwise keep them.
         const credentialPath = `/root/remote-macaroons/${hyphenatedName}`
-        await mkdir(toDisk(credentialPath), { recursive: true })
-        await writeFile(
-          `${toDisk(credentialPath)}/${
-            lnImplementation === 'LND' ? 'admin' : 'access'
-          }.macaroon`,
-          Buffer.from(macaroon, 'base64url'),
-        )
+        const credentialDir = toDisk(credentialPath)
+        await mkdir(credentialDir, { recursive: true, mode: 0o700 })
+        await chmod(credentialDir, 0o700)
+        const credentialFile = `${credentialDir}/${
+          lnImplementation === 'LND' ? 'admin' : 'access'
+        }.macaroon`
+        await writeFile(credentialFile, Buffer.from(macaroon, 'base64url'), {
+          mode: 0o600,
+        })
+        await chmod(credentialFile, 0o600)
 
         // backup
+        // Static channel backups are equally sensitive — they identify channels
+        // and peers, and are what a recovery is driven from.
         const channelBackupPath = `/root/backup/${hyphenatedName}`
-        await mkdir(toDisk(channelBackupPath), { recursive: true })
+        const channelBackupDir = toDisk(channelBackupPath)
+        await mkdir(channelBackupDir, { recursive: true, mode: 0o700 })
+        await chmod(channelBackupDir, 0o700)
 
         const savedNode = config.nodes.find((n) => n.lnNode === lnNode)
 
