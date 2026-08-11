@@ -1,33 +1,33 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.15.10:0',
+  version: '0.15.10:1',
   releaseNotes: {
-    en_US: `Updated Ride The Lightning to 0.15.10.
+    en_US: `Credentials for remote nodes are now stored with restrictive permissions.
 
-A security-hygiene release. Login requests are validated more strictly — two-factor setups are the most affected — and credentials are no longer written to node logs or returned by the configuration API. Authentication settings are now fixed on the server so they cannot be changed through the settings API, and channel-backup downloads are confined to the selected node's backup directory. A node with many channels no longer fires one alias lookup per channel at once, and a race that could send a request with the wrong node's credentials is fixed. Upstream also cleared every known vulnerability in its production dependencies.
+When you add a remote node, the macaroon or rune you paste in — which grants full control of that node — was written with the filesystem's ordinary default permissions rather than being restricted to the service, as were the directory holding it and the channel-backup directory beside it. All three are now locked down. Saving a node again applies this to credentials that were stored previously, not only to new ones.
 
-Full release notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.10`,
-    es_ES: `Se actualizó Ride The Lightning a 0.15.10.
+The node name is also checked more strictly. It was validated against any part of the name rather than the whole of it, so a name only partly made of letters and numbers could slip through; that name becomes a directory holding the credential, so it is now required to match in full.`,
+    es_ES: `Las credenciales de los nodos remotos ahora se guardan con permisos restrictivos.
 
-Una versión centrada en la higiene de seguridad. Las solicitudes de inicio de sesión se validan de forma más estricta —las configuraciones con doble factor son las más afectadas— y las credenciales ya no se escriben en los registros de los nodos ni las devuelve la API de configuración. Los ajustes de autenticación quedan fijados en el servidor, de modo que no pueden cambiarse mediante la API de ajustes, y las descargas de copias de seguridad de canales se limitan al directorio de copias del nodo seleccionado. Un nodo con muchos canales ya no lanza una búsqueda de alias por canal a la vez, y se corrigió una condición de carrera que podía enviar una solicitud con las credenciales del nodo equivocado. Además, upstream resolvió todas las vulnerabilidades conocidas en sus dependencias de producción.
+Al añadir un nodo remoto, el macaroon o rune que pega —que otorga control total de ese nodo— se escribía con los permisos predeterminados del sistema de archivos en lugar de quedar restringido al servicio, al igual que el directorio que lo contiene y el directorio de copias de seguridad de canales contiguo. Los tres quedan ahora protegidos. Volver a guardar un nodo aplica esto también a las credenciales guardadas anteriormente, no solo a las nuevas.
 
-Notas de la versión completas: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.10`,
-    de_DE: `Ride The Lightning wurde auf 0.15.10 aktualisiert.
+El nombre del nodo también se comprueba de forma más estricta. Se validaba contra cualquier parte del nombre en lugar de contra el nombre completo, de modo que podía colarse un nombre formado solo en parte por letras y números; ese nombre se convierte en el directorio que guarda la credencial, así que ahora debe coincidir por completo.`,
+    de_DE: `Zugangsdaten für entfernte Knoten werden jetzt mit restriktiven Berechtigungen gespeichert.
 
-Eine Version zur Verbesserung der Sicherheitshygiene. Anmeldeanfragen werden strenger geprüft — Einrichtungen mit Zwei-Faktor-Authentifizierung sind am stärksten betroffen — und Zugangsdaten werden nicht mehr in Knoten-Logs geschrieben oder von der Konfigurations-API zurückgegeben. Authentifizierungseinstellungen sind jetzt serverseitig festgelegt und lassen sich nicht mehr über die Einstellungs-API ändern; Downloads von Kanal-Backups bleiben auf das Backup-Verzeichnis des ausgewählten Knotens beschränkt. Ein Knoten mit vielen Kanälen startet nicht mehr eine Alias-Abfrage pro Kanal gleichzeitig, und eine Race-Condition, die eine Anfrage mit den Zugangsdaten des falschen Knotens senden konnte, wurde behoben. Upstream hat außerdem alle bekannten Schwachstellen in seinen Produktionsabhängigkeiten beseitigt.
+Beim Hinzufügen eines entfernten Knotens wurde das eingefügte Macaroon bzw. die Rune — die volle Kontrolle über diesen Knoten gewährt — mit den üblichen Standardberechtigungen des Dateisystems geschrieben, statt auf den Dienst beschränkt zu sein; ebenso das zugehörige Verzeichnis und das daneben liegende Verzeichnis der Kanal-Backups. Alle drei sind nun abgesichert. Wird ein Knoten erneut gespeichert, gilt das auch für zuvor abgelegte Zugangsdaten, nicht nur für neue.
 
-Vollständige Versionshinweise: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.10`,
-    pl_PL: `Zaktualizowano Ride The Lightning do 0.15.10.
+Auch der Knotenname wird strenger geprüft. Bisher wurde gegen einen beliebigen Teil des Namens geprüft statt gegen den ganzen, sodass ein nur teilweise aus Buchstaben und Ziffern bestehender Name durchrutschen konnte; aus diesem Namen wird das Verzeichnis der Zugangsdaten, daher muss er nun vollständig übereinstimmen.`,
+    pl_PL: `Poświadczenia zdalnych węzłów są teraz zapisywane z restrykcyjnymi uprawnieniami.
 
-Wydanie poświęcone higienie bezpieczeństwa. Żądania logowania są sprawdzane bardziej rygorystycznie — najbardziej dotyczy to konfiguracji z uwierzytelnianiem dwuskładnikowym — a dane uwierzytelniające nie trafiają już do logów węzłów ani nie są zwracane przez API konfiguracji. Ustawienia uwierzytelniania są teraz ustalone po stronie serwera, więc nie można ich zmienić przez API ustawień, a pobieranie kopii zapasowych kanałów ogranicza się do katalogu kopii wybranego węzła. Węzeł z wieloma kanałami nie wysyła już jednocześnie jednego zapytania o alias na kanał, a wyścig, który mógł wysłać żądanie z danymi uwierzytelniającymi niewłaściwego węzła, został naprawiony. Upstream usunął też wszystkie znane podatności w zależnościach produkcyjnych.
+Przy dodawaniu zdalnego węzła wklejany macaroon lub rune — dający pełną kontrolę nad tym węzłem — był zapisywany ze zwykłymi domyślnymi uprawnieniami systemu plików, zamiast być ograniczonym do samej usługi; tak samo katalog, który go przechowuje, i sąsiadujący katalog kopii zapasowych kanałów. Wszystkie trzy są teraz zabezpieczone. Ponowne zapisanie węzła stosuje to również do poświadczeń zapisanych wcześniej, nie tylko do nowych.
 
-Pełne informacje o wydaniu: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.10`,
-    fr_FR: `Ride The Lightning a été mis à jour vers 0.15.10.
+Nazwa węzła jest też sprawdzana ściślej. Była weryfikowana względem dowolnej części nazwy, a nie całości, więc nazwa złożona tylko częściowo z liter i cyfr mogła się prześlizgnąć; z tej nazwy powstaje katalog przechowujący poświadczenie, dlatego teraz musi pasować w całości.`,
+    fr_FR: `Les identifiants des nœuds distants sont désormais enregistrés avec des permissions restrictives.
 
-Une version consacrée à l'hygiène de sécurité. Les demandes de connexion sont validées plus strictement — les configurations à deux facteurs sont les plus concernées — et les identifiants ne sont plus écrits dans les journaux des nœuds ni renvoyés par l'API de configuration. Les paramètres d'authentification sont désormais fixés côté serveur et ne peuvent donc plus être modifiés via l'API de paramètres, et les téléchargements de sauvegardes de canaux sont limités au répertoire de sauvegarde du nœud sélectionné. Un nœud comportant de nombreux canaux ne lance plus une recherche d'alias par canal en même temps, et une situation de compétition pouvant envoyer une requête avec les identifiants du mauvais nœud a été corrigée. En amont, toutes les vulnérabilités connues des dépendances de production ont également été éliminées.
+Lorsque vous ajoutez un nœud distant, le macaroon ou la rune que vous collez — qui donne le contrôle total de ce nœud — était écrit avec les permissions par défaut du système de fichiers au lieu d'être réservé au service, tout comme le répertoire qui le contient et le répertoire de sauvegardes de canaux voisin. Les trois sont maintenant verrouillés. Réenregistrer un nœud applique cela aux identifiants déjà stockés, et pas seulement aux nouveaux.
 
-Notes de version complètes : https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.10`,
+Le nom du nœud est également vérifié plus strictement. Il était validé sur une partie quelconque du nom plutôt que sur son ensemble, si bien qu'un nom composé seulement en partie de lettres et de chiffres pouvait passer ; ce nom devient le répertoire qui contient l'identifiant, il doit donc désormais correspondre entièrement.`,
   },
   migrations: {},
 })
