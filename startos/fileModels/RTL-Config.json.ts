@@ -7,6 +7,9 @@ const host = '0.0.0.0' as const
 const shape = z.object({
   host: z.literal(host).catch(host),
   port: z.literal(uiPort).catch(uiPort),
+  // The package writes the plaintext here; RTL hashes it into multiPassHashed
+  // and blanks this field. So a blank multiPass with a populated hash is a
+  // password that IS set — never read it as "no password".
   multiPass: z.string().catch(''),
   multiPassHashed: z.string().catch(''), // set by RTL
   secret2fa: z.string().catch(''), // set by RTL
