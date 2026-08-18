@@ -1,33 +1,43 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.15.10:1',
+  version: '0.15.11:0',
   releaseNotes: {
-    en_US: `Credentials for remote nodes are now stored with restrictive permissions.
+    en_US: `Updated Ride The Lightning to 0.15.11.
 
-When you add a remote node, the macaroon or rune you paste in — which grants full control of that node — was written with the filesystem's ordinary default permissions rather than being restricted to the service, as were the directory holding it and the channel-backup directory beside it. All three are now locked down. Saving a node again applies this to credentials that were stored previously, not only to new ones.
+- Fixes a bug where, with more than one LND node attached, peer alias lookups and connect requests could be sent to the wrong node — showing truncated aliases or failing to connect.
+- The two-factor code field is now recognised by browsers and password managers, so the code can be filled in for you.
+- Ride The Lightning now publishes a security policy with a private channel for reporting vulnerabilities.
 
-The node name is also checked more strictly. It was validated against any part of the name rather than the whole of it, so a name only partly made of letters and numbers could slip through; that name becomes a directory holding the credential, so it is now required to match in full.`,
-    es_ES: `Las credenciales de los nodos remotos ahora se guardan con permisos restrictivos.
+Full upstream release notes: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.11`,
+    es_ES: `Ride The Lightning actualizado a 0.15.11.
 
-Al añadir un nodo remoto, el macaroon o rune que pega —que otorga control total de ese nodo— se escribía con los permisos predeterminados del sistema de archivos en lugar de quedar restringido al servicio, al igual que el directorio que lo contiene y el directorio de copias de seguridad de canales contiguo. Los tres quedan ahora protegidos. Volver a guardar un nodo aplica esto también a las credenciales guardadas anteriormente, no solo a las nuevas.
+- Corrige un fallo por el que, con más de un nodo LND conectado, las consultas de alias de pares y las solicitudes de conexión podían enviarse al nodo equivocado, mostrando alias truncados o fallando al conectar.
+- El campo del código de dos factores ahora lo reconocen los navegadores y gestores de contraseñas, de modo que pueden rellenarlo por usted.
+- Ride The Lightning publica ahora una política de seguridad con un canal privado para informar de vulnerabilidades.
 
-El nombre del nodo también se comprueba de forma más estricta. Se validaba contra cualquier parte del nombre en lugar de contra el nombre completo, de modo que podía colarse un nombre formado solo en parte por letras y números; ese nombre se convierte en el directorio que guarda la credencial, así que ahora debe coincidir por completo.`,
-    de_DE: `Zugangsdaten für entfernte Knoten werden jetzt mit restriktiven Berechtigungen gespeichert.
+Notas de la versión completas: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.11`,
+    de_DE: `Ride The Lightning auf 0.15.11 aktualisiert.
 
-Beim Hinzufügen eines entfernten Knotens wurde das eingefügte Macaroon bzw. die Rune — die volle Kontrolle über diesen Knoten gewährt — mit den üblichen Standardberechtigungen des Dateisystems geschrieben, statt auf den Dienst beschränkt zu sein; ebenso das zugehörige Verzeichnis und das daneben liegende Verzeichnis der Kanal-Backups. Alle drei sind nun abgesichert. Wird ein Knoten erneut gespeichert, gilt das auch für zuvor abgelegte Zugangsdaten, nicht nur für neue.
+- Behebt einen Fehler, durch den bei mehreren angebundenen LND-Knoten Alias-Abfragen und Verbindungsanfragen an den falschen Knoten gehen konnten — mit abgeschnittenen Aliassen oder fehlgeschlagenen Verbindungen.
+- Das Feld für den Zwei-Faktor-Code wird jetzt von Browsern und Passwortmanagern erkannt, sodass der Code für Sie ausgefüllt werden kann.
+- Ride The Lightning veröffentlicht nun eine Sicherheitsrichtlinie mit einem privaten Kanal zum Melden von Schwachstellen.
 
-Auch der Knotenname wird strenger geprüft. Bisher wurde gegen einen beliebigen Teil des Namens geprüft statt gegen den ganzen, sodass ein nur teilweise aus Buchstaben und Ziffern bestehender Name durchrutschen konnte; aus diesem Namen wird das Verzeichnis der Zugangsdaten, daher muss er nun vollständig übereinstimmen.`,
-    pl_PL: `Poświadczenia zdalnych węzłów są teraz zapisywane z restrykcyjnymi uprawnieniami.
+Vollständige Versionshinweise: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.11`,
+    pl_PL: `Zaktualizowano Ride The Lightning do 0.15.11.
 
-Przy dodawaniu zdalnego węzła wklejany macaroon lub rune — dający pełną kontrolę nad tym węzłem — był zapisywany ze zwykłymi domyślnymi uprawnieniami systemu plików, zamiast być ograniczonym do samej usługi; tak samo katalog, który go przechowuje, i sąsiadujący katalog kopii zapasowych kanałów. Wszystkie trzy są teraz zabezpieczone. Ponowne zapisanie węzła stosuje to również do poświadczeń zapisanych wcześniej, nie tylko do nowych.
+- Naprawiono błąd, przez który przy podłączeniu więcej niż jednego węzła LND zapytania o aliasy peerów i żądania połączenia mogły trafiać do niewłaściwego węzła — pokazując skrócone aliasy lub kończąc się niepowodzeniem.
+- Pole kodu dwuskładnikowego jest teraz rozpoznawane przez przeglądarki i menedżery haseł, więc kod może zostać wypełniony za Ciebie.
+- Ride The Lightning publikuje teraz politykę bezpieczeństwa z prywatnym kanałem zgłaszania podatności.
 
-Nazwa węzła jest też sprawdzana ściślej. Była weryfikowana względem dowolnej części nazwy, a nie całości, więc nazwa złożona tylko częściowo z liter i cyfr mogła się prześlizgnąć; z tej nazwy powstaje katalog przechowujący poświadczenie, dlatego teraz musi pasować w całości.`,
-    fr_FR: `Les identifiants des nœuds distants sont désormais enregistrés avec des permissions restrictives.
+Pełne informacje o wydaniu: https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.11`,
+    fr_FR: `Ride The Lightning mis à jour vers 0.15.11.
 
-Lorsque vous ajoutez un nœud distant, le macaroon ou la rune que vous collez — qui donne le contrôle total de ce nœud — était écrit avec les permissions par défaut du système de fichiers au lieu d'être réservé au service, tout comme le répertoire qui le contient et le répertoire de sauvegardes de canaux voisin. Les trois sont maintenant verrouillés. Réenregistrer un nœud applique cela aux identifiants déjà stockés, et pas seulement aux nouveaux.
+- Corrige un défaut qui, avec plusieurs nœuds LND rattachés, pouvait envoyer les recherches d'alias de pairs et les demandes de connexion au mauvais nœud — alias tronqués ou connexion échouée.
+- Le champ du code à deux facteurs est désormais reconnu par les navigateurs et gestionnaires de mots de passe, qui peuvent donc le remplir pour vous.
+- Ride The Lightning publie maintenant une politique de sécurité avec un canal privé pour signaler les vulnérabilités.
 
-Le nom du nœud est également vérifié plus strictement. Il était validé sur une partie quelconque du nom plutôt que sur son ensemble, si bien qu'un nom composé seulement en partie de lettres et de chiffres pouvait passer ; ce nom devient le répertoire qui contient l'identifiant, il doit donc désormais correspondre entièrement.`,
+Notes de version complètes : https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.11`,
   },
   migrations: {},
 })
