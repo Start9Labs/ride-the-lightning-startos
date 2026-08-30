@@ -2,6 +2,7 @@
 
 ## Documentation
 
+- [Start9 Bitcoin Guides](https://docs.start9.com/bitcoin-guides/) — connecting wallets and dashboards to a Lightning node on StartOS.
 - [Ride The Lightning on GitHub](https://github.com/Ride-The-Lightning/RTL) — the upstream project, including the README and detailed configuration reference.
 
 ## What you get on StartOS
