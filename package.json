@@ -8,6 +8,7 @@
   "dependencies": {
     "@start9labs/start-sdk": "2.0.9",
     "cln-startos": "github:Start9Labs/cln-startos#next",
+    "eclair-startos": "github:Start9Labs/eclair-startos#next",
     "lnd-startos": "github:Start9Labs/lnd-startos#next"
   },
   "devDependencies": {

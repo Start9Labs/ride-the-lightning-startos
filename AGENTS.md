@@ -27,4 +27,6 @@ verified, tried, and decided belongs in the commit message and the PR body.
 ## This repo
 
 - **`main` throws rather than starting without a resolvable node address.** A fabricated loopback placeholder would just pretend to be the dependency and could never work; failing loudly with the dependency named is the intended behaviour.
-- **LND is `https://`, clnrest is `http://`.** LND terminates its own TLS over the bridge; Core Lightning's REST interface serves plaintext. Getting this backwards fails at connect time with an opaque error.
+- **LND is `https://`, clnrest and Eclair's API are `http://`.** LND terminates its own TLS over the bridge; the other two serve plaintext. Getting this backwards fails at connect time with an opaque error.
+- **Eclair's API password is read from its mounted config, not handed to RTL's own HOCON parser.** RTL will parse an `eclair.conf` itself given `authentication.configPath`, but only through a library that has never been asked to read the JSON form Eclair's package writes. `main` reads the password with Eclair's own file model and writes `lnApiPassword` instead.
+- **Only Eclair's `lnImplementation` marks it internal.** LND and CLN are identified by their credential mountpoint; Eclair has no credential file, and the remote-node form cannot express its password, so every `ECL` node here is the one on this server.

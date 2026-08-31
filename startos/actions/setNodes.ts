@@ -9,6 +9,10 @@ import {
   lndMountpoint,
 } from '../utils'
 import {
+  apiHostId as eclairApiHostId,
+  apiPort as eclairApiPort,
+} from 'eclair-startos/startos/utils'
+import {
   controlHostId as lndControlHostId,
   restPort,
 } from 'lnd-startos/startos/interfaces'
@@ -100,10 +104,11 @@ export const inputSpec = InputSpec.of({
   internalNodes: Value.multiselect({
     name: 'Internal Nodes',
     description:
-      '- LND: Lightning Network Daemon from Lightning Labs\n- CLN: Core Lightning from Blockstream\n',
+      '- LND: Lightning Network Daemon from Lightning Labs\n- CLN: Core Lightning from Blockstream\n- Eclair: from ACINQ\n',
     values: {
       lnd: 'Lightning Network Daemon (LND)',
       cln: 'Core Lightning (CLN)',
+      eclair: 'Eclair',
     },
     default: ['lnd'],
   }),
@@ -132,16 +137,18 @@ export const setNodes = sdk.Action.withInput(
     const nodes = await rtlConfig.read((c) => c.nodes).const(effects)
     if (!nodes) throw new Error('nodes not found in config file')
 
-    const configuredNodes: ('lnd' | 'cln')[] = []
+    const configuredNodes: ('lnd' | 'cln' | 'eclair')[] = []
     if (hasInternal(nodes, 'lnd')) configuredNodes.push('lnd')
     if (hasInternal(nodes, 'c-lightning')) configuredNodes.push('cln')
+    if (hasInternal(nodes, 'eclair')) configuredNodes.push('eclair')
 
     return {
       internalNodes: configuredNodes,
       remoteNodes: await Promise.all(
         nodes
           .filter(
-            (n) =>
+            (n): n is typeof n & { lnImplementation: 'LND' | 'CLN' } =>
+              n.lnImplementation !== 'ECL' &&
               !n.authentication.macaroonPath?.startsWith(lndMountpoint) &&
               !n.authentication.runePath?.startsWith(clnMountpoint),
           )
@@ -233,6 +240,31 @@ export const setNodes = sdk.Action.withInput(
       )
     }
 
+    if (input.internalNodes.includes('eclair')) {
+      const channelBackupPath = `${internalBackupPath}Eclair`
+      await mkdir(toDisk(channelBackupPath), { recursive: true })
+
+      const eclairAddr = await sdk.host
+        .getBridgeAddress(effects, {
+          packageId: 'eclair',
+          hostId: eclairApiHostId,
+          internalPort: eclairApiPort,
+          ssl: false,
+        })
+        .once()
+
+      built.push(
+        await toRtlNode({
+          lnImplementation: 'ECL',
+          lnNode: 'Internal Eclair',
+          // main fills lnApiPassword from Eclair's own config on every start.
+          authentication: {},
+          channelBackupPath,
+          lnServerUrl: eclairAddr ? `http://${eclairAddr}` : undefined,
+        }),
+      )
+    }
+
     const config = await rtlConfig.read().once()
     if (!config) throw new Error('Config file not found')
 
@@ -317,7 +349,7 @@ async function toRtlNode({
   lnServerUrl,
   settings,
 }: {
-  lnImplementation: 'LND' | 'CLN'
+  lnImplementation: 'LND' | 'CLN' | 'ECL'
   lnNode: string
   authentication: RtlConfig['nodes'][0]['authentication']
   channelBackupPath: string

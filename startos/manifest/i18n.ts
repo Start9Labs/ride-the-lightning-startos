@@ -22,15 +22,23 @@ export const depLndDescription = {
   fr_FR: 'Connectez optionnellement RTL à votre nœud LND.',
 }
 
+export const depEclairDescription = {
+  en_US: 'Optionally connect RTL to your Eclair node.',
+  es_ES: 'Conectar opcionalmente RTL a su nodo Eclair.',
+  de_DE: 'Verbinden Sie RTL optional mit Ihrem Eclair-Knoten.',
+  pl_PL: 'Opcjonalnie połącz RTL z węzłem Eclair.',
+  fr_FR: 'Connectez optionnellement RTL à votre nœud Eclair.',
+}
+
 export const long = {
   en_US:
-    'A full function, device agnostic, web user interface for managing lightning nodes. RTL connects directly to your StartOS LND and/or CLN node and is accessible from any browser.',
+    'A full function, device agnostic, web user interface for managing lightning nodes. RTL connects directly to your StartOS LND, Core Lightning and Eclair nodes and is accessible from any browser.',
   es_ES:
-    'Una interfaz web completa, independiente del dispositivo, para gestionar nodos Lightning. RTL se conecta directamente a su nodo LND y/o CLN de StartOS y es accesible desde cualquier navegador.',
+    'Una interfaz web completa, independiente del dispositivo, para gestionar nodos Lightning. RTL se conecta directamente a sus nodos LND, Core Lightning y Eclair de StartOS y es accesible desde cualquier navegador.',
   de_DE:
-    'Eine voll funktionsfähige, geräteunabhängige Weboberfläche zur Verwaltung von Lightning-Knoten. RTL verbindet sich direkt mit Ihrem StartOS LND- und/oder CLN-Knoten und ist über jeden Browser zugänglich.',
+    'Eine voll funktionsfähige, geräteunabhängige Weboberfläche zur Verwaltung von Lightning-Knoten. RTL verbindet sich direkt mit Ihren StartOS-Knoten LND, Core Lightning und Eclair und ist über jeden Browser zugänglich.',
   pl_PL:
-    'Pełnofunkcyjny, niezależny od urządzenia interfejs webowy do zarządzania węzłami Lightning. RTL łączy się bezpośrednio z węzłem LND i/lub CLN StartOS i jest dostępny z dowolnej przeglądarki.',
+    'Pełnofunkcyjny, niezależny od urządzenia interfejs webowy do zarządzania węzłami Lightning. RTL łączy się bezpośrednio z węzłami LND, Core Lightning i Eclair w StartOS i jest dostępny z dowolnej przeglądarki.',
   fr_FR:
-    "Une interface web complète, indépendante de l'appareil, pour gérer les nœuds Lightning. RTL se connecte directement à votre nœud LND et/ou CLN StartOS et est accessible depuis n'importe quel navigateur.",
+    "Une interface web complète, indépendante de l'appareil, pour gérer les nœuds Lightning. RTL se connecte directement à vos nœuds LND, Core Lightning et Eclair sur StartOS et est accessible depuis n'importe quel navigateur.",
 }

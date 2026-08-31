@@ -28,11 +28,14 @@ const shape = z.object({
     .array(
       z.object({
         index: z.number().int().nonnegative(),
-        lnImplementation: z.enum(['LND', 'CLN']).catch('CLN'),
+        lnImplementation: z.enum(['LND', 'CLN', 'ECL']).catch('CLN'),
         lnNode: z.string(),
         authentication: z.object({
           macaroonPath: z.string().optional(),
           runePath: z.string().optional(),
+          // Eclair authenticates with a password rather than a credential
+          // file. main reads it out of Eclair's own config on every start.
+          lnApiPassword: z.string().optional(),
         }),
         settings: z.object({
           themeMode: z.enum(['DAY', 'NIGHT']),

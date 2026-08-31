@@ -26,5 +26,13 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
     }
   }
 
+  if (hasInternal(nodes, 'eclair')) {
+    deps.eclair = {
+      kind: 'running',
+      versionRange: '>=0.14.2:0',
+      healthChecks: ['eclair'],
+    }
+  }
+
   return deps
 })
