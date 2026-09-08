@@ -37,11 +37,11 @@
 
 One upstream image, unmodified.
 
-| Property      | Value                                                               |
-| ------------- | ------------------------------------------------------------------- |
-| Image         | `shahanafarooqui/rtl`                                               |
-| Architectures | Whatever the image publishes — the manifest declares no restriction |
-| Command       | `node rtl`                                                          |
+| Property      | Value                 |
+| ------------- | --------------------- |
+| Image         | `shahanafarooqui/rtl` |
+| Architectures | x86_64 and aarch64    |
+| Command       | `node rtl`            |
 
 | Subcontainer | Purpose                                       |
 | ------------ | --------------------------------------------- |
@@ -104,6 +104,8 @@ One interface, serving RTL's web UI.
 The port is bound on the `main` MultiHost and is not masked.
 
 **RTL's own password is the only thing in front of it**, which is why setting one is a `critical` task. Single sign-on is held off in the config; there is no second authentication layer here.
+
+The package sets `TRUSTED_PROXIES` to the StartOS reverse proxy's fixed bridge address. RTL therefore applies failed-login limits to each client address rather than sharing one limit among everyone using the interface.
 
 ## Installation and First-Run Flow
 
@@ -176,7 +178,7 @@ The `main` volume is copied wholesale — `sdk.Backups.ofVolumes('main')`. No du
 4. **Single sign-on is held off.** The RTL password is the only authentication.
 5. **Removing a node leaves its channel backups on the volume.**
 6. **Internal node credentials are never copied** — the node's directory is mounted read-only and read in place.
-7. **The manifest declares no architecture restriction**, so which architectures work is whatever the published image covers.
+7. **The package supports x86_64 and aarch64.**
 
 ---
 
@@ -185,7 +187,7 @@ The `main` volume is copied wholesale — `sdk.Backups.ofVolumes('main')`. No du
 ```yaml
 package_id: ride-the-lightning
 image: shahanafarooqui/rtl
-architectures: as published by the image # the manifest declares no restriction
+architectures: [x86_64, aarch64]
 subcontainers:
   - rtl-sub # the only container
 volumes:
@@ -194,6 +196,7 @@ file_models:
   - /root/RTL-Config.json
 startos_managed_env_vars:
   - RTL_CONFIG_PATH
+  - TRUSTED_PROXIES # fixed to the StartOS reverse proxy
 dependencies: # each declared only while an internal node of that kind exists
   - lnd # /mnt/lnd, read-only
   - c-lightning # /mnt/cln, read-only
