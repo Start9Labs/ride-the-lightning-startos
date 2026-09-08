@@ -182,6 +182,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
       command: ['node', 'rtl'],
       env: {
         RTL_CONFIG_PATH: '/root',
+        TRUSTED_PROXIES: '10.0.3.1',
       },
     },
     ready: {
