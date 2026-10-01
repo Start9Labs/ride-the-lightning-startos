@@ -1,48 +1,48 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.15.12:0',
+  version: '0.15.13:0',
   releaseNotes: {
-    en_US: `Updated Ride The Lightning to 0.15.12.
+    en_US: `Updated Ride The Lightning to 0.15.13.
 
-- Security: hardens login lockouts and application settings, and protects every state-changing route
-- LND: adds an option to open a channel with the entire wallet balance
-- Eclair: pages large invoice histories and reports channel-open failures correctly
-- StartOS: trusts the OS reverse proxy so login lockouts count each client separately
+- Removes the Boltz swap pages, since Boltz has suspended its swap service
+- Fixes "Invalid CSRF token" on the first login
+- LND: wallets can be initialised with any seed passphrase
+- Loop: on a multi-node setup, each request goes to the selected node's swap server
 
-[Full release notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.12)`,
-    es_ES: `Ride The Lightning actualizado a 0.15.12.
+[Full release notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.13)`,
+    es_ES: `Ride The Lightning actualizado a 0.15.13.
 
-- Seguridad: refuerza los bloqueos de inicio de sesión y la configuración de la aplicación, y protege todas las rutas que cambian el estado
-- LND: añade una opción para abrir un canal con todo el saldo de la cartera
-- Eclair: pagina historiales de facturas grandes e informa correctamente de los fallos al abrir canales
-- StartOS: confía en el proxy inverso del sistema operativo para que los bloqueos de inicio de sesión cuenten cada cliente por separado
+- Elimina las páginas de intercambios de Boltz, ya que Boltz ha suspendido su servicio de intercambios
+- Corrige el error "Invalid CSRF token" en el primer inicio de sesión
+- LND: las carteras se pueden inicializar con cualquier frase de contraseña de la semilla
+- Loop: en una configuración con varios nodos, cada solicitud va al servidor de intercambios del nodo seleccionado
 
-[Notas de la versión completas](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.12)`,
-    de_DE: `Ride The Lightning wurde auf 0.15.12 aktualisiert.
+[Notas de la versión completas](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.13)`,
+    de_DE: `Ride The Lightning wurde auf 0.15.13 aktualisiert.
 
-- Sicherheit: verbessert Anmeldesperren und Anwendungseinstellungen und schützt alle zustandsändernden Routen
-- LND: fügt eine Option hinzu, einen Kanal mit dem gesamten Wallet-Guthaben zu öffnen
-- Eclair: teilt große Rechnungsverläufe in Seiten auf und meldet Fehler beim Öffnen von Kanälen korrekt
-- StartOS: vertraut dem Reverse-Proxy des Betriebssystems, damit Anmeldesperren jeden Client getrennt zählen
+- Entfernt die Boltz-Swap-Seiten, da Boltz seinen Swap-Dienst eingestellt hat
+- Behebt "Invalid CSRF token" bei der ersten Anmeldung
+- LND: Wallets lassen sich mit jeder Seed-Passphrase initialisieren
+- Loop: Bei mehreren Knoten geht jede Anfrage an den Swap-Server des ausgewählten Knotens
 
-[Vollständige Versionshinweise](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.12)`,
-    pl_PL: `Zaktualizowano Ride The Lightning do wersji 0.15.12.
+[Vollständige Versionshinweise](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.13)`,
+    pl_PL: `Zaktualizowano Ride The Lightning do wersji 0.15.13.
 
-- Bezpieczeństwo: wzmacnia blokady logowania i ustawienia aplikacji oraz chroni wszystkie trasy zmieniające stan
-- LND: dodaje opcję otwarcia kanału z wykorzystaniem całego salda portfela
-- Eclair: dzieli duże historie faktur na strony i prawidłowo zgłasza błędy otwierania kanałów
-- StartOS: ufa odwrotnemu serwerowi proxy systemu operacyjnego, dzięki czemu blokady logowania liczą każdego klienta osobno
+- Usuwa strony wymian Boltz, ponieważ Boltz zawiesił swoją usługę wymian
+- Naprawia błąd "Invalid CSRF token" przy pierwszym logowaniu
+- LND: portfele można inicjalizować z dowolnym hasłem do seeda
+- Loop: przy wielu węzłach każde żądanie trafia do serwera wymian wybranego węzła
 
-[Pełne informacje o wydaniu](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.12)`,
-    fr_FR: `Ride The Lightning a été mis à jour vers la version 0.15.12.
+[Pełne informacje o wydaniu](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.13)`,
+    fr_FR: `Ride The Lightning a été mis à jour vers la version 0.15.13.
 
-- Sécurité : renforce le verrouillage des connexions et les paramètres de l'application, et protège toutes les routes qui modifient l'état
-- LND : ajoute une option permettant d'ouvrir un canal avec la totalité du solde du portefeuille
-- Eclair : pagine les historiques de factures volumineux et signale correctement les échecs d'ouverture de canal
-- StartOS : approuve le proxy inverse du système d'exploitation afin que le verrouillage des connexions comptabilise chaque client séparément
+- Supprime les pages d'échange Boltz, Boltz ayant suspendu son service d'échange
+- Corrige l'erreur « Invalid CSRF token » lors de la première connexion
+- LND : les portefeuilles peuvent être initialisés avec n'importe quelle phrase secrète de la graine
+- Loop : sur une configuration à plusieurs nœuds, chaque requête est envoyée au serveur d'échange du nœud sélectionné
 
-[Notes de version complètes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.12)`,
+[Notes de version complètes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.13)`,
   },
   migrations: {},
 })
