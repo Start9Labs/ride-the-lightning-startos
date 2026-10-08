@@ -7,6 +7,9 @@ import {
   clnRestHostId,
   hasInternal,
   lndMountpoint,
+  parseRuneFile,
+  runeFileContents,
+  toDisk,
 } from '../utils'
 import {
   apiHostId as eclairApiHostId,
@@ -17,45 +20,26 @@ import {
   restPort,
 } from 'lnd-startos/startos/interfaces'
 import { clnrestPort } from 'cln-startos/startos/utils'
-const { InputSpec, Value, List } = sdk
+const { InputSpec, Value, List, Variants } = sdk
 
-// Persistent package data volume. RTL's subcontainer bind-mounts it at /root
-// (see main.ts), so paths stored in RTL-Config.json use that form. The action
-// runtime (where this code executes) is a *different* filesystem context where
-// the same volume is reachable at /media/startos/volumes/main. Any disk
-// operation from inside this action must translate /root/... to the action-
-// runtime-visible path; otherwise writes land in an overlay filesystem that
-// RTL never sees, leaving the node entry in the config but no macaroon file
-// where RTL can read it.
-const VOLUME_ROOT_RTL = '/root'
-const VOLUME_ROOT_DISK = '/media/startos/volumes/main'
-const toDisk = (rtlPath: string): string =>
-  rtlPath.startsWith(`${VOLUME_ROOT_RTL}/`)
-    ? `${VOLUME_ROOT_DISK}${rtlPath.slice(VOLUME_ROOT_RTL.length)}`
-    : rtlPath
+type UnindexedNode = Pick<
+  RtlConfig['nodes'][number],
+  'lnImplementation' | 'lnNode' | 'authentication' | 'settings'
+>
 
 export const remoteNodes = Value.list(
   List.obj(
     {
       name: 'Remote Nodes',
-      description: 'List of lightning nodes to manage',
+      description:
+        'LND or Core Lightning nodes on other machines, which RTL reaches at their REST URL. A remote Eclair node cannot be added.',
     },
     {
       spec: InputSpec.of({
-        lnImplementation: Value.select({
-          name: 'Implementation',
-          description:
-            'The underlying lightning node implementation: currently, LND or CLN',
-          values: {
-            LND: 'LND',
-            CLN: 'CLN',
-          },
-          default: 'LND',
-          immutable: false,
-        }),
         lnNode: Value.text({
           name: 'Node Name',
-          description: 'Name of this node in the list',
+          description:
+            'The name RTL shows for this node. Renaming a node starts its channel backups in a new folder and keeps the old one.',
           required: true,
           default: null,
           immutable: false,
@@ -78,20 +62,52 @@ export const remoteNodes = Value.list(
           description: `The fully qualified URL of your node's REST server, including protocol and port.\nNOTE: RTL does not support a .onion URL here`,
           placeholder: 'https://<hostname>.com:8080',
         }),
-        macaroon: Value.text({
-          name: 'Macaroon',
-          required: true,
-          default: null,
+        implementation: Value.union({
+          name: 'Implementation',
           description:
-            'Your admin.macaroon (LND) or access.macaroon (CLN), Base64URL encoded.',
-          masked: true,
-          patterns: [
-            {
-              regex: '[=A-Za-z0-9_-]+',
-              description:
-                'Macaroon must be encoded in Base64URL format (only A-Z, a-z, 0-9, _, - and = allowed)',
+            '- LND: Lightning Network Daemon from Lightning Labs\n- CLN: Core Lightning from Blockstream',
+          default: 'LND',
+          variants: Variants.of({
+            LND: {
+              name: 'LND',
+              spec: InputSpec.of({
+                macaroon: Value.text({
+                  name: 'Macaroon',
+                  required: true,
+                  default: null,
+                  description: 'Your admin.macaroon, Base64URL encoded.',
+                  masked: true,
+                  patterns: [
+                    {
+                      regex: '^[=A-Za-z0-9_-]+$',
+                      description:
+                        'Macaroon must be encoded in Base64URL format (only A-Z, a-z, 0-9, _, - and = allowed)',
+                    },
+                  ],
+                }),
+              }),
             },
-          ],
+            CLN: {
+              name: 'CLN',
+              spec: InputSpec.of({
+                rune: Value.text({
+                  name: 'Rune',
+                  required: true,
+                  default: null,
+                  description:
+                    'A rune for this node, as printed by `lightning-cli createrune`.',
+                  masked: true,
+                  patterns: [
+                    {
+                      regex: '^[=A-Za-z0-9_-]+$',
+                      description:
+                        'A rune contains only A-Z, a-z, 0-9, _, - and =',
+                    },
+                  ],
+                }),
+              }),
+            },
+          }),
         }),
       }),
       displayAs: '{{lnNode}}',
@@ -152,30 +168,45 @@ export const setNodes = sdk.Action.withInput(
               !n.authentication.macaroonPath?.startsWith(lndMountpoint) &&
               !n.authentication.runePath?.startsWith(clnMountpoint),
           )
-          .map(async (n) => {
-            const credDir =
-              n.authentication.macaroonPath || n.authentication.runePath || ''
-            const credFile =
+          .map(async (n) => ({
+            lnNode: n.lnNode,
+            lnServerUrl: n.settings.lnServerUrl,
+            implementation:
               n.lnImplementation === 'LND'
-                ? 'admin.macaroon'
-                : 'access.macaroon'
-            const macaroon = (
-              await readFile(`${toDisk(credDir)}/${credFile}`)
-            ).toString('base64url')
-            return {
-              lnImplementation: n.lnImplementation,
-              lnNode: n.lnNode,
-              lnServerUrl: n.settings.lnServerUrl,
-              macaroon,
-            }
-          }),
+                ? {
+                    selection: 'LND' as const,
+                    value: {
+                      macaroon: (
+                        await readFile(
+                          `${toDisk(n.authentication.macaroonPath ?? '')}/admin.macaroon`,
+                        )
+                      ).toString('base64url'),
+                    },
+                  }
+                : {
+                    selection: 'CLN' as const,
+                    value: {
+                      rune: await readFile(
+                        toDisk(n.authentication.runePath ?? ''),
+                        'utf8',
+                      )
+                        .then(parseRuneFile)
+                        .catch(() => undefined),
+                    },
+                  },
+          })),
       ),
     }
   },
 
   // the execution function
   async ({ effects, input }) => {
-    const built: Omit<RtlConfig['nodes'][number], 'index'>[] = []
+    const config = await rtlConfig.read().once()
+    if (!config) throw new Error('Config file not found')
+    const savedSettings = (lnNode: string) =>
+      config.nodes.find((n) => n.lnNode === lnNode)?.settings
+
+    const built: UnindexedNode[] = []
 
     // The internal-node `lnServerUrl`s below are resolved to the dependency's
     // live LXC-bridge address via the helper's `.once()` (`.startos` DNS is
@@ -205,6 +236,7 @@ export const setNodes = sdk.Action.withInput(
         await toRtlNode({
           lnImplementation: 'LND',
           lnNode: 'Internal LND',
+          settings: savedSettings('Internal LND'),
           authentication: {
             macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet`,
           },
@@ -231,6 +263,7 @@ export const setNodes = sdk.Action.withInput(
         await toRtlNode({
           lnImplementation: 'CLN',
           lnNode: 'Internal CLN',
+          settings: savedSettings('Internal CLN'),
           authentication: {
             runePath: `${clnMountpoint}/.commando-env`,
           },
@@ -257,6 +290,7 @@ export const setNodes = sdk.Action.withInput(
         await toRtlNode({
           lnImplementation: 'ECL',
           lnNode: 'Internal Eclair',
+          settings: savedSettings('Internal Eclair'),
           // main fills lnApiPassword from Eclair's own config on every start.
           authentication: {},
           channelBackupPath,
@@ -265,35 +299,28 @@ export const setNodes = sdk.Action.withInput(
       )
     }
 
-    const config = await rtlConfig.read().once()
-    if (!config) throw new Error('Config file not found')
-
     await Promise.all(
       input.remoteNodes.map(async (node) => {
-        const { lnImplementation, lnNode, lnServerUrl, macaroon } = node
+        const { implementation, lnNode, lnServerUrl } = node
         const hyphenatedName = lnNode.replace(/\s+/g, '-')
 
-        // macaroon: decode base64url string from the form back to raw binary
-        // bytes before persisting. Upstream RTL expects the on-disk file to be
-        // raw macaroon bytes; writing the ASCII base64url text would fail
-        // auth. Write to the action-runtime-visible path so the bytes land in
-        // the persistent data volume that RTL's subcontainer sees at /root.
-        // An LND admin macaroon and a CLN rune are full-control credentials for
-        // the node, so neither the file nor the directory holding it is left at
-        // the default 0644/0755. The chmod is not redundant with the create
-        // mode: both only apply when the entry is created, so an install that
-        // already wrote these at the old modes would otherwise keep them.
+        // Full-control credentials: chmod too, since the create modes don't
+        // tighten files an earlier version wrote.
         const credentialPath = `/root/remote-macaroons/${hyphenatedName}`
         const credentialDir = toDisk(credentialPath)
         await mkdir(credentialDir, { recursive: true, mode: 0o700 })
         await chmod(credentialDir, 0o700)
-        const credentialFile = `${credentialDir}/${
-          lnImplementation === 'LND' ? 'admin' : 'access'
-        }.macaroon`
-        await writeFile(credentialFile, Buffer.from(macaroon, 'base64url'), {
+        const [credentialFile, contents] =
+          implementation.selection === 'LND'
+            ? [
+                'admin.macaroon',
+                Buffer.from(implementation.value.macaroon, 'base64url'),
+              ]
+            : ['rune', runeFileContents(implementation.value.rune)]
+        await writeFile(`${credentialDir}/${credentialFile}`, contents, {
           mode: 0o600,
         })
-        await chmod(credentialFile, 0o600)
+        await chmod(`${credentialDir}/${credentialFile}`, 0o600)
 
         // backup
         // Static channel backups are equally sensitive — they identify channels
@@ -303,21 +330,17 @@ export const setNodes = sdk.Action.withInput(
         await mkdir(channelBackupDir, { recursive: true, mode: 0o700 })
         await chmod(channelBackupDir, 0o700)
 
-        const savedNode = config.nodes.find((n) => n.lnNode === lnNode)
-
-        const authentication =
-          lnImplementation === 'LND'
-            ? { macaroonPath: credentialPath }
-            : { runePath: credentialPath }
-
         built.push(
           await toRtlNode({
-            lnImplementation,
+            lnImplementation: implementation.selection,
             lnNode,
-            authentication,
+            authentication:
+              implementation.selection === 'LND'
+                ? { macaroonPath: credentialPath }
+                : { runePath: `${credentialPath}/rune` },
             channelBackupPath,
             lnServerUrl,
-            settings: savedNode?.settings,
+            settings: savedSettings(lnNode),
           }),
         )
       }),
@@ -355,14 +378,15 @@ async function toRtlNode({
   channelBackupPath: string
   lnServerUrl?: string
   settings?: RtlConfig['nodes'][0]['settings']
-}): Promise<Omit<RtlConfig['nodes'][0], 'index'>> {
+}): Promise<UnindexedNode> {
   return {
     lnImplementation,
     lnNode,
     authentication,
-    settings: settings || {
+    settings: {
       themeMode: 'NIGHT',
       themeColor: 'PINK',
+      ...settings,
       channelBackupPath,
       lnServerUrl,
     },
