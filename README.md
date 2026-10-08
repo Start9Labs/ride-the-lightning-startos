@@ -81,7 +81,7 @@ The address is a reactive read, so it changes only when the dependency is instal
 
 ## Dependencies
 
-Three, all optional, and each declared only while an internal node of that kind is configured.
+Three, all optional, and each active only while an internal node of that kind is configured.
 
 | Dependency    | Kind      | Required when                         | Health check |
 | ------------- | --------- | ------------------------------------- | ------------ |
@@ -89,7 +89,7 @@ Three, all optional, and each declared only while an internal node of that kind 
 | `c-lightning` | `running` | An internal CLN node is configured    | `lightningd` |
 | `eclair`      | `running` | An internal Eclair node is configured | `eclair`     |
 
-Configuring only external nodes leaves this package with no dependencies at all.
+Configuring only external nodes leaves all three inactive.
 
 **The three are reached differently over the bridge.** LND terminates its own TLS, so its URL is `https://`; Core Lightning's REST interface and Eclair's API both serve plaintext, so theirs are `http://`. Eclair also authenticates with a password rather than a credential file, which is why its volume is mounted: the package reads that password out of Eclair's config.
 
@@ -126,8 +126,8 @@ Chooses which Lightning nodes RTL manages.
 
 - **What it changes:** the `nodes` array in `RTL-Config.json`, and through it the package's dependencies, the container's mounts, and the channel-backup directories it creates.
 - **Cost:** seconds, then a restart.
-- **Repeat safety:** idempotent per node, keyed by name. Removing a node from the list removes it from RTL; **the channel backups it took are left on the volume.**
-- **Internal versus external.** An internal node is the LND, Core Lightning or Eclair on this server, wired up with no credential from you. An external node needs its own URL and macaroon, which you supply; external Eclair nodes are not supported, because RTL authenticates Eclair with a password rather than a macaroon.
+- **Repeat safety:** idempotent per node, keyed by name; each node keeps the RTL settings changed in its UI. Removing a node from the list removes it from RTL; **the channel backups it took are left on the volume.**
+- **Internal versus external.** An internal node is the LND, Core Lightning or Eclair on this server, wired up with no credential from you. An external node needs its own URL and credential, which you supply — an admin macaroon for LND or a rune for Core Lightning; external Eclair nodes are not supported, because RTL authenticates Eclair with a password rather than a macaroon.
 - **Node indexes are renumbered positionally** when the list is rewritten, and the default-node index is kept pointing at a real entry.
 
 ### Create Password / Reset Password
@@ -136,12 +136,12 @@ One action whose name flips once a password exists.
 
 - **What it changes:** the password field in `RTL-Config.json`; RTL hashes it on its next start.
 - **Cost:** seconds, then a restart.
-- **Repeat safety:** safe to re-run; each run replaces the previous password.
+- **Repeat safety:** safe to re-run; each run replaces the previous password. Once a password exists, the action asks for confirmation before replacing it.
 - **Outputs:** the new password, shown once.
 
 ## Tasks
 
-Two tasks, and both can come back.
+Two tasks of its own, and both can come back.
 
 | Task            | Severity   | Raised when             | Cleared when    |
 | --------------- | ---------- | ----------------------- | --------------- |
@@ -149,6 +149,8 @@ Two tasks, and both can come back.
 | Create Password | `critical` | No password is set      | The action runs |
 
 Both are checked on every init rather than only at install. Both are `critical` for the same reason: with no nodes the service will not start at all, and with no password the web UI — which can move funds — has nothing in front of it.
+
+While an internal Core Lightning node is configured, the package also raises a `critical` task on Core Lightning's **Plugins** action whenever its CLNrest toggle is off, because RTL reaches Core Lightning only through CLNrest.
 
 ## Health Checks
 
@@ -166,7 +168,7 @@ A service that will not start with a clear message about a node being unreachabl
 
 The `main` volume is copied wholesale — `sdk.Backups.ofVolumes('main')`. No dump step and nothing excluded.
 
-- **Included:** `RTL-Config.json` with the node list, the hashed password, and any external node's macaroon; RTL's own database; and every channel backup it has taken.
+- **Included:** `RTL-Config.json` with the node list, the hashed password, and any external node's macaroon or rune; RTL's own database; and every channel backup it has taken.
 - **Not included:** anything belonging to LND, Core Lightning or Eclair. Channel state and funds are those packages' backups — the channel-backup files here are RTL's copies, not a substitute.
 - **Restore:** complete, and no task is raised. Internal nodes' URLs are re-resolved on the first start, so a node now on a different port is repaired automatically. External nodes keep the URLs you gave them.
 
@@ -197,7 +199,7 @@ file_models:
 startos_managed_env_vars:
   - RTL_CONFIG_PATH
   - TRUSTED_PROXIES # fixed to the StartOS reverse proxy
-dependencies: # each declared only while an internal node of that kind exists
+dependencies: # each active only while an internal node of that kind exists
   - lnd # /mnt/lnd, read-only
   - c-lightning # /mnt/cln, read-only
   - eclair # /mnt/eclair, read-only
@@ -209,6 +211,7 @@ actions:
 tasks:
   - { action: set-nodes, severity: critical } # re-raises whenever no node exists
   - { action: reset-password, severity: critical } # re-raises whenever no password exists
+  - { package: c-lightning, action: plugins, severity: critical, set: { clnrest: true } } # internal CLN only
 health_checks:
   - primary # displayed "Web Interface"
 ```

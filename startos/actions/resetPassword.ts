@@ -8,14 +8,17 @@ export const resetPassword = sdk.Action.withoutInput(
 
   // metadata
   async ({ effects }) => {
-    const config = await rtlConfig.read().const(effects)
-    const hasPass = config?.multiPassHashed
+    const hasPass = await rtlConfig
+      .read((c) => !!(c.multiPassHashed || c.multiPass))
+      .const(effects)
     const desc = 'your user interface password'
 
     return {
       name: hasPass ? 'Reset Password' : 'Create Password',
       description: hasPass ? `Reset ${desc}` : `Create ${desc}`,
-      warning: null,
+      warning: hasPass
+        ? 'Replaces the current RTL password. The old password stops working, and RTL restarts if it is running.'
+        : null,
       allowedStatuses: 'any',
       group: null,
       visibility: 'enabled',

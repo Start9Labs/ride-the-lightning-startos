@@ -31,3 +31,16 @@ export function hasInternal(
       return nodes.some((n) => n.lnImplementation === 'ECL')
   }
 }
+
+// RTL sees the main volume at /root; package code reaches it here.
+const VOLUME_ROOT_RTL = '/root'
+const VOLUME_ROOT_DISK = '/media/startos/volumes/main'
+export const toDisk = (rtlPath: string): string =>
+  rtlPath.startsWith(`${VOLUME_ROOT_RTL}/`)
+    ? `${VOLUME_ROOT_DISK}${rtlPath.slice(VOLUME_ROOT_RTL.length)}`
+    : rtlPath
+
+// The format RTL's getRuneValue parses.
+export const runeFileContents = (rune: string) => `LIGHTNING_RUNE="${rune}"\n`
+export const parseRuneFile = (contents: string) =>
+  contents.match(/LIGHTNING_RUNE="([^"]+)"/)?.[1]
