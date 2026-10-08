@@ -18,15 +18,23 @@ Freshly scaffolded? Work the
 guide page, not a file in this repo — read it, don't copy it in.
 
 Keep `README.md` (technical reference for an AI support or administering agent) and
-`instructions.md` (end-user docs) in sync with your changes.
+`instructions.md` (end-user docs) in sync with your changes. This file restates neither:
+whoever changes the package has both, so it carries only what they don't — repo mechanics,
+a change that looks right and is not, where the next thing gets added, a naming trap, a
+build or test invocation particular to this repo.
 
-**Bugs and feature requests are GitHub issues on this repo** — file them as you find them.
+**Fix a defect you spot rather than reporting it** — you have the package open and the
+context to be sure. File **a GitHub issue on this repo** only when the call isn't yours to
+make: you can't pin the cause down, two defensible fixes exist, or it's too large to ride on
+the work in hand. An open issue is a report, not a queue — implement one when you're asked
+to or when it's labelled `Approved`, then close it with `Closes #<n>`.
+
 Don't record work in the repo instead: no `TODO.md`, no `NOTES.md`, no `PLAN.md`. What you
 verified, tried, and decided belongs in the commit message and the PR body.
 
 ## This repo
 
-- **`main` throws rather than starting without a resolvable node address.** A fabricated loopback placeholder would just pretend to be the dependency and could never work; failing loudly with the dependency named is the intended behaviour.
-- **LND is `https://`, clnrest and Eclair's API are `http://`.** LND terminates its own TLS over the bridge; the other two serve plaintext. Getting this backwards fails at connect time with an opaque error.
-- **Eclair's API password is read from its mounted config, not handed to RTL's own HOCON parser.** RTL will parse an `eclair.conf` itself given `authentication.configPath`, but only through a library that has never been asked to read the JSON form Eclair's package writes. `main` reads the password with Eclair's own file model and writes `lnApiPassword` instead.
-- **Only Eclair's `lnImplementation` marks it internal.** LND and CLN are identified by their credential mountpoint; Eclair has no credential file, and the remote-node form cannot express its password, so every `ECL` node here is the one on this server.
+- **Never give `main` a fallback address for an internal node.** It throws while the dependency's bridge address is unresolved; a placeholder could never reach the dependency.
+- **Keep LND on `https://` and clnrest and Eclair's API on `http://`.** Swapping a scheme fails at connect time with an opaque error.
+- **Don't hand Eclair's config to RTL through `authentication.configPath`.** RTL's HOCON parser has never read the JSON form Eclair's package writes; `main` reads the password with Eclair's own file model instead.
+- **Supporting a remote Eclair node needs a new internal marker first.** `hasInternal` treats every `ECL` node as the one on this server.

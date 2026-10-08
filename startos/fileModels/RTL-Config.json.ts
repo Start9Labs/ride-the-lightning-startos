@@ -4,7 +4,7 @@ import { uiPort } from '../utils'
 
 const host = '0.0.0.0' as const
 
-const shape = z.object({
+const shape = z.looseObject({
   host: z.literal(host).catch(host),
   port: z.literal(uiPort).catch(uiPort),
   // The package writes the plaintext here; RTL hashes it into multiPassHashed
@@ -14,7 +14,7 @@ const shape = z.object({
   multiPassHashed: z.string().catch(''), // set by RTL
   secret2fa: z.string().catch(''), // set by RTL
   SSO: z
-    .object({
+    .looseObject({
       logoutRedirectLink: z.literal('').catch(''),
       rtlCookiePath: z.literal('').catch(''),
       rtlSSO: z.literal(0).catch(0),
@@ -26,18 +26,18 @@ const shape = z.object({
     }),
   nodes: z
     .array(
-      z.object({
+      z.looseObject({
         index: z.number().int().nonnegative(),
         lnImplementation: z.enum(['LND', 'CLN', 'ECL']).catch('CLN'),
         lnNode: z.string(),
-        authentication: z.object({
+        authentication: z.looseObject({
           macaroonPath: z.string().optional(),
           runePath: z.string().optional(),
           // Eclair authenticates with a password rather than a credential
           // file. main reads it out of Eclair's own config on every start.
           lnApiPassword: z.string().optional(),
         }),
-        settings: z.object({
+        settings: z.looseObject({
           themeMode: z.enum(['DAY', 'NIGHT']),
           themeColor: z.enum(['PURPLE', 'TEAL', 'INDIGO', 'PINK', 'YELLOW']),
           channelBackupPath: z.string(),
