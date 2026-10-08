@@ -40,8 +40,7 @@ export const current = VersionInfo.of({
         (n) =>
           n.lnImplementation === 'CLN' &&
           n.authentication.runePath &&
-          !n.authentication.runePath.startsWith(clnMountpoint) &&
-          !n.authentication.runePath.endsWith('/rune'),
+          !n.authentication.runePath.startsWith(clnMountpoint),
       )
       if (!remoteCln.length) return
       for (const n of remoteCln) {
