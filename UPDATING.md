@@ -4,10 +4,10 @@ Ride The Lightning is pulled as a prebuilt image from Docker Hub. The canonical 
 
 ## Determining the upstream version
 
-- **Ride The Lightning** ([Ride-The-Lightning/RTL](https://github.com/Ride-The-Lightning/RTL)) — latest GitHub release:
+- **Ride The Lightning** ([Ride-The-Lightning/RTL](https://github.com/Ride-The-Lightning/RTL)) — list GitHub tags and select the newest stable version rather than relying on the Latest release badge:
 
   ```
-  gh release view -R Ride-The-Lightning/RTL --json tagName -q .tagName
+  gh api 'repos/Ride-The-Lightning/RTL/tags?per_page=100' --jq '.[].name'
   ```
 
   The pin lives in `startos/manifest/index.ts` as `images.rtl.source.dockerTag` (`shahanafarooqui/rtl:v<version>`).
