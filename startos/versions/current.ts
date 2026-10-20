@@ -1,59 +1,51 @@
-import { VersionInfo } from '@start9labs/start-sdk'
-import { readFile, rm, writeFile } from 'fs/promises'
-import { rtlConfig } from '../fileModels/RTL-Config.json'
-import { clnMountpoint, runeFileContents, toDisk } from '../utils'
+import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.15.13:1',
+  version: '0.15.14:0',
   releaseNotes: {
-    en_US: `- Reset Password asks for confirmation before replacing an existing password, and is named Reset Password as soon as a password has been created.
-- The descriptions of Set Nodes' remote node list, implementation and node name explain each choice.
-- Set Nodes takes a rune for a remote Core Lightning node, and remote Core Lightning nodes added earlier now connect.
-- Set Nodes keeps each node's RTL settings, such as theme and currency.
-- With an internal Core Lightning node, RTL raises a task to turn on CLNrest in Core Lightning whenever it is off.`,
-    es_ES: `- Reset Password pide confirmación antes de reemplazar una contraseña existente, y se llama Reset Password en cuanto se ha creado una contraseña.
-- Las descripciones de la lista de nodos remotos, la implementación y el nombre del nodo en Set Nodes explican cada opción.
-- Set Nodes acepta una runa para un nodo remoto de Core Lightning, y los nodos remotos de Core Lightning añadidos antes ahora se conectan.
-- Set Nodes conserva los ajustes de RTL de cada nodo, como el tema y la moneda.
-- Con un nodo interno de Core Lightning, RTL crea una tarea para activar CLNrest en Core Lightning siempre que esté desactivado.`,
-    de_DE: `- Reset Password fragt vor dem Ersetzen eines bestehenden Passworts nach einer Bestätigung und heißt Reset Password, sobald ein Passwort erstellt wurde.
-- Die Beschreibungen der Liste entfernter Knoten, der Implementierung und des Knotennamens in Set Nodes erklären jede Auswahl.
-- Set Nodes nimmt für einen entfernten Core-Lightning-Knoten eine Rune entgegen, und zuvor hinzugefügte entfernte Core-Lightning-Knoten verbinden sich jetzt.
-- Set Nodes behält die RTL-Einstellungen jedes Knotens bei, etwa Design und Währung.
-- Mit einem internen Core-Lightning-Knoten erstellt RTL eine Aufgabe, CLNrest in Core Lightning einzuschalten, sobald es ausgeschaltet ist.`,
-    pl_PL: `- Reset Password prosi o potwierdzenie przed zastąpieniem istniejącego hasła i nazywa się Reset Password, gdy tylko hasło zostanie utworzone.
-- Opisy listy zdalnych węzłów, implementacji i nazwy węzła w akcji Set Nodes wyjaśniają każdy wybór.
-- Set Nodes przyjmuje runę dla zdalnego węzła Core Lightning, a dodane wcześniej zdalne węzły Core Lightning teraz się łączą.
-- Set Nodes zachowuje ustawienia RTL każdego węzła, takie jak motyw i waluta.
-- Przy wewnętrznym węźle Core Lightning RTL tworzy zadanie włączenia CLNrest w Core Lightning, gdy jest ono wyłączone.`,
-    fr_FR: `- Reset Password demande une confirmation avant de remplacer un mot de passe existant, et s'appelle Reset Password dès qu'un mot de passe a été créé.
-- Les descriptions de la liste des nœuds distants, de l'implémentation et du nom du nœud dans Set Nodes expliquent chaque choix.
-- Set Nodes accepte une rune pour un nœud Core Lightning distant, et les nœuds Core Lightning distants ajoutés auparavant se connectent désormais.
-- Set Nodes conserve les réglages RTL de chaque nœud, comme le thème et la devise.
-- Avec un nœud Core Lightning interne, RTL crée une tâche pour activer CLNrest dans Core Lightning dès qu'il est désactivé.`,
+    en_US: `Updated Ride The Lightning to 0.15.14.
+
+- Fixes cross-node session interference and protects LND channel backups when another node fails.
+- Supports Eclair 0.14 payment history and reports; shows fee limits before payments and rebalances.
+- Hardens logout, CSV exports and external links. Block explorer URLs are now configured in RTL-Config.json, not the settings UI; existing URLs are preserved.
+- Updates start-sdk to 3.1.0.
+
+[Full release notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.14)`,
+    es_ES: `Ride The Lightning actualizado a 0.15.14.
+
+- Corrige interferencias entre sesiones de distintos nodos y protege las copias de seguridad de canales LND cuando falla otro nodo.
+- Admite el historial de pagos y los informes de Eclair 0.14; muestra los límites de comisiones antes de pagos y reequilibrios.
+- Refuerza el cierre de sesión, las exportaciones CSV y los enlaces externos. Las URL de exploradores de bloques se configuran ahora en RTL-Config.json, no en la interfaz de ajustes; se conservan las URL existentes.
+- Actualiza start-sdk a 3.1.0.
+
+[Notas de la versión completas](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.14)`,
+    de_DE: `Ride The Lightning wurde auf 0.15.14 aktualisiert.
+
+- Behebt gegenseitige Störungen von Sitzungen verschiedener Knoten und schützt LND-Kanalsicherungen beim Ausfall eines anderen Knotens.
+- Unterstützt den Zahlungsverlauf und Berichte von Eclair 0.14; zeigt Gebührenlimits vor Zahlungen und Rebalancing an.
+- Sichert Abmeldung, CSV-Exporte und externe Links ab. Blockexplorer-URLs werden jetzt in RTL-Config.json statt in der Einstellungsoberfläche konfiguriert; vorhandene URLs bleiben erhalten.
+- Aktualisiert start-sdk auf 3.1.0.
+
+[Vollständige Versionshinweise](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.14)`,
+    pl_PL: `Zaktualizowano Ride The Lightning do wersji 0.15.14.
+
+- Naprawiono wzajemne zakłócanie sesji różnych węzłów i zabezpieczono kopie kanałów LND na wypadek awarii innego węzła.
+- Dodano obsługę historii płatności i raportów Eclair 0.14; limity opłat są pokazywane przed płatnościami i równoważeniem kanałów.
+- Wzmocniono wylogowywanie, eksport CSV i odnośniki zewnętrzne. Adresy eksploratorów bloków konfiguruje się teraz w RTL-Config.json, a nie w interfejsie ustawień; istniejące adresy są zachowywane.
+- Zaktualizowano start-sdk do wersji 3.1.0.
+
+[Pełne informacje o wydaniu](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.14)`,
+    fr_FR: `Ride The Lightning a été mis à jour vers la version 0.15.14.
+
+- Corrige les interférences entre sessions de nœuds différents et protège les sauvegardes de canaux LND lorsqu'un autre nœud tombe en panne.
+- Prend en charge l'historique des paiements et les rapports d'Eclair 0.14 ; affiche les limites de frais avant les paiements et les rééquilibrages.
+- Renforce la déconnexion, les exports CSV et les liens externes. Les URL d'explorateurs de blocs se configurent désormais dans RTL-Config.json, et non dans l'interface des paramètres ; les URL existantes sont conservées.
+- Met à jour start-sdk vers la version 3.1.0.
+
+[Notes de version complètes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.14)`,
   },
   migrations: {
-    up: async ({ effects }) => {
-      const nodes = await rtlConfig.read((c) => c.nodes).once()
-      if (!nodes) return
-      const remoteCln = nodes.filter(
-        (n) =>
-          n.lnImplementation === 'CLN' &&
-          n.authentication.runePath &&
-          !n.authentication.runePath.startsWith(clnMountpoint),
-      )
-      if (!remoteCln.length) return
-      for (const n of remoteCln) {
-        const dir = toDisk(n.authentication.runePath!)
-        const rune = await readFile(`${dir}/access.macaroon`)
-          .then((b) => b.toString('base64url'))
-          .catch(() => null)
-        if (!rune) continue
-        await writeFile(`${dir}/rune`, runeFileContents(rune), { mode: 0o600 })
-        await rm(`${dir}/access.macaroon`)
-        n.authentication.runePath += '/rune'
-      }
-      await rtlConfig.merge(effects, { nodes })
-    },
+    up: async () => {},
+    down: IMPOSSIBLE,
   },
 })
