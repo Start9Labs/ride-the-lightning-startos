@@ -1,46 +1,25 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
+import { rtlConfig } from '../fileModels/RTL-Config.json'
+import { lndMountpoint } from '../utils'
 
 export const current = VersionInfo.of({
-  version: '0.15.17:0',
+  version: '0.15.17:1',
   releaseNotes: {
-    en_US: `Updated Ride The Lightning to 0.15.17. Requires StartOS 0.4.1 or later.
-
-- Fixes login when opening RTL at the site root and clears session cookies correctly on logout.
-- Accepts two-factor authentication codes when the server clock is slightly off.
-- Allows labelling any LND on-chain transaction and keeps routing CSV columns consistent across exports.
-
-[Full release notes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.17)`,
-    es_ES: `Ride The Lightning actualizado a 0.15.17. Requiere StartOS 0.4.1 o posterior.
-
-- Corrige el inicio de sesión al abrir RTL en la raíz del sitio y elimina correctamente las cookies de sesión al cerrar sesión.
-- Acepta códigos de autenticación de dos factores cuando el reloj del servidor está ligeramente desajustado.
-- Permite etiquetar cualquier transacción en cadena de LND y mantiene las columnas CSV de enrutamiento uniformes entre exportaciones.
-
-[Notas de la versión completas](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.17)`,
-    de_DE: `Ride The Lightning wurde auf 0.15.17 aktualisiert. Erfordert StartOS 0.4.1 oder neuer.
-
-- Behebt die Anmeldung beim Öffnen von RTL im Stammverzeichnis der Website und löscht Sitzungscookies beim Abmelden korrekt.
-- Akzeptiert Zwei-Faktor-Authentifizierungscodes bei leicht abweichender Serveruhr.
-- Ermöglicht das Beschriften jeder LND-On-Chain-Transaktion und hält die Spalten von Routing-CSV-Exporten einheitlich.
-
-[Vollständige Versionshinweise](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.17)`,
-    pl_PL: `Zaktualizowano Ride The Lightning do wersji 0.15.17. Wymaga StartOS 0.4.1 lub nowszego.
-
-- Naprawiono logowanie po otwarciu RTL pod głównym adresem witryny oraz poprawiono usuwanie ciasteczek sesji przy wylogowaniu.
-- Akceptuje kody uwierzytelniania dwuskładnikowego przy niewielkim odchyleniu zegara serwera.
-- Umożliwia oznaczanie dowolnej transakcji on-chain LND i zachowuje spójne kolumny w eksportach CSV routingu.
-
-[Pełne informacje o wydaniu](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.17)`,
-    fr_FR: `Ride The Lightning a été mis à jour vers la version 0.15.17. Nécessite StartOS 0.4.1 ou ultérieur.
-
-- Corrige la connexion lors de l'ouverture de RTL à la racine du site et supprime correctement les cookies de session à la déconnexion.
-- Accepte les codes d'authentification à deux facteurs lorsque l'horloge du serveur est légèrement décalée.
-- Permet d'étiqueter toute transaction LND sur la chaîne et conserve des colonnes cohérentes entre les exports CSV de routage.
-
-[Notes de version complètes](https://github.com/Ride-The-Lightning/RTL/releases/tag/v0.15.17)`,
+    en_US: `RTL now reads only the credential it needs from LND, Core Lightning or Eclair, and can no longer read that node's seed or other files. Requires LND 0.21.6-beta:3, Core Lightning 26.6.10:3 or Eclair 0.14.6:2 or later.`,
+    es_ES: `RTL ahora lee solo la credencial que necesita de LND, Core Lightning o Eclair, y ya no puede leer la semilla ni otros archivos de ese nodo. Requiere LND 0.21.6-beta:3, Core Lightning 26.6.10:3 o Eclair 0.14.6:2 o posterior.`,
+    de_DE: `RTL liest von LND, Core Lightning oder Eclair jetzt nur noch die benötigte Zugangsberechtigung und kann den Seed und andere Dateien dieses Knotens nicht mehr lesen. Erfordert LND 0.21.6-beta:3, Core Lightning 26.6.10:3 oder Eclair 0.14.6:2 oder neuer.`,
+    pl_PL: `RTL odczytuje teraz z LND, Core Lightning lub Eclair tylko potrzebne mu poświadczenie i nie może już odczytać seeda ani innych plików tego węzła. Wymaga LND 0.21.6-beta:3, Core Lightning 26.6.10:3 lub Eclair 0.14.6:2 albo nowszych.`,
+    fr_FR: `RTL ne lit désormais que l'identifiant dont il a besoin auprès de LND, Core Lightning ou Eclair, et ne peut plus lire la seed ni les autres fichiers de ce nœud. Nécessite LND 0.21.6-beta:3, Core Lightning 26.6.10:3 ou Eclair 0.14.6:2 ou ultérieur.`,
   },
   migrations: {
-    up: async () => {},
+    up: async ({ effects }) => {
+      const nodes = await rtlConfig.read((c) => c.nodes).once()
+      if (!nodes) return
+      for (const n of nodes)
+        if (n.authentication.macaroonPath?.startsWith(lndMountpoint))
+          n.authentication.macaroonPath = lndMountpoint
+      await rtlConfig.merge(effects, { nodes })
+    },
     down: IMPOSSIBLE,
   },
 })

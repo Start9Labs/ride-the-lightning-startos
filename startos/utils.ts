@@ -12,8 +12,8 @@ export const clnRestHostId = 'clnrest'
 // Internal LND and CLN nodes are identified by their credential mountpoint
 // (LND's macaroon under /mnt/lnd, CLN's rune under /mnt/cln), not by their
 // server URL — main rewrites that URL to the dependency's live LXC-bridge
-// address on every start. Eclair has no credential file, and a remote Eclair
-// node cannot be configured here, so its implementation identifies it.
+// address on every start. A remote Eclair node cannot be configured here, so
+// its implementation identifies it.
 export function hasInternal(
   nodes: RtlConfig['nodes'],
   imp: 'lnd' | 'c-lightning' | 'eclair',

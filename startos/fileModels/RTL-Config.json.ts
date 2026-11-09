@@ -33,8 +33,8 @@ const shape = z.looseObject({
         authentication: z.looseObject({
           macaroonPath: z.string().optional(),
           runePath: z.string().optional(),
-          // Eclair authenticates with a password rather than a credential
-          // file. main reads it out of Eclair's own config on every start.
+          // Eclair authenticates with a password, which main copies in from
+          // Eclair's mounted `password` file on every start.
           lnApiPassword: z.string().optional(),
         }),
         settings: z.looseObject({
