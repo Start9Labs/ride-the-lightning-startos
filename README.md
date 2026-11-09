@@ -49,13 +49,13 @@ One upstream image, unmodified.
 
 ## Volume and Data Layout
 
-One volume, plus a read-only view of each internal node's.
+One volume, plus a read-only view of each internal node's credential.
 
 | Volume | Mount Point | Purpose                                                                 |
 | ------ | ----------- | ----------------------------------------------------------------------- |
 | `main` | `/root`     | `RTL-Config.json`, RTL's own database, and the channel backups it takes |
 
-Each internal node's data directory is mounted **read-only** — `/mnt/lnd`, `/mnt/cln` or `/mnt/eclair` — which is how the package reaches LND's macaroon, Core Lightning's rune, and Eclair's API password. **No node credential is stored by this package**; the macaroon and rune are read in place by RTL, and Eclair's password is copied into `RTL-Config.json` on every start rather than kept anywhere else.
+For each internal node, only the read-only `public` volume tier holding its credential is mounted: LND's `admin/` (`admin.macaroon`, `tls.cert`) at `/mnt/lnd`, Core Lightning's `admin/` (`.commando-env`) at `/mnt/cln`, and Eclair's `api/` (`password`) at `/mnt/eclair`. **No node credential is stored by this package**; the macaroon and rune are read in place by RTL, and Eclair's password is copied into `RTL-Config.json` on every start rather than kept anywhere else.
 
 Channel backups RTL takes land under this volume, one directory per node.
 
@@ -69,7 +69,7 @@ One model, and it is RTL's own configuration file.
 
 **Enforced** — rewritten whenever the package writes: the listen address and port, and the whole SSO block held off.
 
-**Derived** — each internal node's `lnServerUrl`, rewritten by `main` on every start from the dependency's live bridge address, and an internal Eclair node's `lnApiPassword`, re-read on every start from Eclair's own config so a rotation there reaches RTL without the user retyping it. **An internal LND or CLN node is identified by its credential mountpoint, not by its URL** — the macaroon under `/mnt/lnd`, the rune under `/mnt/cln` — because the URL is the thing being rewritten and the mountpoints are stable. Eclair has no credential file to point at, and an external Eclair node cannot be configured here, so its implementation identifies it.
+**Derived** — each internal node's `lnServerUrl`, rewritten by `main` on every start from the dependency's live bridge address, and an internal Eclair node's `lnApiPassword`, re-read on every start from Eclair's mounted `password` file so a rotation there reaches RTL without the user retyping it. **An internal LND or CLN node is identified by its credential mountpoint, not by its URL** — `macaroonPath` `/mnt/lnd`, `runePath` `/mnt/cln/.commando-env` — because the URL is the thing being rewritten and the mountpoints are stable. An external Eclair node cannot be configured here, so its implementation identifies it.
 
 The address is a reactive read, so it changes only when the dependency is installed, uninstalled, or its assigned port moves — a routine node update restarts nothing here. **If an internal node's dependency is not reachable, the service refuses to start** with a message naming it, rather than running against an address that does not resolve.
 
@@ -200,9 +200,9 @@ startos_managed_env_vars:
   - RTL_CONFIG_PATH
   - TRUSTED_PROXIES # fixed to the StartOS reverse proxy
 dependencies: # each active only while an internal node of that kind exists
-  - lnd # /mnt/lnd, read-only
-  - c-lightning # /mnt/cln, read-only
-  - eclair # /mnt/eclair, read-only
+  - lnd # public/admin at /mnt/lnd, read-only
+  - c-lightning # public/admin at /mnt/cln, read-only
+  - eclair # public/api at /mnt/eclair, read-only
 interfaces:
   ui: { type: ui, port: 80 }
 actions:

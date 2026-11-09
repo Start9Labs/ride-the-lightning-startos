@@ -1,3 +1,4 @@
+import { FileHelper } from '@start9labs/start-sdk'
 import { sdk } from './sdk'
 import { rtlConfig } from './fileModels/RTL-Config.json'
 import {
@@ -16,7 +17,6 @@ import {
   restPort,
 } from 'lnd-startos/startos/interfaces'
 import { clnrestPort } from 'cln-startos/startos/utils'
-import { eclairConf } from 'eclair-startos/startos/fileModels/eclair.conf'
 import {
   apiHostId as eclairApiHostId,
   apiPort as eclairApiPort,
@@ -45,8 +45,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
   if (hasLnd) {
     mounts = mounts.mountDependency<typeof lndManifest>({
       dependencyId: 'lnd',
-      volumeId: 'main',
-      subpath: null,
+      volumeId: 'public',
+      subpath: 'admin',
       mountpoint: lndMountpoint,
       readonly: true,
     })
@@ -55,8 +55,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
   if (hasCln) {
     mounts = mounts.mountDependency<typeof clnManifest>({
       dependencyId: 'c-lightning',
-      volumeId: 'main',
-      subpath: null,
+      volumeId: 'public',
+      subpath: 'admin',
       mountpoint: clnMountpoint,
       readonly: true,
     })
@@ -65,8 +65,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
   if (hasEclair) {
     mounts = mounts.mountDependency<typeof eclairManifest>({
       dependencyId: 'eclair',
-      volumeId: 'main',
-      subpath: null,
+      volumeId: 'public',
+      subpath: 'api',
       mountpoint: eclairMountpoint,
       readonly: true,
     })
@@ -136,17 +136,15 @@ export const main = sdk.setupMain(async ({ effects }) => {
       )
     }
 
-    // Eclair authenticates with a password rather than a credential file, and
-    // keeps it in its own config. Read it from the mounted volume on every
-    // start so a rotation reaches RTL without the user retyping it. RTL can
-    // parse that file itself given `configPath`, but only through a HOCON
-    // library that has never been asked to read the JSON form Eclair's package
-    // writes.
+    // Re-read on every start so a rotation in Eclair reaches RTL without the user retyping it.
     const eclairPassword = hasEclair
-      ? await eclairConf
-          .withPath(`${await rtlSub.rootfs}${eclairMountpoint}/eclair.conf`)
-          .read((c) => c['api.password'])
-          .const(effects)
+      ? (
+          await FileHelper.string(
+            `${await rtlSub.rootfs}${eclairMountpoint}/password`,
+          )
+            .read()
+            .const(effects)
+        )?.trim()
       : null
     if (hasEclair && !eclairPassword) {
       throw new Error(

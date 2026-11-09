@@ -238,7 +238,7 @@ export const setNodes = sdk.Action.withInput(
           lnNode: 'Internal LND',
           settings: savedSettings('Internal LND'),
           authentication: {
-            macaroonPath: `${lndMountpoint}/data/chain/bitcoin/mainnet`,
+            macaroonPath: lndMountpoint,
           },
           channelBackupPath,
           lnServerUrl: lndAddr ? `https://${lndAddr}` : undefined,
